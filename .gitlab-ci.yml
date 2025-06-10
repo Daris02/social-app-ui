@@ -1,0 +1,17 @@
+stages:
+  - build
+
+build-windows:
+  stage: build
+  tags:
+    - windows
+  script:
+    - echo "Vérification de Flutter"
+    - flutter --version
+    - flutter config --enable-windows-desktop
+    - flutter pub get
+    - flutter build windows
+  artifacts:
+    paths:
+      - build/windows/runner/Release/
+    expire_in: 1 week
