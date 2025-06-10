@@ -41,13 +41,7 @@ class LoginScreen extends ConsumerWidget {
                     .login(_username.text, _password.text);
 
                 if (success) {
-                  final user = ref.read(
-                    authProvider,
-                  );
-                  final token = user?.token;
-
-                  print("TOKEN => $token");
-
+                  ref.read(authProvider);
                   appRouter.go('/annonces');
                 } else {
                   ScaffoldMessenger.of(

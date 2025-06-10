@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/providers/annonce_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/services/auth_service.dart';
 import '../services/api_service.dart';
 import '../routes/app_router.dart';
@@ -39,6 +38,7 @@ class AnnoncesScreen extends ConsumerWidget {
               );
               _titleController.clear();
               _contentController.clear();
+              // ignore: unused_result
               ref.refresh(annoncesProvider);
               Navigator.pop(context);
             },
@@ -82,13 +82,13 @@ class AnnoncesScreen extends ConsumerWidget {
         child: Icon(Icons.add),
       ),
       body: annonces.when(
-        data: (data) => ListView.builder(
+        data: (data) => data.isEmpty ? Text('No post') : ListView.builder(
           itemCount: data.length,
           itemBuilder: (_, i) {
             final a = data[i];
             return ListTile(
               title: Text(a.title),
-              subtitle: Text("${a.content}\nAuteur: ${a.author}"),
+              subtitle: Text("${a.content}\nAuteur: ${a.author.lastName}"),
               isThreeLine: true,
             );
           },

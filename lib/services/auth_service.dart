@@ -14,25 +14,68 @@ class AuthController extends StateNotifier<User?> {
 
   Future<void> _loadUser() async {
     final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getInt('id');
     final token = prefs.getString('token');
+    final firstName = prefs.getString('firstName');
     final lastName = prefs.getString('lastName');
     final email = prefs.getString('email');
-    final id = prefs.getInt('id');
-    if (token != null && lastName != null && id != null && email != null) {
-      state = User(id: id, lastName: lastName, email: email, token: token);
+    final IM = prefs.getString('IM');
+    final phone = prefs.getString('phone');
+    final address = prefs.getString('address');
+    final position = prefs.getString('position');
+    final attribution = prefs.getString('attribution');
+    final direction = prefs.getString('direction');
+    final entryDate = prefs.getString('entryDate');
+    final senator = prefs.getBool('senator');
+    if (id != null &&
+        firstName != null &&
+        lastName != null &&
+        email != null &&
+        token != null &&
+        IM != null &&
+        phone != null &&
+        address != null &&
+        position != null &&
+        attribution != null &&
+        direction != null &&
+        entryDate != null &&
+        senator != null) {
+      state = User(
+        id: id,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        token: token,
+        IM: IM,
+        phone: phone,
+        address: address,
+        position: position,
+        attribution: attribution,
+        direction: direction,
+        entryDate: DateTime.parse(entryDate),
+        senator: senator,
+      );
     }
   }
 
   Future<bool> login(String email, String password) async {
     try {
-      final data = await ApiService.login(email, password);
-      final user = User.fromJson(data);
-
+      final user = await ApiService.login(email, password);
+      if (user == null || user == 'Fail login') return false;
       final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('id', user.id);
       await prefs.setString('token', user.token);
+      await prefs.setString('firstName', user.firstName);
       await prefs.setString('lastName', user.lastName);
       await prefs.setString('email', user.email);
-      await prefs.setInt('id', user.id);
+      await prefs.setString('IM', user.IM);
+      await prefs.setString('phone', user.phone);
+      await prefs.setString('address', user.address);
+      await prefs.setString('position', user.position);
+      await prefs.setString('attribution', user.attribution);
+      await prefs.setString('direction', user.direction);
+      await prefs.setString('entryDate', user.entryDate.toString());
+      await prefs.setBool('senator', user.senator);
 
       state = user;
       return true;
@@ -41,13 +84,13 @@ class AuthController extends StateNotifier<User?> {
     }
   }
 
-  Future<bool> register(String lastName, String email, String password) async {
+  Future<bool> register(CreateUser newUser) async {
     try {
-      final data = await ApiService.register(lastName, email, password);
+      final data = await ApiService.register(newUser);
       if (data == null) {
         return false;
       }
-      if (data["message"] != 'Inscription réussie') {
+      if (data == 'Fail registration') {
         return false;
       }
       return true;

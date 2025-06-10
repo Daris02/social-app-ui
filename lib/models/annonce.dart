@@ -1,8 +1,10 @@
+import 'package:social_app/models/user.dart';
+
 class Annonce {
   final int id;
   final String title;
   final String content;
-  final String author;
+  final User author;
 
   Annonce({
     required this.id,
@@ -16,7 +18,7 @@ class Annonce {
       id: json['id'],
       title: json['title'],
       content: json['content'],
-      author: json['user']['username'],
+      author: User.fromJson(json['author']),
     );
   }
 }

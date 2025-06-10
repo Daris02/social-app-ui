@@ -18,12 +18,15 @@ class WebRTCSignaling {
     instance.prefs = await SharedPreferences.getInstance();
     instance.token = instance.prefs.getString('token');
     instance.userId = instance.prefs.getInt('id');
-    instance._ws = WebSocketChannel.connect(
-      Uri.parse('ws://192.168.0.53:4000?token=${instance.token}'),
-    );
+    // instance._ws = WebSocketChannel.connect(
+    //   Uri.parse('ws://192.168.0.53:4000?token=${instance.token}'),
+    // );
     // instance._ws = WebSocketChannel.connect(
     //   Uri.parse('ws://192.168.88.201?token=${instance.token}'),
     // );
+    instance._ws = WebSocketChannel.connect(
+      Uri.parse('ws://192.168.8.100?token=${instance.token}'),
+    );
     // instance._ws = WebSocketChannel.connect(
     //   Uri.parse('ws://192.168.112.12?token=${instance.token}'),
     // );
