@@ -1,13 +1,13 @@
-const host = '192.168.8.100'; // 192.168.8.100:4000;
+final host = 'localhost'; // 192.168.8.100:4000;
+final hostProd = 'social-app-api-production-9cb5.up.railway.app';
+final env = 'dev';
 
-const env = 'dev';
+final baseApiUrlLocal = 'http://$host:4000';
+final baseApiUrlProd = 'https://$hostProd';
 
-const baseApiUrlLocal = 'http://$host:4000';
-const baseApiUrlProd = 'https://$host';
+final baseApiUrl = env == 'dev' ? baseApiUrlLocal : baseApiUrlProd;
 
-const baseApiUrl = env == 'dev' ? baseApiUrlLocal : baseApiUrlProd;
+final baseWSUrlLocal = 'ws://$host:4000';
+final baseWSUrlProd = 'wss://$hostProd';
 
-const baseWSUrlLocal = 'ws://$host';
-const baseWSUrlProd = 'wss://$host';
-
-const baseWSUrl = env == 'dev' ? baseWSUrlLocal : baseWSUrlProd;
+final baseWSUrl = env == 'dev' ? baseWSUrlLocal : baseWSUrlProd;
