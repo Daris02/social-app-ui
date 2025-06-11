@@ -3,7 +3,7 @@ import 'package:social_app/screens/call.dart';
 import 'package:social_app/screens/chat.dart';
 import 'package:social_app/screens/login.dart';
 import 'package:social_app/screens/register.dart';
-import 'package:social_app/screens/annonces.dart';
+import 'package:social_app/screens/post.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [

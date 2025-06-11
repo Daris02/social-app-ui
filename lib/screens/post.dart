@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:social_app/providers/annonce_provider.dart';
+import 'package:social_app/providers/post_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/services/auth_service.dart';
 import '../services/api_service.dart';
@@ -32,14 +32,14 @@ class AnnoncesScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () async {
-              await ApiService.createAnnonce(
+              await ApiService.createPost(
                 _titleController.text,
                 _contentController.text,
               );
               _titleController.clear();
               _contentController.clear();
               // ignore: unused_result
-              ref.refresh(annoncesProvider);
+              ref.refresh(postProvider);
               Navigator.pop(context);
             },
             child: Text("Publier"),
@@ -51,7 +51,7 @@ class AnnoncesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final annonces = ref.watch(annoncesProvider);
+    final annonces = ref.watch(postProvider);
 
     return Scaffold(
       appBar: AppBar(

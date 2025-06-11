@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:social_app/models/annonce.dart';
+import 'package:social_app/models/post.dart';
 import 'package:social_app/models/user.dart';
 
 final dio = Dio(
@@ -59,12 +59,12 @@ class ApiService {
     }
   }
 
-  static Future<List<Annonce>> getAnnonces() async {
+  static Future<List<Post>> getPosts() async {
     final res = await dio.get('/posts');
-    return (res.data as List).map((e) => Annonce.fromJson(e)).toList();
+    return (res.data as List).map((e) => Post.fromJson(e)).toList();
   }
 
-  static Future<void> createAnnonce(String title, String content) async {
+  static Future<void> createPost(String title, String content) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
