@@ -13,7 +13,10 @@ class MyApp extends StatelessWidget {
       title: 'Flutter App Auth',
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        colorSchemeSeed: Colors.lightBlue,
+        scaffoldBackgroundColor: Colors.white        
+      ),
     );
   }
 }
