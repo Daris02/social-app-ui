@@ -1,14 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:social_app/constant/api.dart';
 import 'package:social_app/models/post.dart';
 import 'package:social_app/models/user.dart';
 
 final dio = Dio(
   BaseOptions(
-    baseUrl: 'http://192.168.8.100:4000',
-    // baseUrl: 'http://localhost:40   // baseUrl: 'http://192.168.0.53:4000',
-    // baseUrl: 'http://192.168.88.201:4000',
-    // baseUrl: 'http://192.168.112.12:4000',
+    baseUrl: baseApiUrl,
     contentType: 'application/json',
   ),
 );

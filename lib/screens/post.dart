@@ -5,11 +5,11 @@ import 'package:social_app/services/auth_service.dart';
 import '../services/api_service.dart';
 import '../routes/app_router.dart';
 
-class AnnoncesScreen extends ConsumerWidget {
+class PostScreen extends ConsumerWidget {
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
 
-  AnnoncesScreen({super.key});
+  PostScreen({super.key});
 
   void _showCreateDialog(BuildContext context, WidgetRef ref) {
     showDialog(
@@ -51,7 +51,7 @@ class AnnoncesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final annonces = ref.watch(postProvider);
+    final posts = ref.watch(postProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -81,7 +81,7 @@ class AnnoncesScreen extends ConsumerWidget {
         onPressed: () => _showCreateDialog(context, ref),
         child: Icon(Icons.add),
       ),
-      body: annonces.when(
+      body: posts.when(
         data: (data) => data.isEmpty ? Text('No post') : ListView.builder(
           itemCount: data.length,
           itemBuilder: (_, i) {

@@ -9,7 +9,7 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(path: '/', builder: (_, __) => LoginScreen()),
     GoRoute(path: '/register', builder: (_, __) => RegisterScreen()),
-    GoRoute(path: '/annonces', builder: (_, __) => AnnoncesScreen()),
+    GoRoute(path: '/post', builder: (_, __) => PostScreen()),
     GoRoute(path: '/chat', builder: (_, __) => ChatScreen()),
     GoRoute(path: '/call', builder: (_, __) => CallScreen()),
   ],

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:social_app/constant/api.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebRTCSignaling {
@@ -18,18 +19,9 @@ class WebRTCSignaling {
     instance.prefs = await SharedPreferences.getInstance();
     instance.token = instance.prefs.getString('token');
     instance.userId = instance.prefs.getInt('id');
-    // instance._ws = WebSocketChannel.connect(
-    //   Uri.parse('ws://192.168.0.53:4000?token=${instance.token}'),
-    // );
-    // instance._ws = WebSocketChannel.connect(
-    //   Uri.parse('ws://192.168.88.201?token=${instance.token}'),
-    // );
     instance._ws = WebSocketChannel.connect(
-      Uri.parse('ws://192.168.8.100?token=${instance.token}'),
+      Uri.parse('$baseWSUrl?token=${instance.token}'),
     );
-    // instance._ws = WebSocketChannel.connect(
-    //   Uri.parse('ws://192.168.112.12?token=${instance.token}'),
-    // );
     return instance;
   }
 

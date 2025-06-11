@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:social_app/constant/api.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../models/message.dart';
 
@@ -23,11 +24,7 @@ class ChatController extends StateNotifier<List<Message>> {
     final token = prefs.getString('token');
 
     _channel = WebSocketChannel.connect(
-      // Uri.parse('ws://192.168.0.53:4000?token=$token'),
-      Uri.parse('ws://192.168.8.100:4000?token=$token'),
-      // Uri.parse('ws://192.168.88.201:4000?token=$token'),
-      // Uri.parse('ws://192.168.112.12:4000?token=$token'),
-      // Uri.parse('ws://localhost:4000?token=$token'),
+      Uri.parse('$baseWSUrl?token=$token'),
     );
 
     _channel.stream.listen(
