@@ -67,6 +67,7 @@ class WebRTCSignaling {
 
     _ws.stream.listen((data) async {
       final msg = jsonDecode(data);
+      late bool _localDescriptionSet = false;
       print('[WS] Message $msg');
 
       switch (msg['type']) {
@@ -92,6 +93,7 @@ class WebRTCSignaling {
               msg['data']['sdpMLineIndex'],
             ),
           );
+          _localDescriptionSet = true;
           break;
       }
     });
@@ -99,7 +101,12 @@ class WebRTCSignaling {
 
   void _send(String type, String to, dynamic data) {
     _ws.sink.add(
-      jsonEncode({'type': type, 'from': userId.toString(), 'to': to, 'data': data}),
+      jsonEncode({
+        'type': type,
+        'from': userId.toString(),
+        'to': to,
+        'data': data,
+      }),
     );
   }
 
