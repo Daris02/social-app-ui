@@ -14,13 +14,13 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _controller = TextEditingController();
-  String username = "Moi";
+  String username = "";
 
   @override
   void initState() {
     super.initState();
     SharedPreferences.getInstance().then((prefs) {
-      setState(() => username = prefs.getString('username') ?? "Moi");
+      setState(() => username = prefs.getString('email')!);
     });
   }
 
@@ -58,7 +58,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       color: isMe ? Colors.blue[200] : Colors.grey[300],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text('${m.author}: ${m.content}'),
+                    child: Text('${isMe ? 'Moi' : m.author}: ${m.content}'),
                   ),
                 );
               },
