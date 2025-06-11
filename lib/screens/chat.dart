@@ -31,13 +31,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Chat'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () => appRouter.go('/annonces'),
-            tooltip: 'Annonces',
-          ),
-        ],
+        actions: [],
       ),
       body: Column(
         children: [

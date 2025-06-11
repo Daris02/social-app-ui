@@ -16,7 +16,7 @@ class LoginScreen extends ConsumerWidget {
     SharedPreferences.getInstance().then((prefs) {
       final token = prefs.getString('token');
       if (token != null) isConnected = true;
-      if (isConnected) appRouter.go('/annonces');
+      if (isConnected) appRouter.go('/');
     });
 
     return Scaffold(
@@ -42,7 +42,7 @@ class LoginScreen extends ConsumerWidget {
 
                 if (success) {
                   ref.read(authProvider);
-                  appRouter.go('/annonces');
+                  appRouter.go('/');
                 } else {
                   ScaffoldMessenger.of(
                     context,

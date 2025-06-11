@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:social_app/providers/post_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/services/auth_service.dart';
 import '../services/api_service.dart';
-import '../routes/app_router.dart';
 
 class PostScreen extends ConsumerWidget {
   final _titleController = TextEditingController();
@@ -15,7 +13,7 @@ class PostScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text("Nouvelle annonce"),
+        title: Text("Nouvelle Publications"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -55,31 +53,14 @@ class PostScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Annonces"),
+        title: Text("Publications"),
         actions: [
           IconButton(
-            icon: Icon(Icons.chat),
-            onPressed: () => appRouter.go('/chat'),
-            tooltip: 'Chat',
-          ),
-          IconButton(
-            icon: Icon(Icons.video_call),
-            onPressed: () => appRouter.go('/call'),
-            tooltip: 'Call',
-          ),
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            onPressed: () async {
-              final success = await ref.read(authProvider.notifier).logout();
-              if (success) appRouter.go('/');
-            },
-            tooltip: 'Logout',
+            icon: Icon(Icons.add_box_outlined),
+            onPressed: () => _showCreateDialog(context, ref),
+            tooltip: 'Create Post',
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showCreateDialog(context, ref),
-        child: Icon(Icons.add),
       ),
       body: posts.when(
         data: (data) => data.isEmpty ? Text('No post') : ListView.builder(
@@ -95,7 +76,7 @@ class PostScreen extends ConsumerWidget {
         ),
         loading: () => Center(child: CircularProgressIndicator()),
         error: (e, _) {
-          print("Erreur lors du chargement des annonces: $e");
+          print("Erreur lors du chargement des publications: $e");
           return Center(child: Text("Erreur de chargement"));
         },
       ),

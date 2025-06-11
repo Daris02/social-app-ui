@@ -85,8 +85,8 @@ class _CallScreenState extends State<CallScreen> {
           ),
           IconButton(
             icon: Icon(Icons.home),
-            onPressed: () => appRouter.go('/annonces'),
-            tooltip: 'Annonces',
+            onPressed: () => appRouter.go('/post'),
+            tooltip: 'Posts',
           ),
         ],
       ),
