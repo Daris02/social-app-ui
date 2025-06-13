@@ -1,13 +1,13 @@
 final host = 'localhost'; // 192.168.8.100:4000;
 final hostProd = 'social-app-api-production-9cb5.up.railway.app';
-final env = 'dev';
+final ENV = 'dev'; // prod
 
 final baseApiUrlLocal = 'http://$host:4000';
 final baseApiUrlProd = 'https://$hostProd';
 
-final baseApiUrl = env == 'dev' ? baseApiUrlLocal : baseApiUrlProd;
+final baseApiUrl = ENV == 'dev' ? baseApiUrlLocal : baseApiUrlProd;
 
 final baseWSUrlLocal = 'ws://$host:4000';
 final baseWSUrlProd = 'wss://$hostProd';
 
-final baseWSUrl = env == 'dev' ? baseWSUrlLocal : baseWSUrlProd;
+final baseWSUrl = ENV == 'dev' ? baseWSUrlLocal : baseWSUrlProd;
