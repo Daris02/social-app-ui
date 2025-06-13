@@ -1,3 +1,4 @@
+
 class User {
   int id;
   String IM;
@@ -41,7 +42,9 @@ class User {
     if (json['attribution'] == null) json['attribution'] = '';
     if (json['direction'] == null) json['direction'] = '';
     if (json['phone'] == null) json['phone'] = '';
-    if (json['entryDate'] == null) json['entryDate'] = DateTime.now().toString();
+    if (json['entryDate'] == null) {
+      json['entryDate'] = DateTime.now().toString();
+    }
     return User(
       id: json['id'],
       firstName: json['firstName'],
@@ -57,6 +60,11 @@ class User {
       senator: json['senator'],
       token: json['token'],
     );
+  }
+
+  @override
+  String toString() {
+    return '{"id": $id,"firstName":"$firstName","lastName":"$lastName","email":"$email","IM":"$IM","phone":"$phone","address":"$address","attribution":"$attribution","position":"$position","direction":"$direction","entryDate":"${entryDate.toString()}","senator":$senator,"token":"$token"}';
   }
 }
 
