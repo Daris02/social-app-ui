@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/screens/call.dart';
 import 'package:social_app/screens/chat.dart';
 import 'package:social_app/screens/post.dart';
 import 'package:social_app/screens/setting.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({Key? key});
 
   @override
-  _HomeState createState() => _HomeState();
+  ConsumerState createState() => _HomeState();
 }
 
-class _HomeState extends State<HomeScreen> {
+class _HomeState extends ConsumerState<HomeScreen> {
   int pageIndex = 0;
   final pages = [PostScreen(), ChatScreen(), CallScreen(), SettingScreen()];
 
