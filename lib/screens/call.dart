@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:social_app/routes/app_router.dart';
 import 'package:social_app/services/ws_service.dart';
 
 class CallScreen extends StatefulWidget {
@@ -82,11 +81,6 @@ class _CallScreenState extends State<CallScreen> {
             icon: Icon(_isMicEnabled ? Icons.mic : Icons.mic_off),
             onPressed: _toggleMic,
             tooltip: _isMicEnabled ? 'Couper le micro' : 'Activer le micro',
-          ),
-          IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () => appRouter.go('/post'),
-            tooltip: 'Posts',
           ),
         ],
       ),

@@ -67,9 +67,7 @@ class WebRTCSignaling {
 
     _ws.stream.listen((data) async {
       final msg = jsonDecode(data);
-      late bool _localDescriptionSet = false;
-      print('[WS] Message $msg');
-
+      
       switch (msg['type']) {
         case 'offer':
           targetId = msg['from'];
@@ -93,7 +91,6 @@ class WebRTCSignaling {
               msg['data']['sdpMLineIndex'],
             ),
           );
-          _localDescriptionSet = true;
           break;
       }
     });
