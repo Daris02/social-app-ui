@@ -57,6 +57,11 @@ class ApiService {
     }
   }
 
+  static Future<List<User>> getGetFriends() async {
+    final res = await dio.get('/friends');
+    return (res.data as List).map((e) => User.fromJson(e)).toList();
+  }
+
   static Future<List<Post>> getPosts() async {
     final res = await dio.get('/posts');
     return (res.data as List).map((e) => Post.fromJson(e)).toList();
