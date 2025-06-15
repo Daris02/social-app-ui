@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:social_app/models/user.dart';
+import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/routes/app_router.dart';
 import 'package:social_app/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,7 +39,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: Center(
           child: Card(
             elevation: 12,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
             child: Container(
               width: 350,
               padding: const EdgeInsets.all(32),
@@ -48,7 +52,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 16),
                   Text(
                     "Connexion",
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   TextField(
@@ -68,7 +74,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       prefixIcon: const Icon(Icons.lock_outline),
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
-                        icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
+                        icon: Icon(
+                          _obscure ? Icons.visibility : Icons.visibility_off,
+                        ),
                         onPressed: () => setState(() => _obscure = !_obscure),
                       ),
                     ),
@@ -79,7 +87,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         backgroundColor: Colors.blue[700],
                       ),
                       onPressed: _loading
@@ -90,11 +100,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   .read(authProvider.notifier)
                                   .login(_username.text, _password.text);
                               setState(() => _loading = false);
-                              if (success) {
+                              debugPrint('User : $success');
+                              if (success != false) {
+                                ref.read(userProvider.notifier).setUser(success as User);
                                 appRouter.go('/');
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Échec de connexion')),
+                                  const SnackBar(
+                                    content: Text('Échec de connexion'),
+                                  ),
                                 );
                               }
                             },
@@ -102,9 +116,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ? const SizedBox(
                               width: 24,
                               height: 24,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
                             )
-                          : const Text("Se connecter", style: TextStyle(color: Colors.white,fontSize: 16)),
+                          : const Text(
+                              "Se connecter",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 12),

@@ -1,22 +1,47 @@
+import 'package:hive/hive.dart';
 
-class User {
+part 'user.g.dart';
+
+@HiveType(typeId: 0)
+class User extends HiveObject {
+  @HiveField(0)
   int id;
-  String IM;
-  String firstName;
-  String lastName;
-  String email;
-  String phone;
-  String address;
-  String position;
-  String attribution;
-  String direction;
-  DateTime entryDate;
-  bool senator;
-  String token;
 
-  setToken(newToken) {
-    this.token = newToken;
-  }
+  @HiveField(1)
+  String IM;
+
+  @HiveField(2)
+  String firstName;
+
+  @HiveField(3)
+  String lastName;
+
+  @HiveField(4)
+  String email;
+
+  @HiveField(5)
+  String phone;
+
+  @HiveField(6)
+  String address;
+
+  @HiveField(7)
+  String position;
+
+  @HiveField(8)
+  String attribution;
+
+  @HiveField(9)
+  String direction;
+
+  @HiveField(10)
+  DateTime entryDate;
+
+  @HiveField(11)
+  bool senator;
+
+  @HiveField(12)
+  String token;
 
   User({
     required this.id,
@@ -65,7 +90,7 @@ class User {
   @override
   String toString() {
     return '{"id": $id,"firstName":"$firstName","lastName":"$lastName","email":"$email","IM":"$IM","phone":"$phone","address":"$address","attribution":"$attribution","position":"$position","direction":"$direction","entryDate":"${entryDate.toString()}","senator":$senator,"token":"$token"}';
-  }
+  }  
 }
 
 class CreateUser {
