@@ -21,6 +21,8 @@ class ApiService {
       if (res.data['message'] != 'Login successful') return "Fail login";
       final token = res.data['token'];
       final user = User.fromJson(res.data['user']);
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', token);
       user.token = token;
       return user;
     } catch (e) {
@@ -74,6 +76,27 @@ class ApiService {
     await dio.post(
       '/posts',
       data: {'title': title, 'content': content},
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+  }
+
+  static Future<void> likePost(int id, String reaction) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    await dio.post(
+      '/posts/$id/reactions',
+      data: {'reactionType': reaction},
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+  }
+
+  static Future<void> deletePost(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    await dio.delete(
+      '/posts/$id',
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
   }
