@@ -70,7 +70,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit(router) async {
     if (!_formKey.currentState!.validate() || _entryDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Veuillez remplir tous les champs")),
@@ -97,7 +97,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ),
         );
     if (success) {
-      appRouter.go('/login');
+      router.go('/login');
     } else {
       ScaffoldMessenger.of(
         context,
@@ -107,6 +107,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final router = ref.read(appRouterProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Inscription"),
@@ -341,7 +342,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                     if (_step == 2)
                       ElevatedButton(
-                        onPressed: _submit,
+                        onPressed: () => _submit(router),
                         child: Text(
                           "S'inscrire",
                           style: TextStyle(

@@ -15,6 +15,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
+    final router = ref.read(appRouterProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text("Settings"),
@@ -24,7 +25,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
             onPressed: () async {
               final success = await ref.read(authProvider.notifier).logout();
               ref.read(userProvider.notifier).clearUser();
-              if (success) appRouter.go('/login');
+              if (success) router.go('/login');
             },
             tooltip: 'Logout',
           ),

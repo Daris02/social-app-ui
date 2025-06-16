@@ -27,6 +27,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final router = ref.read(appRouterProvider);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
@@ -103,7 +104,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 ref
                                     .read(userProvider.notifier)
                                     .setUser(success);
-                                appRouter.go('/');
+                                router.go('/');
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -131,7 +132,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => appRouter.push('/register'),
+                      onTap: () => router.push('/register'),
                       child: Text(
                         "Register Here",
                         style: TextStyle(fontWeight: FontWeight.bold),
