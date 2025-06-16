@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/screens/call.dart';
 import 'package:social_app/screens/chat.dart';
+import 'package:social_app/screens/notification.dart';
 import 'package:social_app/screens/post.dart';
 import 'package:social_app/screens/setting.dart';
 
@@ -14,14 +14,14 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeState extends ConsumerState<HomeScreen> {
   int pageIndex = 0;
-  final pages = [PostScreen(), ChatScreen(), CallScreen(), SettingScreen()];
+  final pages = [PostScreen(), ChatScreen(), NotificationScreen(), SettingScreen()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: pages[pageIndex],
       bottomNavigationBar: NavigationBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         selectedIndex: pageIndex,
         onDestinationSelected: (index) => {
           setState(() {
@@ -31,13 +31,13 @@ class _HomeState extends ConsumerState<HomeScreen> {
         destinations: [
           NavigationDestination(
             icon: Icon(Icons.blur_circular_outlined),
-            label: 'Posts',
+            label: '',
           ),
-          NavigationDestination(icon: Icon(Icons.chat), label: 'Chat'),
-          NavigationDestination(icon: Icon(Icons.phone), label: 'Call'),
+          NavigationDestination(icon: Icon(Icons.message), label: ''),
+          NavigationDestination(icon: Icon(Icons.notifications), label: '',),
           NavigationDestination(
             icon: Icon(Icons.settings_outlined),
-            label: 'Setting',
+            label: '',
           ),
         ],
       ),
