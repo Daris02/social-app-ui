@@ -18,22 +18,56 @@ class _SettingState extends ConsumerState<SettingScreen> {
     final router = ref.read(appRouterProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Settings"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () async {
-              final success = await ref.read(authProvider.notifier).logout();
-              ref.read(userProvider.notifier).clearUser();
-              if (success) router.go('/login');
-            },
-            tooltip: 'Logout',
-          ),
-        ],
+        title: Text("Profile"),
       ),
       body: Padding(
         padding: EdgeInsetsGeometry.all(20),
-        child: ListView(children: [Text('User data : ${user?.email}')]),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          spacing: 20,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 10,
+              children: [
+                Icon(Icons.person),
+                Text('${user?.firstName} ${user?.lastName}'),
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 10,
+              children: [Icon(Icons.email), Text('${user?.email}')],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 10,
+              children: [Icon(Icons.phone), Text('${user?.phone}')],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 10,
+              children: [Icon(Icons.info), Text('Info plus ...')],
+            ),
+
+
+            GestureDetector(
+              onTap: () async {
+                final success = await ref.read(authProvider.notifier).logout();
+                ref.read(userProvider.notifier).clearUser();
+                if (success) router.go('/login');
+              },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 10,
+                children: [
+                  Icon(Icons.exit_to_app),
+                  Text('Se déconnecter'),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

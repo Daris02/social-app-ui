@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 
@@ -37,8 +38,8 @@ class AuthController extends StateNotifier<User?> {
 
   Future<bool> logout() async {
     try {
-      // final prefs = await SharedPreferences.getInstance();
-      // await prefs.clear();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
       state = null;
       return true;
     } catch (err) {

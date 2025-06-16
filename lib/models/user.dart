@@ -43,6 +43,9 @@ class User extends HiveObject {
   @HiveField(12)
   String token;
 
+  @HiveField(13)
+  String? photo;
+
   User({
     required this.id,
     required this.firstName,
