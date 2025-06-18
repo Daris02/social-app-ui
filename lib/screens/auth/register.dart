@@ -1,9 +1,11 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/components/MyTextField.dart';
+import 'package:social_app/models/direction.dart';
+import 'package:social_app/screens/auth/components/MyTextField.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/auth_provider.dart';
+import 'package:social_app/services/api_service.dart';
 import '../../routes/app_router.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -30,8 +32,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   // Step 3
   String? _position;
-  String? _attribution;
-  String? _direction;
+  final _attribution = TextEditingController();
+  final _service = TextEditingController();
+  Direction? _direction;
   DateTime? _entryDate;
   bool _senator = false;
 
@@ -44,9 +47,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     'AGENT_DE_SERVICE',
   ];
   final List<String> attributions = ['Finance', 'RH', 'Technique'];
-  final List<String> directions = ['Nord', 'Sud', 'Est', 'Ouest'];
+  late List<Direction> directions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDirections();
+  }
 
   int _step = 0;
+
+  void fetchDirections() async {
+    final res = await ApiService.getDirections();
+    setState(() => directions = res);
+  }
 
   void _nextStep() {
     if (_formKey.currentState!.validate()) {
@@ -90,7 +104,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             phone: _phone.text,
             address: _address.text,
             position: _position!,
-            attribution: _attribution!,
+            attribution: _attribution.text,
+            service: _service.text,
             direction: _direction!,
             entryDate: _entryDate!,
             senator: _senator,
@@ -247,32 +262,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 v == null ? "Sélectionnez une position" : null,
                           ),
                           const SizedBox(height: 12),
-                          DropdownButtonFormField<String>(
-                            value: _attribution,
-                            items: attributions
-                                .map(
-                                  (e) => DropdownMenuItem(
-                                    value: e,
-                                    child: Text(e),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (v) => setState(() => _attribution = v),
-                            decoration: const InputDecoration(
-                              labelText: "Attribution",
-                            ),
-                            validator: (v) => v == null
-                                ? "Sélectionnez une attribution"
-                                : null,
+                          MyTextField(
+                            controller: _attribution,
+                            labelText: "Attribution",
                           ),
                           const SizedBox(height: 12),
-                          DropdownButtonFormField<String>(
+                          MyTextField(
+                            controller: _service,
+                            labelText: "Service",
+                          ),
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<Direction>(
                             value: _direction,
                             items: directions
                                 .map(
-                                  (e) => DropdownMenuItem(
-                                    value: e,
-                                    child: Text(e),
+                                  (direction) => DropdownMenuItem(
+                                    value: direction,
+                                    child: Text(direction.name),
                                   ),
                                 )
                                 .toList(),
@@ -307,7 +313,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           CheckboxListTile(
                             value: _senator,
                             onChanged: (v) => setState(() => _senator = v!),
-                            title: const Text("Sénateur"),
+                            title: const Text("secretaire particullier"),
                           ),
                         ],
                       ),

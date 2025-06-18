@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:social_app/models/direction.dart';
 
 part 'user.g.dart';
 
@@ -32,7 +33,7 @@ class User extends HiveObject {
   String attribution;
 
   @HiveField(9)
-  String direction;
+  Direction? direction;
 
   @HiveField(10)
   DateTime entryDate;
@@ -63,37 +64,42 @@ class User extends HiveObject {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
-    if (json['token'] == null) json['token'] = '';
-    if (json['IM'] == null) json['IM'] = '';
-    if (json['address'] == null) json['address'] = '';
-    if (json['position'] == null) json['position'] = '';
-    if (json['attribution'] == null) json['attribution'] = '';
-    if (json['direction'] == null) json['direction'] = '';
-    if (json['phone'] == null) json['phone'] = '';
-    if (json['entryDate'] == null) {
-      json['entryDate'] = DateTime.now().toString();
-    }
     return User(
       id: json['id'],
       firstName: json['firstName'],
       lastName: json['lastName'],
       email: json['email'],
-      IM: json['IM'],
-      phone: json['phone'],
-      address: json['address'],
-      position: json['position'],
-      attribution: json['attribution'],
-      direction: json['direction'],
-      entryDate: DateTime.parse(json['entryDate']),
+      IM: json['IM'] ?? '',
+      phone: json['phone'] ?? '',
+      address: json['address'] ?? '',
+      position: json['position'] ?? '',
+      attribution: json['attribution'] ?? '',
+      direction: json['direction'] != null
+          ? Direction.fromJson(json['direction'])
+          : null,
+      entryDate: DateTime.parse(
+        json['entryDate'] ?? DateTime.now().toIso8601String(),
+      ),
       senator: json['senator'],
-      token: json['token'],
+      token: json['token'] ?? '',
     );
   }
-
-  @override
-  String toString() {
-    return '{"id": $id,"firstName":"$firstName","lastName":"$lastName","email":"$email","IM":"$IM","phone":"$phone","address":"$address","attribution":"$attribution","position":"$position","direction":"$direction","entryDate":"${entryDate.toString()}","senator":$senator,"token":"$token"}';
-  }  
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'firstName': firstName,
+    'lastName': lastName,
+    'email': email,
+    'IM': IM,
+    'phone': phone,
+    'address': address,
+    'position': position,
+    'attribution': attribution,
+    'direction': direction?.toJson(),
+    'entryDate': entryDate.toIso8601String(),
+    'senator': senator,
+    'token': token,
+    'photo': photo,
+  };
 }
 
 class CreateUser {
@@ -107,7 +113,8 @@ class CreateUser {
   String address;
   String position;
   String attribution;
-  String direction;
+  String service;
+  Direction direction;
   DateTime entryDate;
   bool senator;
 
@@ -122,6 +129,7 @@ class CreateUser {
     required this.address,
     required this.position,
     required this.attribution,
+    required this.service,
     required this.direction,
     required this.entryDate,
     required this.senator,
