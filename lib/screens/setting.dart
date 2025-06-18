@@ -54,7 +54,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
             GestureDetector(
               onTap: () async {
                 final success = await ref.read(authProvider.notifier).logout();
-                ref.read(userProvider.notifier).clearUser();
+                await ref.read(userProvider.notifier).clearUser();
                 if (success) router.go('/login');
               },
               child: Row(
