@@ -1,4 +1,4 @@
-final host = 'localhost'; // 192.168.8.100:4000;
+final host = '192.168.0.9'; // 192.168.8.100:4000; // 192.168.0.9
 final hostProd = 'social-app-api-production-9cb5.up.railway.app';
 final ENV = 'dev'; // prod
 
