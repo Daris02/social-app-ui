@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/components/MyButton.dart';
-import 'package:social_app/components/MyTextField.dart';
+import 'package:social_app/screens/auth/components/MyButton.dart';
+import 'package:social_app/screens/auth/components/MyTextField.dart';
 import 'package:social_app/providers/auth_provider.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/routes/app_router.dart';

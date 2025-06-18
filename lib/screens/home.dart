@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/screens/chat.dart';
+import 'package:social_app/screens/messages/chat.dart';
 import 'package:social_app/screens/notification.dart';
-import 'package:social_app/screens/post.dart';
+import 'package:social_app/screens/posts/post.dart';
 import 'package:social_app/screens/setting.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -22,6 +22,7 @@ class _HomeState extends ConsumerState<HomeScreen> {
       body: pages[pageIndex],
       bottomNavigationBar: NavigationBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
+        height: 55,
         selectedIndex: pageIndex,
         onDestinationSelected: (index) => {
           setState(() {
@@ -36,7 +37,7 @@ class _HomeState extends ConsumerState<HomeScreen> {
           NavigationDestination(icon: Icon(Icons.message), label: ''),
           NavigationDestination(icon: Icon(Icons.notifications), label: '',),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
+            icon: Icon(Icons.view_list_rounded),
             label: '',
           ),
         ],
