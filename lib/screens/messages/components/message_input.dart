@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MessageInput extends StatefulWidget {
   final Function(String) onSend;
 
-  const MessageInput({required this.onSend});
+  const MessageInput({super.key, required this.onSend});
 
   @override
   _MessageInputState createState() => _MessageInputState();

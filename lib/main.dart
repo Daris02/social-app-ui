@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:social_app/models/direction.dart';
-import 'package:social_app/models/user.dart';
-import 'package:social_app/providers/auth_provider.dart';
+import 'package:social_app/constant/api.dart';
+import 'routes/app_router.dart';
 import 'package:social_app/theme/dark_mode.dart';
 import 'package:social_app/theme/light_mode.dart';
-import 'routes/app_router.dart';
+import 'package:social_app/providers/auth_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  Hive.registerAdapter(DirectionAdapter());
-  Hive.registerAdapter(UserAdapter());
-  await Hive.openBox<User>('userBox');
+  await dotenv.load(fileName: ".env");
+  DioClient.init();
   runApp(ProviderScope(child: MyApp()));
 }
 

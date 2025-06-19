@@ -31,14 +31,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/',
         builder: (context, state) => HomeScreen(),
         redirect: (context, state) {
-          final user = ref.read(userProvider);
+          final user = ref.watch(userProvider);
           if (user == null) return '/login';
           return null;
         },
       ),
       GoRoute(
         path: '/login',
-        builder: (context, state) => LoginPage(),
+        builder: (context, state) => LoginScreen(),
       ),
       GoRoute(
         path: '/register',

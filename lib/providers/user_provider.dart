@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 
 final userProvider = StateNotifierProvider<UserController, User?>((ref) {
@@ -7,21 +8,30 @@ final userProvider = StateNotifierProvider<UserController, User?>((ref) {
 });
 
 class UserController extends StateNotifier<User?> {
-  final Box<User> _box = Hive.box<User>('userBox');
+  static const _userKey = 'current_user';
 
-  UserController() : super(Hive.box<User>('userBox').get('current')) {
-    _box.watch(key: 'current').listen((event) {
-      state = event.value as User?;
-    });
+  UserController() : super(null) {
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString(_userKey);
+    if (userData != null) {
+      final userMap = jsonDecode(userData);
+      state = User.fromJson(userMap);
+    }
   }
 
   Future<void> setUser(User user) async {
-    await _box.put('current', user);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userKey, jsonEncode(user.toJson()));
     state = user;
   }
 
   Future<void> clearUser() async {
-    await _box.delete('current');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_userKey);
     state = null;
   }
 }

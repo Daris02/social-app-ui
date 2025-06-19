@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/providers/ws_provider.dart';
+import 'package:social_app/services/auth_service.dart';
 import '../models/user.dart';
-import '../services/api_service.dart';
 
 final authProvider = StateNotifierProvider<AuthController, User?>(
   (ref) => AuthController(ref),
@@ -16,7 +17,7 @@ final authInitProvider = FutureProvider<void>((ref) async {
 
   if (userJson != null) {
     final user = User.fromJson(jsonDecode(userJson));
-    ref.read(authProvider.notifier).state = user;
+    // ref.read(authProvider.notifier).state = user;
     ref.read(webSocketServiceProvider).connect(user.token);
     ref.read(webSocketServiceProvider).send('user_connected', {
       'userId': user.id,
@@ -31,7 +32,7 @@ class AuthController extends StateNotifier<User?> {
 
   Future<dynamic> login(String email, String password) async {
     try {
-      final user = await ApiService.login(email, password);
+      final user = await AuthService.login(email, password);
       if (user == null || user == 'Fail login') return false;
 
       final prefs = await SharedPreferences.getInstance();
@@ -42,14 +43,17 @@ class AuthController extends StateNotifier<User?> {
         'userId': user.id,
       });
       return user;
-    } catch (_) {
+    } catch (err) {
+      if (kDebugMode) {
+        print('Error during login: $err');
+      }
       return false;
     }
   }
 
   Future<bool> register(CreateUser newUser) async {
     try {
-      final data = await ApiService.register(newUser);
+      final data = await AuthService.register(newUser);
       if (data == null) {
         return false;
       }

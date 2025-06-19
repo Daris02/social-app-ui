@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:social_app/models/post.dart';
-import 'package:social_app/providers/post_provider.dart';
-import 'package:social_app/services/api_service.dart';
-
 import '../../../models/user.dart';
+import 'package:social_app/models/post.dart';
+import 'package:social_app/services/post_service.dart';
+import 'package:social_app/providers/post_provider.dart';
 
-class PostComponent extends ConsumerStatefulWidget {
+class PostView extends ConsumerStatefulWidget {
   final Post post;
   final User author;
 
-  const PostComponent({super.key, required this.post, required this.author});
+  const PostView({super.key, required this.post, required this.author});
 
   @override
-  ConsumerState<PostComponent> createState() => _PostComponentState();
+  ConsumerState<PostView> createState() => _PostViewState();
 }
 
-class _PostComponentState extends ConsumerState<PostComponent> {
+class _PostViewState extends ConsumerState<PostView> {
   @override
   Widget build(BuildContext context) {
     final dateStr = DateFormat('dd MMM yyyy à HH:mm').format(widget.post.createdAt);
@@ -141,7 +140,7 @@ class _PostComponentState extends ConsumerState<PostComponent> {
                 IconButton(
                   icon: const Icon(Icons.thumb_up_alt_outlined),
                   onPressed: () async {
-                    await ApiService.likePost(widget.post.id, 'LIKE');
+                    await PostService.likePost(widget.post.id, 'LIKE');
                     ref.refresh(postsProvider);
                     setState(() {
                       

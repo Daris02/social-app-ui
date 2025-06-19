@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'components/post_view.dart';
 import 'package:social_app/models/post.dart';
+import 'package:social_app/services/post_service.dart';
 import 'package:social_app/providers/post_provider.dart';
-import 'package:social_app/services/api_service.dart';
-import 'components/PostComponent.dart';
 
 class PostScreen extends ConsumerStatefulWidget {
   const PostScreen({super.key});
@@ -27,7 +27,7 @@ class _PostScreenState extends ConsumerState<PostScreen> {
 
   void fetchPosts() async {
     setState(() => isLoading = true);
-    final data = await ApiService.getPosts();
+    final data = await PostService.getPosts();
     setState(() {
       posts = data;
       filteredPosts = data;
@@ -102,7 +102,7 @@ class _PostScreenState extends ConsumerState<PostScreen> {
               itemCount: filteredPosts.length,
               itemBuilder: (context, index) {
                 final post = filteredPosts[index];
-                return PostComponent(post: post, author: post.author);
+                return PostView(post: post, author: post.author);
               },
             ),
     );
@@ -132,7 +132,7 @@ class _PostScreenState extends ConsumerState<PostScreen> {
         actions: [
           TextButton(
             onPressed: () async {
-              await ApiService.createPost(
+              await PostService.createPost(
                 _titleController.text,
                 _contentController.text,
               );

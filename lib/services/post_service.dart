@@ -3,14 +3,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/constant/api.dart';
 import 'package:social_app/models/post.dart';
 
-final dio = Dio(
-  BaseOptions(baseUrl: baseApiUrl, contentType: 'application/json'),
-);
-
 class PostService {
+  static final dio = DioClient.dio;
   
   static Future<List<Post>> getPosts() async {
-    final res = await dio.get('/posts');
+    final res = await DioClient.dio.get('/posts');
     return (res.data as List).map((e) => Post.fromJson(e)).toList();
   }
 

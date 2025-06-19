@@ -20,7 +20,7 @@ class WebRTCSignaling {
     instance.token = instance.prefs.getString('token');
     instance.userId = instance.prefs.getInt('id');
     instance._ws = WebSocketChannel.connect(
-      Uri.parse('$baseWSUrl?token=${instance.token}'),
+      Uri.parse('${DioClient.baseSocket}?token=${instance.token}'),
     );
     return instance;
   }

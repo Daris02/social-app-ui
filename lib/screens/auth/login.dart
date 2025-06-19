@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/screens/auth/components/MyButton.dart';
-import 'package:social_app/screens/auth/components/MyTextField.dart';
+import 'package:social_app/routes/app_router.dart';
 import 'package:social_app/providers/auth_provider.dart';
 import 'package:social_app/providers/user_provider.dart';
-import 'package:social_app/routes/app_router.dart';
+import 'package:social_app/screens/auth/components/my_button.dart';
+import 'package:social_app/screens/auth/components/my_text_field.dart';
 
-// ignore: must_be_immutable
-class LoginPage extends ConsumerStatefulWidget {
-  const LoginPage({super.key});
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  ConsumerState<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends ConsumerState<LoginPage> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController();
   final _password = TextEditingController();
@@ -99,7 +98,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               final success = await ref
                                   .read(authProvider.notifier)
                                   .login(_email.text, _password.text);
-                              debugPrint('User : $success');
                               if (success != false) {
                                 ref
                                     .read(userProvider.notifier)

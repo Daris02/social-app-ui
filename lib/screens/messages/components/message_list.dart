@@ -5,7 +5,7 @@ class MessageList extends StatelessWidget {
   final List<Message> messages;
   final int currentUserId;
 
-  const MessageList({required this.messages, required this.currentUserId});
+  const MessageList({super.key, required this.messages, required this.currentUserId});
 
   @override
   Widget build(BuildContext context) {

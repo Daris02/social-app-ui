@@ -8,12 +8,12 @@ import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/screens/messages/components/message_input.dart';
 import 'package:social_app/screens/messages/components/message_list.dart';
-import 'package:social_app/services/api_service.dart';
+import 'package:social_app/services/message_service.dart';
 
 class MessageView extends ConsumerStatefulWidget {
   final User partner;
 
-  const MessageView({required this.partner});
+  const MessageView({super.key, required this.partner});
 
   @override
   ConsumerState<MessageView> createState() => _MessageViewState();
@@ -52,7 +52,7 @@ class _MessageViewState extends ConsumerState<MessageView> {
   }
 
   void fetchMessages() async {
-    final fetched = await ApiService.getMessages(widget.partner.id);
+    final fetched = await MessageService.getMessages(widget.partner.id);
     setState(() {
       messages = List.from(fetched)
         ..sort((a, b) => a.createdAt.compareTo(b.createdAt));

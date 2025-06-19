@@ -22,7 +22,7 @@ class WebSocketService {
     if (_socket != null && _socket!.connected) return;
 
     _socket = IO.io(
-      baseApiUrl,
+      DioClient.baseSocket,
       IO.OptionBuilder().setTransports(['websocket']).enableForceNew().setQuery(
         {'token': token},
       ).build(),

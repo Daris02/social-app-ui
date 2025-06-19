@@ -1,14 +1,11 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/constant/api.dart';
 import 'package:social_app/models/user.dart';
 
-final dio = Dio(
-  BaseOptions(baseUrl: baseApiUrl, contentType: 'application/json'),
-);
-
 class AuthService {
+  static final dio = DioClient.dio;
+  
   static dynamic login(String email, String password) async {
     try {
       final res = await dio.post(

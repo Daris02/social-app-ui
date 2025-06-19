@@ -6,17 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/ws_provider.dart';
-import 'package:social_app/services/api_service.dart';
-import 'package:social_app/screens/messages/components/MyCircle.dart';
-import 'package:social_app/screens/messages/components/MySquare.dart';
+import 'package:social_app/services/user_service.dart';
+import 'package:social_app/screens/messages/components/user_circle_view.dart';
+import 'package:social_app/screens/messages/components/last_message_view.dart';
 
-class ChatScreen extends ConsumerStatefulWidget {
-  const ChatScreen({super.key});
+class MessageScreen extends ConsumerStatefulWidget {
+  const MessageScreen({super.key});
   @override
-  ConsumerState<ChatScreen> createState() => _ChatScreenState();
+  ConsumerState<MessageScreen> createState() => _MessageScreenState();
 }
 
-class _ChatScreenState extends ConsumerState<ChatScreen> {
+class _MessageScreenState extends ConsumerState<MessageScreen> {
   late List<User> _contacts = [];
   late StreamSubscription<Set<int>> _userStatusSub;
 
@@ -36,7 +36,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void fetchContacts() async {
-    final data = await ApiService.getContacts();
+    final data = await UserService.getContacts();
     if (mounted) {
       setState(() {
         _contacts = data;
@@ -62,7 +62,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               scrollDirection: Axis.horizontal,
               itemCount: _contacts.length,
               itemBuilder: (context, index) {
-                return MyCircle(user: _contacts[index]);
+                return UserCircleView(user: _contacts[index]);
               },
             ),
           ),
@@ -91,7 +91,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return ListView.builder(
       itemCount: _contacts.length,
       itemBuilder: (context, index) {
-        return MySquare(user: _contacts[index]);
+        return LastMessageView(user: _contacts[index]);
       },
     );
   }

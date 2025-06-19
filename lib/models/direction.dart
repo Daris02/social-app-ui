@@ -1,13 +1,6 @@
-import 'package:hive/hive.dart';
 
-part 'direction.g.dart';
-
-@HiveType(typeId: 1)
-class Direction extends HiveObject {
-  @HiveField(0)
+class Direction {
   int id;
-
-  @HiveField(1)
   String name;
 
   Direction({required this.id, required this.name});

@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/screens/messages/message_view.dart';
-class MyCircle extends ConsumerWidget {
+
+class UserCircleView extends ConsumerWidget {
   final User user;
 
-  const MyCircle({required this.user});
+  const UserCircleView({super.key, required this.user});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

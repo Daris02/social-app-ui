@@ -1,13 +1,26 @@
-final host = '192.168.0.9'; // 192.168.8.100:4000; // 192.168.0.9
-final hostProd = 'social-app-api-production-9cb5.up.railway.app';
-final ENV = 'dev'; // prod
+// dio_client.dart
+import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-final baseApiUrlLocal = 'http://$host:4000';
-final baseApiUrlProd = 'https://$hostProd';
+class DioClient {
+  static late Dio dio;
+  static late String baseSocket;
 
-final baseApiUrl = ENV == 'dev' ? baseApiUrlLocal : baseApiUrlProd;
+  static void init() {
+    final env = dotenv.env['ENV'];
+    final host = dotenv.env['HOST'];
+    final hostProd = dotenv.env['HOST_PROD'];
 
-final baseWSUrlLocal = 'ws://$host:4000';
-final baseWSUrlProd = 'wss://$hostProd';
+    final baseApiUrlLocal = 'http://$host:4000';
+    final baseApiUrlProd = 'https://$hostProd';
+    final baseApiUrl = env == 'dev' ? baseApiUrlLocal : baseApiUrlProd;
 
-final baseWSUrl = ENV == 'dev' ? baseWSUrlLocal : baseWSUrlProd;
+    dio = Dio(
+      BaseOptions(baseUrl: baseApiUrl, contentType: 'application/json'),
+    );
+
+    final baseSocketLocal = 'ws://$host:4000';
+    final baseSocketProd = 'wss://$hostProd';
+    baseSocket = env == 'dev' ? baseSocketLocal : baseSocketProd;
+  }
+}

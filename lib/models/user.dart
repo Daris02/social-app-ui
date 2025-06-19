@@ -1,50 +1,32 @@
-import 'package:hive/hive.dart';
 import 'package:social_app/models/direction.dart';
 
-part 'user.g.dart';
-
-@HiveType(typeId: 0)
-class User extends HiveObject {
-  @HiveField(0)
+class User {
   int id;
 
-  @HiveField(1)
   String IM;
 
-  @HiveField(2)
   String firstName;
 
-  @HiveField(3)
   String lastName;
 
-  @HiveField(4)
   String email;
 
-  @HiveField(5)
   String phone;
 
-  @HiveField(6)
   String address;
 
-  @HiveField(7)
   String position;
 
-  @HiveField(8)
   String attribution;
 
-  @HiveField(9)
   Direction? direction;
 
-  @HiveField(10)
   DateTime entryDate;
 
-  @HiveField(11)
   bool senator;
 
-  @HiveField(12)
   String token;
 
-  @HiveField(13)
   String? photo;
 
   User({
@@ -57,10 +39,11 @@ class User extends HiveObject {
     required this.address,
     required this.position,
     required this.attribution,
-    required this.direction,
     required this.entryDate,
     required this.senator,
     required this.token,
+    this.direction,
+    this.photo,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -74,6 +57,7 @@ class User extends HiveObject {
       address: json['address'] ?? '',
       position: json['position'] ?? '',
       attribution: json['attribution'] ?? '',
+      photo: json['photo'] ?? '',
       direction: json['direction'] != null
           ? Direction.fromJson(json['direction'])
           : null,

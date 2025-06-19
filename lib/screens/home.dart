@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/screens/messages/chat.dart';
-import 'package:social_app/screens/notification.dart';
-import 'package:social_app/screens/posts/post.dart';
 import 'package:social_app/screens/setting.dart';
+import 'package:social_app/screens/posts/post.dart';
+import 'package:social_app/screens/notification.dart';
+import 'package:social_app/screens/messages/message.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({Key? key});
@@ -14,7 +14,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeState extends ConsumerState<HomeScreen> {
   int pageIndex = 0;
-  final pages = [PostScreen(), ChatScreen(), NotificationScreen(), SettingScreen()];
+  final pages = [PostScreen(), MessageScreen(), NotificationScreen(), SettingScreen()];
 
   @override
   Widget build(BuildContext context) {

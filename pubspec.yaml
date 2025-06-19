@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
   dio: ^5.8.0+1
@@ -21,26 +20,27 @@ dependencies:
   provider: ^6.1.5
   flutter_webrtc: ^0.14.1
   intl: ^0.20.2
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
   icons_launcher: ^3.0.1
   socket_io_client: ^3.1.2
   path_provider: ^2.1.5
+  google_nav_bar: ^5.0.7
+  hero_animation: ^1.1.4
+  floating_navbar: ^3.0.0
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^5.0.0
-  build_runner: ^2.4.15
-  hive_generator: ^2.0.1
   flutter_launcher_icons: ^0.14.4
+  rename_app: ^1.6.3
 
 flutter:
 
   uses-material-design: true
 
   assets:
+    - .env
     - assets/images/groot_1.jpg
     - assets/logos/logo-senat.png
 

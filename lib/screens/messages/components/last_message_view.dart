@@ -1,28 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/user.dart';
-import 'package:social_app/providers/user_provider.dart';
-import 'package:social_app/screens/messages/components/MyCircle.dart';
+import 'package:social_app/services/message_service.dart';
 import 'package:social_app/screens/messages/message_view.dart';
-import 'package:social_app/services/api_service.dart';
+import 'package:social_app/screens/messages/components/user_circle_view.dart';
 
-class MySquare extends ConsumerWidget {
+class LastMessageView extends ConsumerWidget {
   final User user;
 
-  const MySquare({required this.user});
+  const LastMessageView({super.key, required this.user});
 
   Future<String> _getLastMessage(int partnerId) async {
-    final messages = await ApiService.getMessages(partnerId);
+    final messages = await MessageService.getMessages(partnerId);
     if (messages.isNotEmpty) {
-      return messages.first.content ?? 'Aucun message';
+      return messages.first.content;
     }
     return 'Aucun message récent';
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentUserId = ref.read(userProvider)!.id;
-
     return FutureBuilder<String>(
       future: _getLastMessage(user.id),
       builder: (context, snapshot) {
@@ -34,7 +31,7 @@ class MySquare extends ConsumerWidget {
               builder: (_) => MessageView(partner: user),
             ));
           },
-          leading: MyCircle(user: user),
+          leading: UserCircleView(user: user),
           title: Text('${user.firstName} ${user.lastName}'),
           subtitle: Text(
             lastMessage,

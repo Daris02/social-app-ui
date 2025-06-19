@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class VideoCallScreen extends ConsumerStatefulWidget {
   final int roomId;
-  const VideoCallScreen({required this.roomId});
+  const VideoCallScreen({super.key, required this.roomId});
 
   @override
   ConsumerState<VideoCallScreen> createState() => _VideoCallScreenState();

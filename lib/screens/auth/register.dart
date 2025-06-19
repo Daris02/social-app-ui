@@ -1,15 +1,15 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/models/direction.dart';
-import 'package:social_app/screens/auth/components/MyTextField.dart';
-import 'package:social_app/models/user.dart';
-import 'package:social_app/providers/auth_provider.dart';
-import 'package:social_app/services/api_service.dart';
 import '../../routes/app_router.dart';
+import 'package:social_app/models/user.dart';
+import 'package:social_app/models/direction.dart';
+import 'package:social_app/services/user_service.dart';
+import 'package:social_app/providers/auth_provider.dart';
+import 'package:social_app/screens/auth/components/my_text_field.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
-  RegisterScreen({super.key});
+  const RegisterScreen({super.key});
   @override
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
@@ -58,7 +58,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   int _step = 0;
 
   void fetchDirections() async {
-    final res = await ApiService.getDirections();
+    final res = await UserService.getDirections();
     setState(() => directions = res);
   }
 
