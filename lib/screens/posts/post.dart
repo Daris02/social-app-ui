@@ -61,7 +61,9 @@ class _PostScreenState extends ConsumerState<PostScreen> {
                 autofocus: true,
                 decoration: InputDecoration(
                   hintText: "Rechercher...",
-                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
                   border: InputBorder.none,
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.close),
@@ -94,17 +96,22 @@ class _PostScreenState extends ConsumerState<PostScreen> {
           ),
         ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : filteredPosts.isEmpty
-          ? const Center(child: Text('Aucun résultat'))
-          : ListView.builder(
-              itemCount: filteredPosts.length,
-              itemBuilder: (context, index) {
-                final post = filteredPosts[index];
-                return PostView(post: post, author: post.author);
-              },
-            ),
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : filteredPosts.isEmpty
+              ? const Center(child: Text('Aucun résultat'))
+              : ListView.builder(
+                  itemCount: filteredPosts.length,
+                  itemBuilder: (context, index) {
+                    final post = filteredPosts[index];
+                    return PostView(post: post, author: post.author);
+                  },
+                ),
+        ),
+      ),
     );
   }
 

@@ -30,7 +30,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
-        child: Padding(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
           padding: const EdgeInsets.all(8.0),
           child: Form(
             key: _formKey,
