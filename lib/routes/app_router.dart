@@ -31,7 +31,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/',
         builder: (context, state) => HomeScreen(),
         redirect: (context, state) {
-          final user = ref.watch(userProvider);
+          final user = ref.read(userProvider);
           if (user == null) return '/login';
           return null;
         },
