@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:social_app/models/enums/position.dart';
 import '../../routes/app_router.dart';
 import 'package:social_app/models/create_user.dart';
 import 'package:social_app/providers/user_provider.dart';
@@ -30,22 +31,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _address = TextEditingController();
 
   // Step 3
-  String? _position;
+  Position? _position;
   final _attribution = TextEditingController();
   final _service = TextEditingController();
   Direction? _direction;
   DateTime? _entryDate;
   bool _senator = false;
-
-  final List<String> positions = [
-    'SG',
-    'IGS',
-    'DIRECTEUR',
-    'CHEF_DE_SERVICE',
-    'CHEF_DE_DIVISION',
-    'AGENT_DE_SERVICE',
-  ];
-  final List<String> attributions = ['Finance', 'RH', 'Technique'];
 
   @override
   void initState() {
@@ -95,7 +86,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             confirmPassword: _confirmPassword.text,
             phone: _phone.text,
             address: _address.text,
-            position: _position!,
+            position: _position,
             attribution: _attribution.text,
             service: _service.text,
             direction: _direction!,
@@ -103,7 +94,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             senator: _senator,
           ),
         );
-    debugPrint('Registration : $success');
     if (success) {
       router.go('/login');
     } else {
@@ -237,13 +227,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          DropdownButtonFormField<String>(
+                          DropdownButtonFormField<Position>(
                             value: _position,
-                            items: positions
+                            items: Position.values
                                 .map(
-                                  (e) => DropdownMenuItem(
-                                    value: e,
-                                    child: Text(e),
+                                  (position) => DropdownMenuItem(
+                                    value: position,
+                                    child: Text(position.name),
                                   ),
                                 )
                                 .toList(),

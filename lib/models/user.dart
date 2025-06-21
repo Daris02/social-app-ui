@@ -1,33 +1,27 @@
-import 'package:social_app/models/direction.dart';
+import 'package:social_app/models/enums/bureau_permanant.dart';
+import 'package:social_app/models/enums/direction.dart';
+import 'package:social_app/models/enums/position.dart';
+import 'package:social_app/models/enums/role.dart';
 
 class User {
   int id;
-
   String IM;
-
   String firstName;
-
   String lastName;
-
   String email;
-
   String phone;
-
   String address;
-
-  String position;
-
-  String attribution;
-
-  Direction? direction;
-
-  DateTime entryDate;
-
-  bool senator;
-
-  String token;
-
   String? photo;
+  Position position;
+  String attribution;
+  String? service;
+  Direction? direction;
+  Role role;
+  DateTime entryDate;
+  bool? senator;
+  bool? secretaireParticullier;
+  BureauPermanent? bureau;
+  String token;
 
   User({
     required this.id,
@@ -39,11 +33,15 @@ class User {
     required this.address,
     required this.position,
     required this.attribution,
+    required this.service,
     required this.entryDate,
-    required this.senator,
+    required this.role,
+    this.senator,
     required this.token,
     this.direction,
     this.photo,
+    this.bureau,
+    this.secretaireParticullier,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -53,19 +51,21 @@ class User {
       lastName: json['lastName'],
       email: json['email'],
       IM: json['IM'] ?? '',
+      role: roleFromString(json['role']),
       phone: json['phone'] ?? '',
       address: json['address'] ?? '',
-      position: json['position'] ?? '',
+      direction: directionFromString(json['direction']),
+      position: positionFromString(json['position']) ?? Position.unknown,
       attribution: json['attribution'] ?? '',
+      service: json['service'] ?? '',
       photo: json['photo'] ?? '',
-      direction: json['direction'] != null
-          ? Direction.fromJson(json['direction'])
-          : null,
       entryDate: DateTime.parse(
         json['entryDate'] ?? DateTime.now().toIso8601String(),
       ),
       senator: json['senator'],
       token: json['token'] ?? '',
+      bureau: bureauFromString(json['bureau']),
+      secretaireParticullier: json['secretaireParticullier'] ?? false,
     );
   }
   Map<String, dynamic> toJson() => {
@@ -76,46 +76,34 @@ class User {
     'IM': IM,
     'phone': phone,
     'address': address,
-    'position': position,
+    'position': position.name,
     'attribution': attribution,
-    'direction': direction?.toJson(),
+    'direction': direction?.name,
+    'role': role.name,
     'entryDate': entryDate.toIso8601String(),
     'senator': senator,
     'token': token,
     'photo': photo,
+    'secretaireParticullier': secretaireParticullier,
+    'bureau': bureau?.name,
   };
-}
 
-class CreateUser {
-  String firstName;
-  String lastName;
-  String email;
-  String IM;
-  String password;
-  String confirmPassword;
-  String phone;
-  String address;
-  String position;
-  String attribution;
-  String service;
-  Direction direction;
-  DateTime entryDate;
-  bool senator;
+  static Role roleFromString(String value) {
+    return Role.values.firstWhere((e) => e.name == value);
+  }
 
-  CreateUser({
-    required this.firstName,
-    required this.lastName,
-    required this.email,
-    required this.IM,
-    required this.password,
-    required this.confirmPassword,
-    required this.phone,
-    required this.address,
-    required this.position,
-    required this.attribution,
-    required this.service,
-    required this.direction,
-    required this.entryDate,
-    required this.senator,
-  });
+  static Direction? directionFromString(String? value) {
+    if (value == null) return null;
+    return Direction.values.firstWhere((e) => e.name == value);
+  }
+
+  static Position? positionFromString(String? value) {
+    if (value == null) return null;
+    return Position.values.firstWhere((e) => e.name == value);
+  }
+
+  static BureauPermanent? bureauFromString(String? value) {
+    if (value == null) return null;
+    return BureauPermanent.values.firstWhere((e) => e.name == value);
+  }
 }
