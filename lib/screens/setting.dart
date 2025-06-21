@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/providers/auth_provider.dart';
 import 'package:social_app/providers/user_provider.dart';
 import '../routes/app_router.dart';
 
@@ -17,9 +16,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
     final user = ref.watch(userProvider);
     final router = ref.read(appRouterProvider);
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Profile"),
-      ),
+      appBar: AppBar(title: Text("Profile")),
       body: Padding(
         padding: EdgeInsetsGeometry.all(20),
         child: Column(
@@ -50,20 +47,16 @@ class _SettingState extends ConsumerState<SettingScreen> {
               children: [Icon(Icons.info), Text('Info plus ...')],
             ),
 
-
             GestureDetector(
               onTap: () async {
-                final success = await ref.read(authProvider.notifier).logout();
+                final success = await ref.read(userProvider.notifier).logout();
                 await ref.read(userProvider.notifier).clearUser();
                 if (success) router.go('/login');
               },
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 10,
-                children: [
-                  Icon(Icons.exit_to_app),
-                  Text('Se déconnecter'),
-                ],
+                children: [Icon(Icons.exit_to_app), Text('Se déconnecter')],
               ),
             ),
           ],

@@ -25,7 +25,9 @@ class GoRouterRefreshStream extends ChangeNotifier {
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    refreshListenable: GoRouterRefreshStream(ref.watch(userProvider.notifier).stream),
+    refreshListenable: GoRouterRefreshStream(
+      ref.watch(userProvider.notifier).stream,
+    ),
     routes: [
       GoRoute(
         path: '/',
@@ -39,11 +41,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         builder: (context, state) => LoginScreen(),
+        redirect: (context, state) {
+          final user = ref.read(userProvider);
+          if (user != null) return '/';
+          return null;
+        },
       ),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => RegisterScreen(),
-      ),
+      GoRoute(path: '/register', builder: (context, state) => RegisterScreen()),
     ],
   );
 });

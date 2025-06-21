@@ -2,10 +2,9 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../routes/app_router.dart';
-import 'package:social_app/models/user.dart';
-import 'package:social_app/models/direction.dart';
-import 'package:social_app/services/user_service.dart';
-import 'package:social_app/providers/auth_provider.dart';
+import 'package:social_app/models/create_user.dart';
+import 'package:social_app/providers/user_provider.dart';
+import 'package:social_app/models/enums/direction.dart';
 import 'package:social_app/screens/auth/components/my_text_field.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -47,20 +46,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     'AGENT_DE_SERVICE',
   ];
   final List<String> attributions = ['Finance', 'RH', 'Technique'];
-  late List<Direction> directions = [];
 
   @override
   void initState() {
     super.initState();
-    fetchDirections();
   }
 
   int _step = 0;
-
-  void fetchDirections() async {
-    final res = await UserService.getDirections();
-    setState(() => directions = res);
-  }
 
   void _nextStep() {
     if (_formKey.currentState!.validate()) {
@@ -92,7 +84,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
     final success = await ref
-        .read(authProvider.notifier)
+        .read(userProvider.notifier)
         .register(
           CreateUser(
             firstName: _firstName.text,
@@ -111,6 +103,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             senator: _senator,
           ),
         );
+    debugPrint('Registration : $success');
     if (success) {
       router.go('/login');
     } else {
@@ -274,7 +267,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           const SizedBox(height: 12),
                           DropdownButtonFormField<Direction>(
                             value: _direction,
-                            items: directions
+                            items: Direction.values
                                 .map(
                                   (direction) => DropdownMenuItem(
                                     value: direction,
@@ -306,8 +299,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 firstDate: DateTime(1950),
                                 lastDate: DateTime.now(),
                               );
-                              if (picked != null)
+                              if (picked != null) {
                                 setState(() => _entryDate = picked);
+                              }
                             },
                           ),
                           CheckboxListTile(

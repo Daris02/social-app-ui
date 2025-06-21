@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/routes/app_router.dart';
-import 'package:social_app/providers/auth_provider.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/auth/components/my_button.dart';
 import 'package:social_app/screens/auth/components/my_text_field.dart';
@@ -97,7 +96,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           try {
                             if (_formKey.currentState!.validate()) {
                               final success = await ref
-                                  .read(authProvider.notifier)
+                                  .read(userProvider.notifier)
                                   .login(_email.text, _password.text);
                               if (success != false) {
                                 ref
