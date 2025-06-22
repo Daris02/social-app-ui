@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/routes/app_router.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/auth/components/my_button.dart';
@@ -102,6 +103,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ref
                                     .read(userProvider.notifier)
                                     .setUser(success);
+                                final socket = ref.read(
+                                  webSocketServiceProvider,
+                                );
+                                if (!socket.hasConnected) {
+                                  socket.connect(success.token);
+                                  socket.send('user_connected', {
+                                    'userId': success.id,
+                                  });
+                                }
                                 router.go('/');
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(

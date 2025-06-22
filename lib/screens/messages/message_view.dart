@@ -29,24 +29,10 @@ class _MessageViewState extends ConsumerState<MessageView> {
     super.initState();
     socket = ref.read(webSocketServiceProvider);
     _messageSubscription = socket.onMessage((msg) {
-      if (!mounted) return;
       final currentUserId = ref.read(userProvider)!.id;
-
-      final alreadyExists = messages.any(
-        (m) =>
-            m.content == msg.content &&
-            m.from == msg.from &&
-            m.to == msg.to &&
-            m.createdAt.difference(msg.createdAt).inSeconds.abs() <
-                1, // marge de 1s
-      );
-
-      if (!alreadyExists &&
-          ((msg.from == widget.partner.id && msg.to == currentUserId) ||
-              (msg.from == currentUserId && msg.to == widget.partner.id))) {
-        setState(() => messages.add(msg));
-        messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-      }
+      if (msg.from == currentUserId) return;
+      setState(() => messages.add(msg));
+      messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     });
     fetchMessages();
   }
@@ -66,6 +52,10 @@ class _MessageViewState extends ConsumerState<MessageView> {
       to: widget.partner.id,
       createdAt: DateTime.now(),
     );
+    setState(() {
+      messages.add(msg);
+      messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    });
     socket.sendMessage(widget.partner.id, msg.content);
   }
 

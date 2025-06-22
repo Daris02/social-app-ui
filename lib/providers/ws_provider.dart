@@ -5,34 +5,40 @@ import 'package:social_app/models/message.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 final webSocketServiceProvider = Provider<WebSocketService>((ref) {
-  return WebSocketService();
+  final service = WebSocketService();
+  ref.onDispose(() => service.dispose());
+  ref.keepAlive();
+  return service;
 });
 
 class WebSocketService {
   IO.Socket? _socket;
+  bool _isConnected = false;
   final List<void Function(Message)> _messageListeners = [];
   final _connectedUsers = <int>{};
   final _streamController = StreamController<Set<int>>.broadcast();
-
+  bool get hasConnected => _isConnected;
   Stream<Set<int>> get connectedUsersStream => _streamController.stream;
 
-  Function(String, dynamic)? onEvent;
-
   void connect(String token) {
-    if (_socket != null && _socket!.connected) return;
+    if (_isConnected) {
+      return;
+    }
 
     _socket = IO.io(
       DioClient.baseSocket,
-      IO.OptionBuilder().setTransports(['websocket']).enableForceNew().setQuery(
-        {'token': token},
-      ).build(),
+      IO.OptionBuilder().setTransports(['websocket']).setQuery({
+        'token': token,
+      }).build(),
     );
 
     _socket!.onConnect((_) {
+      _isConnected = true;
       print('[Socket.io] Connected');
     });
 
     _socket!.onDisconnect((_) {
+      _isConnected = false;
       print('[Socket.io] Disconnected');
       _connectedUsers.clear();
       _streamController.add(_connectedUsers);
@@ -108,6 +114,7 @@ class WebSocketService {
   void disconnect() {
     _socket?.disconnect();
     _socket = null;
+    _isConnected = false;
     _connectedUsers.clear();
     _streamController.add(_connectedUsers);
   }

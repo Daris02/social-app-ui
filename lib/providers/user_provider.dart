@@ -13,15 +13,15 @@ final userProvider = StateNotifierProvider<UserController, User?>((ref) {
 
 final userInitProvider = FutureProvider<void>((ref) async {
   final prefs = await SharedPreferences.getInstance();
-  final userJson = prefs.getString('user');
-
+  final userJson = prefs.getString('current_user');
   if (userJson != null) {
     final user = User.fromJson(jsonDecode(userJson));
-    ref.read(userProvider.notifier).state = user;
-    ref.read(webSocketServiceProvider).connect(user.token);
-    ref.read(webSocketServiceProvider).send('user_connected', {
-      'userId': user.id,
-    });
+    await ref.read(userProvider.notifier).setUser(user);
+    final socket = ref.read(webSocketServiceProvider);
+    if (!socket.hasConnected) {
+      socket.connect(user.token);
+      socket.send('user_connected', {'userId': user.id});
+    }
   }
 });
 
@@ -29,9 +29,7 @@ class UserController extends StateNotifier<User?> {
   final Ref ref;
   static const _userKey = 'current_user';
 
-  UserController(this.ref) : super(null) {
-    _loadUser();
-  }
+  UserController(this.ref) : super(null);
 
   Future<void> _loadUser() async {
     final prefs = await SharedPreferences.getInstance();
@@ -39,11 +37,6 @@ class UserController extends StateNotifier<User?> {
     if (userData != null) {
       final user = User.fromJson(jsonDecode(userData));
       state = user;
-
-      ref.read(webSocketServiceProvider).connect(user.token);
-      ref.read(webSocketServiceProvider).send('user_connected', {
-        'userId': user.id,
-      });
     }
   }
 
@@ -51,20 +44,11 @@ class UserController extends StateNotifier<User?> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_userKey, jsonEncode(user.toJson()));
     state = user;
-
-    ref.read(webSocketServiceProvider).connect(user.token);
-    ref.read(webSocketServiceProvider).send('user_connected', {
-      'userId': user.id,
-    });
   }
 
   Future<void> clearUser() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userKey);
-    ref.read(webSocketServiceProvider).send('user_disconnected', {
-      'userId': state?.id,
-    });
-    ref.read(webSocketServiceProvider).disconnect();
     state = null;
   }
 
@@ -72,7 +56,6 @@ class UserController extends StateNotifier<User?> {
     try {
       final user = await AuthService.login(email, password);
       if (user == null || user == 'Fail login') return false;
-
       await setUser(user);
       return user;
     } catch (err) {
@@ -94,6 +77,7 @@ class UserController extends StateNotifier<User?> {
 
   Future<bool> logout() async {
     try {
+      ref.read(webSocketServiceProvider).disconnect();
       await clearUser();
       return true;
     } catch (err) {
