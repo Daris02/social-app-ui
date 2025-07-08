@@ -49,6 +49,7 @@ class UserController extends StateNotifier<User?> {
   Future<void> clearUser() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userKey);
+    await prefs.remove('token');
     state = null;
   }
 
