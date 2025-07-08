@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/constant/api.dart';
 import 'package:social_app/models/message.dart';
@@ -17,6 +18,7 @@ class WebSocketService {
   final List<void Function(Message)> _messageListeners = [];
   final _connectedUsers = <int>{};
   final _streamController = StreamController<Set<int>>.broadcast();
+
   bool get hasConnected => _isConnected;
   Stream<Set<int>> get connectedUsersStream => _streamController.stream;
 
@@ -34,12 +36,12 @@ class WebSocketService {
 
     _socket!.onConnect((_) {
       _isConnected = true;
-      print('[Socket.io] Connected');
+      debugPrint('[Socket.io] Connected');
     });
 
     _socket!.onDisconnect((_) {
       _isConnected = false;
-      print('[Socket.io] Disconnected');
+      debugPrint('[Socket.io] Disconnected');
       _connectedUsers.clear();
       _streamController.add(_connectedUsers);
     });
@@ -67,17 +69,22 @@ class WebSocketService {
       }
     });
 
-    _socket!.onAny((event, data) {
-      print('[Socket.io] Event reçu: $event, data: $data');
-      if (event == 'chat') {
-        try {
-          final msg = Message.fromJson(data);
-          for (var listener in _messageListeners) {
-            listener(msg);
+    _socket!.onAny((event, data) async {
+      switch (event) {
+        case 'chat':
+          try {
+            final msg = Message.fromJson(data);
+            for (var listener in _messageListeners) {
+              listener(msg);
+            }
+          } catch (e) {
+            debugPrint('Erreur de parsing message: $e');
           }
-        } catch (e) {
-          print('Erreur de parsing message: $e');
-        }
+          break;
+        default:
+          debugPrint(
+            '📨 EVENT: $event | DATA: ${data != null ? 'exist' : 'empty'}',
+          );
       }
     });
   }
@@ -109,6 +116,69 @@ class WebSocketService {
 
   bool isConnected(int userId) {
     return _connectedUsers.contains(userId);
+  }
+
+  void sendCallRequest(String userId, String toUserId, String roomId) {
+    send('call_request', {'to': toUserId, 'from': userId, 'roomId': roomId});
+  }
+
+  void sendCallAccepted(String userId, String toUserId, String roomId) {
+    send('call_accepted', {'to': toUserId, 'from': userId, 'roomId': roomId});
+  }
+
+  void sendCallRefused(String userId, String toUserId, String roomId) {
+    send('call_refused', {'to': toUserId, 'from': userId, 'roomId': roomId});
+  }
+
+  void onCallRequest(void Function(dynamic data) callback) {
+    _socket?.on('call_request', callback);
+  }
+
+  void onCallAccepted(void Function(dynamic data) callback) {
+    _socket?.on('call_accepted', callback);
+  }
+
+  void onCallRefused(void Function(dynamic data) callback) {
+    _socket?.on('call_refused', callback);
+  }
+
+  void sendOffer(String toUserId, dynamic offer) {
+    send('offer', {'to': toUserId, 'offer': offer});
+  }
+
+  void sendAnswer(String userId, String toUserId, dynamic answer) {
+    send('answer', {
+      'type': 'answer',
+      'to': toUserId,
+      'from': userId,
+      'data': answer,
+    });
+  }
+
+  void sendCandidate(String toUserId, dynamic candidate) {
+    send('candidate', {'to': toUserId, 'candidate': candidate});
+  }
+
+  void onOffer(void Function(dynamic data) callback) {
+    _socket?.on('offer', callback);
+  }
+
+  void onAnswer(void Function(dynamic data) callback) {
+    _socket?.on('answer', callback);
+  }
+
+  void onCandidate(void Function(dynamic data) callback) {
+    _socket?.on('candidate', callback);
+  }
+
+  void clearHandlersForEvents(List<String> eventNames) {
+    for (final event in eventNames) {
+      off(event);
+    }
+  }
+
+  void off(String event) {
+    _socket?.off(event);
   }
 
   void disconnect() {
