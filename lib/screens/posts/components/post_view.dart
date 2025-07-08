@@ -17,9 +17,14 @@ class PostView extends ConsumerStatefulWidget {
 }
 
 class _PostViewState extends ConsumerState<PostView> {
+  // late Reaction[] allReactions;
+
+
   @override
   Widget build(BuildContext context) {
-    final dateStr = DateFormat('dd MMM yyyy à HH:mm').format(widget.post.createdAt);
+    final dateStr = DateFormat(
+      'dd MMM yyyy à HH:mm',
+    ).format(widget.post.createdAt);
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       elevation: 4,
@@ -34,15 +39,28 @@ class _PostViewState extends ConsumerState<PostView> {
               children: [
                 CircleAvatar(
                   radius: 22,
-                  backgroundImage: widget.author.photo != null
-                      ? NetworkImage(widget.author.photo!)
-                      : null,
-                  child: widget.author.photo == null
-                      ? Text(
-                          widget.author.firstName[0].toUpperCase(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                  backgroundColor: Colors.grey[200],
+                  child: widget.author.photo != null
+                      ? ClipOval(
+                          child: Image.network(
+                            widget.author.photo!,
+                            width: 44,
+                            height: 44,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.account_circle,
+                                size: 44,
+                                color: Colors.grey,
+                              );
+                            },
+                          ),
                         )
-                      : null,
+                      : Icon(
+                          Icons.account_circle,
+                          size: 44,
+                          color: Colors.grey,
+                        ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -78,7 +96,8 @@ class _PostViewState extends ConsumerState<PostView> {
             ),
           ),
           // Image ou titre
-          if (widget.post.imagesUrl != null && widget.post.imagesUrl!.isNotEmpty)
+          if (widget.post.imagesUrl != null &&
+              widget.post.imagesUrl!.isNotEmpty)
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(18),
@@ -97,11 +116,11 @@ class _PostViewState extends ConsumerState<PostView> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color.fromARGB(255, 114, 115, 117),
+                    const Color.fromARGB(255, 122, 123, 125),
                     const Color.fromARGB(255, 8, 118, 207),
                   ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(18),
@@ -130,7 +149,10 @@ class _PostViewState extends ConsumerState<PostView> {
           if (widget.post.content.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text(widget.post.content, style: const TextStyle(fontSize: 16)),
+              child: Text(
+                widget.post.content,
+                style: const TextStyle(fontSize: 16),
+              ),
             ),
           // Footer
           Padding(
@@ -142,12 +164,12 @@ class _PostViewState extends ConsumerState<PostView> {
                   onPressed: () async {
                     await PostService.likePost(widget.post.id, 'LIKE');
                     ref.refresh(postsProvider);
-                    setState(() {
-                      
-                    });
+                    setState(() {});
                   },
                 ),
-                Text('${widget.post.reactions == 0 ? '' : widget.post.reactions}'),
+                Text(
+                  '${widget.post.reactions == 0 ? '' : widget.post.reactions}',
+                ),
                 const SizedBox(width: 8),
                 const Spacer(),
                 IconButton(

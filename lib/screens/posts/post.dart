@@ -116,8 +116,8 @@ class _PostScreenState extends ConsumerState<PostScreen> {
   }
 
   void _showCreateDialog(BuildContext context, WidgetRef ref) {
-    final _titleController = TextEditingController();
-    final _contentController = TextEditingController();
+    final titleController = TextEditingController();
+    final contentController = TextEditingController();
 
     showDialog(
       context: context,
@@ -127,11 +127,11 @@ class _PostScreenState extends ConsumerState<PostScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              controller: _titleController,
+              controller: titleController,
               decoration: const InputDecoration(labelText: "Titre"),
             ),
             TextField(
-              controller: _contentController,
+              controller: contentController,
               decoration: const InputDecoration(labelText: "Contenu"),
             ),
           ],
@@ -140,8 +140,8 @@ class _PostScreenState extends ConsumerState<PostScreen> {
           TextButton(
             onPressed: () async {
               await PostService.createPost(
-                _titleController.text,
-                _contentController.text,
+                titleController.text,
+                contentController.text,
               );
               ref.refresh(postsProvider);
               Navigator.pop(context);

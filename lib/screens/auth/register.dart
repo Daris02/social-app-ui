@@ -139,7 +139,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         padding: const EdgeInsets.all(16),
                         children: [
                           const Text(
-                            "Informations personnelles",
+                            "Informations personnel",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
