@@ -1,5 +1,6 @@
 // dio_client.dart
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DioClient {
@@ -14,6 +15,8 @@ class DioClient {
     final baseApiUrlLocal = 'http://$host:4000';
     final baseApiUrlProd = 'https://$hostProd';
     final baseApiUrl = env == 'dev' ? baseApiUrlLocal : baseApiUrlProd;
+
+    debugPrint('Base URL : $baseApiUrl');
 
     dio = Dio(
       BaseOptions(baseUrl: baseApiUrl, contentType: 'application/json'),

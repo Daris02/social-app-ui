@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/user.dart';
@@ -29,26 +30,23 @@ class UserCircleView extends ConsumerWidget {
               height: 65,
               width: 65,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey.shade300,
-                image: user.photo != null
-                    ? DecorationImage(
-                        image: NetworkImage(user.photo!),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
+              shape: BoxShape.circle,
+              color: Colors.grey.shade300,
+              image: user.photo != null
+                ? DecorationImage(
+                  image: NetworkImage(user.photo!),
+                  fit: BoxFit.cover,
+                  onError: (error, stackTrace) {
+                    if (kDebugMode) {
+                      debugPrint('Error loading user photo: $error');
+                    }
+                  },
+                  )
+                : null,
               ),
               child: user.photo == null
-                  ? Center(
-                      child: Text(
-                        user.lastName[0].toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    )
-                  : null,
+                ? Icon(Icons.account_circle, size: 40, color: Colors.grey.shade600)
+                : null,
             ),
             if (isOnline)
               Positioned(

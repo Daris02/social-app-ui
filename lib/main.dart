@@ -28,8 +28,10 @@ class MyApp extends ConsumerWidget {
         ),
       ),
       error: (err, _) => MaterialApp(
-        home: const Scaffold(
-          body: Center(child: Text("Erreur init")),
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          body: Center(child: Text("Erreur init: ${err.toString()}")),
         ),
       ),
       data: (_) {
