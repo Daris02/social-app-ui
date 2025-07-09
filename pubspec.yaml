@@ -25,8 +25,11 @@ dependencies:
   path_provider: ^2.1.5
   google_nav_bar: ^5.0.7
   hero_animation: ^1.1.4
-  floating_navbar: ^3.0.0
   flutter_dotenv: ^5.2.1
+  flutter_local_notifications: ^19.3.0
+  drawerbehavior: ^3.0.4
+  flutter_local_notifications_windows: ^1.0.0
+  flutter_local_notifications_linux: ^6.0.0
 
 dev_dependencies:
   flutter_test:
