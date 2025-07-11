@@ -148,8 +148,13 @@ jobs:
           git remote set-url origin https://x-access-token:${PAT}@github.com/${{ github.repository }}
 
           TAG="v${{ needs.build.outputs.version }}"
-
           echo "Generated tag: $TAG"
+
+          # Protection contre tag vide
+          if [ "$TAG" = "v" ]; then
+            echo "❌ ERROR: version is missing, refusing to create empty tag"
+            exit 1
+          fi
 
           if git ls-remote --tags origin | grep -q "refs/tags/$TAG$"; then
             echo "Tag $TAG already exists remotely. Skipping."
