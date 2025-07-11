@@ -2,9 +2,9 @@ name: Build and Auto-Release Flutter App
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths-ignore:
-      - 'pubspec.yaml'
+      - "pubspec.yaml"
 
 jobs:
   version:
@@ -123,6 +123,10 @@ jobs:
           git tag v${{ needs.build.outputs.version }}
           git push origin v${{ needs.build.outputs.version }}
 
+      - name: Print release version
+        run: |
+          echo "Releasing version: ${{ needs.build.outputs.version }}"
+
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
@@ -145,13 +149,14 @@ jobs:
 
           TAG="v${{ needs.build.outputs.version }}"
 
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists. Skipping tag creation."
+          echo "Generated tag: $TAG"
+
+          if git ls-remote --tags origin | grep -q "refs/tags/$TAG$"; then
+            echo "Tag $TAG already exists remotely. Skipping."
           else
             git tag "$TAG"
             git push origin "$TAG"
           fi
-
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
