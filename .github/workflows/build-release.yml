@@ -102,7 +102,7 @@ jobs:
           path: windows-build.zip
 
   release:
-    needs: [build, build-windows]
+    needs: [build-apk, build-windows]
     runs-on: ubuntu-latest
 
     steps:
