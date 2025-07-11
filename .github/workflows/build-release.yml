@@ -3,6 +3,8 @@ name: Build and Auto-Release Flutter App
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'pubspec.yaml'
 
 jobs:
   version:
