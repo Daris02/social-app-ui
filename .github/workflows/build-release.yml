@@ -135,14 +135,23 @@ jobs:
           name: windows-zip
           path: dist
 
-      - name: Create Git Tag
+      - name: Create Git Tag (if not exists)
+        env:
+          PAT: ${{ secrets.PAT }}
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git tag v${{ needs.build.outputs.version }}
-          git push origin v${{ needs.build.outputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+          git remote set-url origin https://x-access-token:${PAT}@github.com/${{ github.repository }}
+
+          TAG="v${{ needs.build.outputs.version }}"
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists. Skipping tag creation."
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
