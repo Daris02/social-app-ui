@@ -15,4 +15,19 @@ class Reaction {
     required this.updatedAt,
     required this.user,
   });
+
+  factory Reaction.fromJson(Map<String, dynamic> json) {
+    return Reaction(
+      id: json['id'],
+      reactionType: reactionTypeFromString(json['reactionType'])!,
+      user: User.fromJson(json['user']),
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+    );
+  }
+
+  static ReactionType? reactionTypeFromString(String? value) {
+    if (value == null) return null;
+    return ReactionType.values.firstWhere((e) => e.name == value);
+  }
 }

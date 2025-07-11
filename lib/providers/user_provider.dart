@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/models/create_user.dart';
 import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/services/auth_service.dart';
+import 'package:social_app/services/user_service.dart';
 import '../models/user.dart';
 
 final userProvider = StateNotifierProvider<UserController, User?>((ref) {
@@ -37,6 +38,22 @@ class UserController extends StateNotifier<User?> {
     if (userData != null) {
       final user = User.fromJson(jsonDecode(userData));
       state = user;
+    }
+  }
+
+  Future<User?> getUserById(int id) async {
+    try {
+      final user = await UserService.getUserById(id);
+      if (user == null) {
+        debugPrint('User not found');
+        return null;
+      }
+      return user;
+    } catch (err) {
+      if (kDebugMode) {
+        print('Error getting user: $err');
+      }
+      return null;
     }
   }
 
