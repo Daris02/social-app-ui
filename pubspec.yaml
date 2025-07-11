@@ -30,6 +30,7 @@ dependencies:
   drawerbehavior: ^3.0.4
   flutter_local_notifications_windows: ^1.0.0
   flutter_local_notifications_linux: ^6.0.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
