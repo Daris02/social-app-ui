@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Bump version patch
         id: bump
@@ -23,20 +25,19 @@ jobs:
           NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
           echo "New version: $NEW_VERSION"
 
-          # Replace version in pubspec.yaml
           sed -i "s/^version: .*/version: $NEW_VERSION+1/" $FILE
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Commit bumped version
+        env:
+          PAT: ${{ secrets.PAT }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${PAT}@github.com/${{ github.repository }}
           git add pubspec.yaml
           git commit -m "chore: bump version to ${{ steps.bump.outputs.new_version }}"
           git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
 
   build:
     needs: version
