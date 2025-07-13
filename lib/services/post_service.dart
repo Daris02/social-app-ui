@@ -10,15 +10,15 @@ import 'package:social_app/models/enums/reaction_type.dart';
 class PostService {
   static final dio = DioClient.dio;
 
-  static Future<List<Post>> getPosts() async {
+  static Future<List<Post>> getPosts(int? page, int? limit) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
     final res = await DioClient.dio.get(
-      '/posts',
+      '/posts?page=$page&limit=$limit',
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
-    return (res.data as List).map((e) => Post.fromJson(e)).toList();
+    return (res.data['items'] as List).map((e) => Post.fromJson(e)).toList();
   }
 
   static Future<List<Reaction>> getReactionsByPostId(int id) async {
