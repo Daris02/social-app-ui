@@ -8,6 +8,9 @@ import 'package:social_app/models/enums/reaction_type.dart';
 import 'package:social_app/models/post.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/ws_provider.dart';
+import 'package:social_app/screens/posts/components/video_thumbnail.dart';
+import 'package:social_app/screens/posts/image_view_screen.dart';
+import 'package:social_app/screens/posts/video_player_screen.dart';
 import 'package:social_app/services/post_service.dart';
 
 class PostView extends ConsumerStatefulWidget {
@@ -29,6 +32,7 @@ class _PostViewState extends ConsumerState<PostView>
   int totalReaction = 0;
   int totalComment = 0;
   late final WebSocketService socket;
+  final TextEditingController _commentController = TextEditingController();
 
   @override
   bool get wantKeepAlive => true;
@@ -95,31 +99,19 @@ class _PostViewState extends ConsumerState<PostView>
     }
   }
 
-  void commentPost() async {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Commentaire'),
-        // content: SizedBox(
-        //   height: 100,
-        //   child: ListView.builder(
-        //     itemCount: post.comments.length,
-        //     itemBuilder: (context, index) {
-        //       return ListTile(leading: Text(post.comments[index].content),);
-        //     },
-        //   ),
-        // ),
-      ),
-    );
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final dateStr = DateFormat('dd MMM yyyy à HH:mm').format(post.createdAt);
-    final isOnline = ref
-        .watch(webSocketServiceProvider)
-        .isConnected(post.author.id);
+    // final isOnline = ref
+    //     .watch(webSocketServiceProvider)
+    //     .isConnected(post.author.id);
     final colorSchema = Theme.of(context).colorScheme;
     return Center(
       child: Container(
@@ -148,23 +140,6 @@ class _PostViewState extends ConsumerState<PostView>
                                   size: 40,
                                   color: colorSchema.inversePrimary,
                                 ),
-                                if (isOnline)
-                                  Positioned(
-                                    bottom: 4,
-                                    right: 4,
-                                    child: Container(
-                                      width: 14,
-                                      height: 14,
-                                      decoration: BoxDecoration(
-                                        color: Colors.green,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 2,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
                               ],
                             )
                           : Stack(
@@ -186,23 +161,6 @@ class _PostViewState extends ConsumerState<PostView>
                                     ),
                                   ),
                                 ),
-                                if (isOnline)
-                                  Positioned(
-                                    bottom: 4,
-                                    right: 4,
-                                    child: Container(
-                                      width: 14,
-                                      height: 14,
-                                      decoration: BoxDecoration(
-                                        color: Colors.green,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 2,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
                               ],
                             ),
                     ),
@@ -282,39 +240,84 @@ class _PostViewState extends ConsumerState<PostView>
                     if (isImage) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            url,
-                            height: 200,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, progress) {
-                              if (progress == null) return child;
-                              return Container(
-                                height: 200,
-                                alignment: Alignment.center,
-                                child: CircularProgressIndicator(
-                                  value: progress.expectedTotalBytes != null
-                                      ? progress.cumulativeBytesLoaded /
-                                            progress.expectedTotalBytes!
-                                      : null,
+                        child: Stack(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ImageViewerScreen(url: url),
+                                  ),
+                                );
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  url,
+                                  height: 200,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (context, child, progress) {
+                                    if (progress == null) return child;
+                                    return Container(
+                                      height: 200,
+                                      alignment: Alignment.center,
+                                      child: CircularProgressIndicator(
+                                        value:
+                                            progress.expectedTotalBytes != null
+                                            ? progress.cumulativeBytesLoaded /
+                                                  progress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(Icons.broken_image, size: 100),
                                 ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.broken_image, size: 100),
-                          ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.download,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () => PostService.downloadMedia(url),
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     } else if (isVideo) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Stack(
-                          children: [
-                            Container(
+                      return FutureBuilder<Uint8List?>(
+                        future: getVideoThumbnail(url),
+                        builder: (context, snapshot) {
+                          Widget thumbnailWidget;
+
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            thumbnailWidget = Container(
                               height: 200,
-                              width: double.infinity,
+                              alignment: Alignment.center,
+                              child: const CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasData &&
+                              snapshot.data != null) {
+                            thumbnailWidget = ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.memory(
+                                snapshot.data!,
+                                height: 200,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          } else {
+                            thumbnailWidget = Container(
+                              height: 200,
                               color: Colors.black12,
                               child: const Center(
                                 child: Icon(
@@ -323,29 +326,44 @@ class _PostViewState extends ConsumerState<PostView>
                                   color: Colors.black45,
                                 ),
                               ),
-                            ),
-                            Positioned.fill(
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    // TODO: Naviguer vers un lecteur vidéo
-                                  },
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.play_circle_fill,
-                                      size: 64,
-                                      color: Colors.white,
+                            );
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Stack(
+                              children: [
+                                thumbnailWidget,
+                                Positioned.fill(
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                VideoPlayerScreen(url: url),
+                                          ),
+                                        );
+                                      },
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.play_circle_fill,
+                                          size: 64,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       );
                     } else {
-                      return const SizedBox(); // Unsupported format
+                      return const SizedBox();
                     }
                   }).toList(),
                 ),
@@ -398,6 +416,217 @@ class _PostViewState extends ConsumerState<PostView>
           ),
         ),
       ),
+    );
+  }
+
+  void commentPost() async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Commentaires',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 200,
+                child: post.comments.isEmpty
+                    ? const Center(child: Text("Aucun commentaire"))
+                    : ListView.builder(
+                        itemCount: post.comments.length,
+                        itemBuilder: (context, index) {
+                          final comment = post.comments[index];
+                          final isMyComment = comment.user.id == currentUser.id;
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage: comment.user.photo != null
+                                  ? NetworkImage(comment.user.photo!)
+                                  : null,
+                              child: comment.user.photo == null
+                                  ? const Icon(Icons.person)
+                                  : null,
+                            ),
+                            title: Text(
+                              "${comment.user.firstName} ${comment.user.lastName}",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(comment.content),
+                            trailing: isMyComment
+                                ? PopupMenuButton<String>(
+                                    onSelected: (value) async {
+                                      if (value == 'edit') {
+                                        final edited = await showDialog<String>(
+                                          context: context,
+                                          builder: (context) {
+                                            final controller =
+                                                TextEditingController(
+                                                  text: comment.content,
+                                                );
+                                            return AlertDialog(
+                                              title: const Text(
+                                                'Modifier le commentaire',
+                                              ),
+                                              content: TextField(
+                                                controller: controller,
+                                                decoration:
+                                                    const InputDecoration(
+                                                      hintText:
+                                                          'Votre commentaire...',
+                                                    ),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  child: const Text('Annuler'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    final newContent =
+                                                        controller.text.trim();
+                                                    Navigator.pop(
+                                                      context,
+                                                      newContent,
+                                                    );
+                                                  },
+                                                  child: const Text('Modifier'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+
+                                        if (edited != null &&
+                                            edited != comment.content) {
+                                          // await PostService.updateComment(
+                                          //   comment.id,
+                                          //   edited,
+                                          // );
+                                          final updated =
+                                              await PostService.getPostById(
+                                                post.id,
+                                              );
+                                          setState(() {
+                                            post = updated;
+                                          });
+                                        }
+                                      } else if (value == 'delete') {
+                                        final confirm = await showDialog<bool>(
+                                          context: context,
+                                          builder: (_) => AlertDialog(
+                                            title: const Text(
+                                              'Supprimer ce commentaire ?',
+                                            ),
+                                            content: const Text(
+                                              'Cette action est irréversible.',
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(
+                                                  context,
+                                                  false,
+                                                ),
+                                                child: const Text('Annuler'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(
+                                                  context,
+                                                  true,
+                                                ),
+                                                child: const Text('Supprimer'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+
+                                        if (confirm == true) {
+                                          await PostService.removeComment(
+                                            post.id,
+                                            comment.id,
+                                          );
+
+                                          final comments =
+                                              await PostService.getCommentsByPostId(
+                                                post.id,
+                                              );
+                                          setState(() {
+                                            post.comments = comments;
+                                            totalComment = comments.length;
+                                          });
+                                          Navigator.pop(context);
+                                          commentPost();
+                                        }
+                                      }
+                                    },
+                                    itemBuilder: (_) => const [
+                                      PopupMenuItem(
+                                        value: 'edit',
+                                        child: Text('Modifier'),
+                                      ),
+                                      PopupMenuItem(
+                                        value: 'delete',
+                                        child: Text('Supprimer'),
+                                      ),
+                                    ],
+                                    icon: const Icon(Icons.more_vert),
+                                  )
+                                : null,
+                          );
+                        },
+                      ),
+              ),
+              const Divider(),
+              TextField(
+                controller: _commentController,
+                decoration: InputDecoration(
+                  hintText: "Ajouter un commentaire...",
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: () async {
+                      final content = _commentController.text.trim();
+                      if (content.isNotEmpty) {
+                        await PostService.commentPost(
+                          post.id,
+                          currentUser.id,
+                          content,
+                        );
+                        _commentController.clear();
+
+                        final comments = await PostService.getCommentsByPostId(
+                          post.id,
+                        );
+                        setState(() {
+                          post.comments = comments;
+                          totalComment = comments.length;
+                        });
+                        Navigator.pop(context);
+                        commentPost();
+                      }
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -5,7 +5,6 @@ import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/routes/app_router.dart';
 import 'package:social_app/screens/messages/message.dart';
-import 'package:social_app/screens/notification.dart';
 import 'package:social_app/screens/posts/post.dart';
 import 'package:social_app/screens/profile/profile.dart';
 import 'package:social_app/screens/setting.dart';
@@ -61,6 +60,7 @@ class _MobileScaffoldState extends ConsumerState<MobileScaffold> {
     //       ),
     //     ),
     //   ),
+
     Scaffold(
       appBar: myAppBar(context),
       backgroundColor: Theme.of(context).colorScheme.primary,

@@ -16,7 +16,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
     final user = ref.watch(userProvider);
     final router = ref.read(appRouterProvider);
     return Scaffold(
-      appBar: AppBar(title: Text("Profile")),
+      appBar: AppBar(title: Text("Paramètre")),
       body: Padding(
         padding: EdgeInsetsGeometry.all(20),
         child: Column(

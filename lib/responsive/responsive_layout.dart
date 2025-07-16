@@ -1,23 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:social_app/responsive/desktop_scaffold.dart';
+import 'package:social_app/responsive/mobile_scaffold.dart';
 
 class ResponsiveLayout extends StatelessWidget {
-  final Widget mobileScaffold;
-  final Widget desktopScaffold;
-
-const ResponsiveLayout({super.key,  
-  required this.mobileScaffold,
-  required this.desktopScaffold,
- });
+  const ResponsiveLayout({super.key});
 
   @override
-  Widget build(BuildContext context){
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) { 
-        if (constraints.maxWidth < 600) {
-          return mobileScaffold;
-        } else {
-          return desktopScaffold;
-        }
-      },
-    );
+  Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
+    return isDesktop ? const DesktopScaffold() : const MobileScaffold();
   }
 }

@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/models/post.dart';
 import 'package:social_app/constant/api.dart';
@@ -33,28 +38,6 @@ class PostService {
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
     return Post.fromJson(res.data);
-  }
-
-  static Future<List<Reaction>> getReactionsByPostId(int id) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    final res = await DioClient.dio.get(
-      '/posts/$id/reactions',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
-    );
-    return (res.data as List).map((e) => Reaction.fromJson(e)).toList();
-  }
-
-  static Future<List<Comment>> getCommentsByPostId(int id) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    final res = await DioClient.dio.get(
-      '/posts/$id/comments',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
-    );
-    return (res.data as List).map((e) => Comment.fromJson(e)).toList();
   }
 
   static Future<void> createPost(
@@ -100,6 +83,66 @@ class PostService {
     debugPrint('Result: ${result.data}');
   }
 
+  static Future<void> deletePost(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    await dio.delete(
+      '/posts/$id',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+  }
+
+  static Future<void> downloadMedia(String url, {String? filename}) async {
+    try {
+      // Demande de permission sur Android
+      if (!kIsWeb && Platform.isAndroid) {
+        final status = await Permission.storage.request();
+        if (!status.isGranted) {
+          throw Exception('Permission refusée');
+        }
+      }
+
+      final fileName = filename ?? url.split('/').last;
+      final dir = !kIsWeb && Platform.isAndroid
+          ? await getExternalStorageDirectory()
+          : await getDownloadsDirectory();
+
+      if (dir == null) throw Exception("Impossible de trouver un dossier.");
+
+      final savePath = '${dir.path}/$fileName';
+      final dio = Dio();
+
+      await dio.download(
+        url,
+        savePath,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            debugPrint(
+              'Téléchargement: ${(received / total * 100).toStringAsFixed(0)}%',
+            );
+          }
+        },
+      );
+
+      debugPrint('✅ Fichier sauvegardé dans $savePath');
+    } catch (e) {
+      debugPrint('❌ Erreur de téléchargement: $e');
+    }
+  }
+
+  // REACTION METHOD ---
+  static Future<List<Reaction>> getReactionsByPostId(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final res = await DioClient.dio.get(
+      '/posts/$id/reactions',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return (res.data as List).map((e) => Reaction.fromJson(e)).toList();
+  }
+
   static Future<void> likePost(
     int id,
     int userId,
@@ -125,12 +168,39 @@ class PostService {
     );
   }
 
-  static Future<void> deletePost(int id) async {
+  // COMMENT METHOD ---
+  static Future<List<Comment>> getCommentsByPostId(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final res = await DioClient.dio.get(
+      '/posts/$id/comments',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return (res.data as List).map((e) => Comment.fromJson(e)).toList();
+  }
+
+  static Future<void> commentPost(
+    int postId,
+    int userId,
+    String commentContent,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    await dio.post(
+      '/posts/$postId/comments',
+      data: {'content': commentContent},
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+  }
+
+  static Future<void> removeComment(int postId, int commentId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
     await dio.delete(
-      '/posts/$id',
+      '/posts/$postId/comments/$commentId',
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
   }

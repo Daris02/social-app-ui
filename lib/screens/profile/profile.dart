@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/providers/user_provider.dart';
+import 'package:social_app/routes/app_router.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -14,11 +15,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
     final colorSchema = Theme.of(context).colorScheme;
+    final router = ref.read(appRouterProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
         centerTitle: true,
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.settings))],
+        actions: [IconButton(onPressed: () {router.push('/settings');}, icon: Icon(Icons.settings))],
       ),
       body: Center(
         child: Container(
