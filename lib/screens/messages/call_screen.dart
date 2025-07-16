@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/services/call_service.dart';
 
 class VideoCallScreen extends ConsumerStatefulWidget {
@@ -26,18 +28,18 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
   bool _hasRemoteVideo = false;
   bool _isRendererDisposed = false;
 
+  late final WebSocketService socket;
+
   @override
   void initState() {
-    debugPrint('[VideoCallScreen] Init State');
     super.initState();
     _initRenderers();
   }
 
   Future<void> _initRenderers() async {
-    debugPrint('[VideoCallScreen] Init Render');
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
-    debugPrint('[VideoCallScreen] Finished Render initializing');
+    socket = ref.read(webSocketServiceProvider);
 
     final service = widget.callService;
     service.attachRenderers(
@@ -66,7 +68,6 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
             false;
 
         if (hasVideo && !_hasRemoteVideo) {
-          debugPrint('[VideoCallScreen] 🔁 Force refresh remote video');
           setState(() {
             _remoteRenderer.srcObject = widget.callService.currentRemoteStream;
             _hasRemoteVideo =
@@ -75,6 +76,18 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
                 ) ??
                 false;
           });
+        }
+      }
+    });
+    socket.onCallEnded((_) async {
+      if (!mounted) return;
+
+      await widget.callService.hangUp(ref, notifyPeer: false);
+      if (mounted) {
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        } else {
+          context.go('/');
         }
       }
     });
@@ -95,20 +108,33 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
   }
 
   void _hangUp() async {
-    await widget.callService.hangUp(ref);
-    if (mounted) Navigator.pop(context);
+    if (!mounted) return;
+    await widget.callService.hangUp(ref, notifyPeer: true);
+
+    if (!mounted) return;
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      context.go('/');
+    }
   }
 
   @override
   void dispose() {
+    _isRendererDisposed = true;
     _localRenderer.srcObject = null;
     _remoteRenderer.srcObject = null;
-    _isRendererDisposed = true;
+
     try {
       _localRenderer.dispose();
+    } catch (e) {
+      debugPrint("_localRenderer dispose failed: $e");
+    }
+
+    try {
       _remoteRenderer.dispose();
     } catch (e) {
-      debugPrint("⚠️ RTCVideoRenderer dispose failed: $e");
+      debugPrint("_remoteRenderer dispose failed: $e");
     }
 
     super.dispose();

@@ -141,6 +141,10 @@ class WebSocketService {
     send('call_refused', {'to': toUserId, 'from': userId, 'roomId': roomId});
   }
 
+  void sendCallEnded(String userId, String toUserId, String roomId) {
+    send('call_ended', {'from': userId, 'to': toUserId, 'roomId': roomId});
+  }
+
   void onCallRequest(void Function(dynamic data) callback) {
     _socket?.on('call_request', callback);
   }
@@ -164,6 +168,10 @@ class WebSocketService {
 
   void onCallRefused(void Function(dynamic data) callback) {
     _socket?.on('call_refused', callback);
+  }
+
+  void onCallEnded(void Function(dynamic data) callback) {
+    _socket?.on('call_ended', callback);
   }
 
   void sendOffer(String toUserId, dynamic offer) {

@@ -89,15 +89,9 @@ class VideoCallService {
   }) {
     if (localStream != null) {
       localRenderer.srcObject = localStream;
-      debugPrint(
-        'Local renderer srcObject set with tracks: ${localStream!.getTracks().map((t) => t.kind)}',
-      );
     }
     if (remoteStream != null) {
       remoteRenderer.srcObject = remoteStream;
-      debugPrint(
-        'Remote renderer srcObject set with tracks: ${remoteStream!.getTracks().map((t) => t.kind)}',
-      );
       onRemoteTrackReady?.call();
     }
 
@@ -127,32 +121,21 @@ class VideoCallService {
         'video': true,
       });
       _onLocalStream?.call(localStream!);
-      debugPrint('📷 [callee] Video tracks: ${localStream?.getVideoTracks()}');
-      debugPrint('📷 [callee] Audio tracks: ${localStream?.getAudioTracks()}');
 
       _peerConnection = await createPeerConnection({
         'iceServers': [
           {'urls': 'stun:stun1.l.google.com:19302'},
-          {
-            'urls': 'turn:turn.blackdow.carleon.gov:3478',
-            'username': 'social',
-            'credential': '123',
-          },
           // {
-          //   'urls': 'turn:relay1.expressturn.com:3480',
-          //   'username': '000000002068012360',
-          //   'credential': '2uHynHKAnrAV1c59Tl8D0AlWbV4=',
+          //   'urls': 'turn:turn.blackdow.carleon.gov:3478',
+          //   'username': 'social',
+          //   'credential': '123',
           // },
         ],
       });
-      debugPrint('🛠️ Creating new RTCPeerConnection');
       for (final track in localStream!.getTracks()) {
         _peerConnection!.addTrack(track, localStream!);
       }
       _peerConnection!.onTrack = (event) {
-        debugPrint(
-          '📡 onTrack triggered - kind=${event.track.kind} id=${event.track.id}',
-        );
         if (event.streams.isNotEmpty) {
           remoteStream = event.streams.first;
           if (_onRemoteStream != null) {
@@ -165,10 +148,10 @@ class VideoCallService {
         socket.sendCandidate(peerId, candidate.toMap());
       };
       _peerConnection!.onConnectionState = (RTCPeerConnectionState state) {
-        debugPrint('🔌 Connection state: $state');
+        debugPrint('Connection state: $state');
       };
       _peerConnection!.onIceConnectionState = (state) {
-        debugPrint('🌐 ICE connection state: $state');
+        debugPrint('ICE connection state: $state');
       };
 
       _preparingCompleter?.complete();
@@ -198,20 +181,20 @@ class VideoCallService {
           await _peerConnection!.setLocalDescription(answer);
           socket.sendAnswer(userId, peerId, answer.toMap());
         } catch (e) {
-          debugPrint('❌ Failed to create or set answer: $e');
+          debugPrint('Failed to create or set answer: $e');
         }
       } catch (e) {
-        debugPrint('❌ Erreur lors de la réception de l’offre : $e');
+        debugPrint('Erreur lors de la réception de l’offre : $e');
       }
     });
 
     socket.onAnswer((data) async {
       if (!_isCaller) {
-        debugPrint("⚠️ [callee] doit ignorer answer");
+        debugPrint("[callee] doit ignorer answer");
         return;
       }
       if (_isCaller) {
-        debugPrint("⚠️ [caller] recoit answer");
+        debugPrint("[caller] recoit answer");
       }
       final sdp = data['answer'] ?? data['data'];
       final answer = RTCSessionDescription(sdp['sdp'], sdp['type']);
@@ -225,46 +208,35 @@ class VideoCallService {
         c['sdpMid'],
         c['sdpMLineIndex'],
       );
-      debugPrint('🌍 Remote ICE Candidate: ${candidate.candidate}');
+      debugPrint('Remote ICE Candidate: ${candidate.candidate}');
 
       try {
         final state = _peerConnection!.signalingState;
         if (state != RTCSignalingState.RTCSignalingStateStable &&
             state != RTCSignalingState.RTCSignalingStateHaveRemoteOffer &&
             state != RTCSignalingState.RTCSignalingStateHaveLocalPrAnswer) {
-          debugPrint('⚠️ RTCSignalingState = $state)');
+          debugPrint('RTCSignalingState = $state)');
           return;
         } else {
           await _peerConnection!.addCandidate(candidate);
         }
       } catch (e) {
-        debugPrint('❌ Erreur lors de addCandidate: $e');
+        debugPrint('Erreur lors de addCandidate: $e');
       }
     });
 
-    // socket.onCallRequest((data) {
-    //   debugPrint('📞 Appel entrant reçu.');
-    //   onCallRequest?.call();
-    // });
-
     socket.onCallAccepted((data) async {
       if (_isCaller) {
-        debugPrint('📞 [Caller] Prepare connection');
         await _prepareConnection();
-
-        debugPrint('📞 [Caller] Send Offer');
         final offer = await _peerConnection!.createOffer();
         await _peerConnection!.setLocalDescription(offer);
         socket.sendOffer(peerId, offer.toMap());
-
-        debugPrint('📞 [Caller] After sending Offer');
       }
 
       onCallAccepted?.call();
     });
 
     socket.onCallRefused((data) {
-      debugPrint('❌ Appel refusé par le callee');
       onCallRefused?.call();
     });
   }
@@ -307,33 +279,54 @@ class VideoCallService {
       'candidate',
       'call_accepted',
       'call_refused',
+      'call_ended',
     ]);
   }
 
-  Future<void> hangUp(WidgetRef ref) async {
+  Future<void> hangUp(WidgetRef ref, {bool notifyPeer = true}) async {
+    if (notifyPeer) {
+      final ids = [userId, peerId]..sort();
+      final roomId = ids.join('-');
+      socket.sendCallEnded(userId, peerId, roomId);
+    }
+
     await dispose();
     ref.invalidate(videoCallServiceProvider(VideoCallParams(userId, peerId)));
   }
 
+  bool _isDisposed = false;
+
   Future<void> dispose() async {
+    if (_isDisposed) return;
+    _isDisposed = true;
+
     try {
-      await _peerConnection?.close();
-      debugPrint('✅ RTCPeerConnection closed');
+      if (_peerConnection != null) {
+        await _peerConnection!.close();
+        _peerConnection = null;
+      }
+    } catch (e) {
+      debugPrint('Error closing peerConnection: $e');
+    }
+
+    try {
       await localStream?.dispose();
+    } catch (e) {
+      debugPrint('Error disposing localStream: $e');
+    }
+    localStream = null;
+
+    try {
       await remoteStream?.dispose();
     } catch (e) {
-      debugPrint('❌ Error during dispose: $e');
+      debugPrint('Error disposing remoteStream: $e');
     }
-    _unbindSocketEvents();
-
-    _peerConnection = null;
-    localStream = null;
     remoteStream = null;
+
+    _unbindSocketEvents();
 
     _onLocalStream = null;
     _onRemoteStream = null;
-    onLocalStream = null;
-    onRemoteStream = null;
     onCallRequest = null;
     onCallAccepted = null;
     onCallRefused = null;
