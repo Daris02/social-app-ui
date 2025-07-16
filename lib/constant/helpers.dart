@@ -4,34 +4,19 @@ PreferredSizeWidget myAppBar(BuildContext context) => AppBar(
   backgroundColor: Theme.of(context).primaryColor,
   title: Text('S O C I A L  A P P', style: TextStyle(color: Theme.of(context).colorScheme.inversePrimary)),
   centerTitle: true,
-  actions: [
-    // IconButton(
-    //   icon: Icon(Icons.notifications, color: Colors.white),
-    //   onPressed: () {
-    //     // Handle notifications
-    //   },
-    // ),
-    // IconButton(
-    //   icon: Icon(Icons.account_circle, color: Colors.white),
-    //   onPressed: () {
-    //     // Handle user profile
-    //   },
-    // ),
-  ],
 );
 
 Drawer myDrawer(BuildContext context, dynamic router, dynamic userProvider) {
   return Drawer(
-    backgroundColor: Theme.of(context).colorScheme.primary,
-    
+    backgroundColor: Theme.of(context).colorScheme.surface,
     child: Column(
       children: [
         DrawerHeader(child: Text('S O C I A L  A P P')),
-        ListTile(leading: Icon(Icons.home), title: Text('D A S H B O A R D'), onTap: () {
-          router.push('/posts');
-        },),
-        ListTile(leading: Icon(Icons.chat), title: Text('M E S S A G E'), onTap: () {
+        ListTile(leading: Icon(Icons.chat_rounded), title: Text('M E S S A G E'), onTap: () {
           router.push('/messages');
+        },),
+        ListTile(leading: Icon(Icons.person), title: Text('P R O F I L E'), onTap: () {
+          router.push('/profile');
         },),
         ListTile(leading: Icon(Icons.settings), title: Text('S E T T I N G S'), onTap: () {
           router.push('/settings');

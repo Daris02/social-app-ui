@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/posts/components/create_post.dart';
@@ -25,6 +26,7 @@ class _PostScreenState extends ConsumerState<PostScreen> {
 
   final ScrollController _scrollController = ScrollController();
   final TextEditingController searchController = TextEditingController();
+  final FocusNode _keyboardFocus = FocusNode();
 
   @override
   void initState() {
@@ -34,108 +36,120 @@ class _PostScreenState extends ConsumerState<PostScreen> {
   }
 
   void firstLoad() async {
-    setState(() {
-      isFirstLoadRunning = true;
-    });
-    fetchPosts();
-    setState(() {
-      isFirstLoadRunning = false;
-    });
+    setState(() => isFirstLoadRunning = true);
+    await refreshPosts();
+    setState(() => isFirstLoadRunning = false);
   }
 
-  void loadMore() {
-    if (hasNextPage == true && isLoadMoreRunning == false) {
-      setState(() {
-        isLoadMoreRunning = true;
-      });
-    }
+  Future<void> loadMore() async {
+    if (!hasNextPage || isLoadMoreRunning) return;
 
-    // Timer(Duration(seconds: 3), () {});
-    fetchPosts();
+    setState(() => isLoadMoreRunning = true);
 
-    setState(() {
-      isLoadMoreRunning = false;
-    });
-  }
+    final fetched = await PostService.getPosts(page, 5);
 
-  Future<void> fetchPosts() async {
-    final fetchPosts = await PostService.getPosts(page, 5);
-    if (fetchPosts.isNotEmpty) {
+    if (fetched.isNotEmpty) {
       setState(() {
         page++;
-        posts.addAll(fetchPosts);
+        posts.addAll(fetched);
       });
     } else {
-      setState(() {
-        hasNextPage = false;
-      });
+      setState(() => hasNextPage = false);
     }
+
+    setState(() => isLoadMoreRunning = false);
+  }
+
+  Future<void> refreshPosts() async {
+    setState(() {
+      posts = [];
+      page = 1;
+      hasNextPage = true;
+    });
+
+    final freshPosts = await PostService.getPosts(page, 5);
+    setState(() {
+      posts = freshPosts;
+      page++;
+    });
   }
 
   void scrollListener() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      fetchPosts();
-    } else {
-      setState(() {
-        hasNextPage = true;
-      });
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
+      loadMore();
+    }
+  }
+
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.f5) {
+        refreshPosts();
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Publications"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CreatePostScreen()),
-              ).then((_) => fetchPosts());
-            },
-          ),
-        ],
-      ),
-      body: isFirstLoadRunning
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    controller: _scrollController,
-                    itemCount: posts.length,
-                    itemBuilder: (context, index) {
-                      final post = posts[index];
-                      return PostView(post: post, user: user!);
-                    },
-                  ),
-                ),
-                if (isLoadMoreRunning == true)
-                  Container(
-                    padding: EdgeInsets.only(top: 10, bottom: 40),
-                    color: Colors.white,
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                if (hasNextPage == false)
-                  Container(
-                    padding: EdgeInsets.only(top: 10, bottom: 10),
-                    color: Colors.black,
-                    child: Center(child: Text('No more post')),
-                  ),
-              ],
+
+    return KeyboardListener(
+      focusNode: _keyboardFocus..requestFocus(),
+      onKeyEvent: _handleKeyEvent,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Publications"),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CreatePostScreen()),
+                ).then((_) => refreshPosts());
+              },
             ),
+          ],
+        ),
+        body: isFirstLoadRunning
+            ? const Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+                onRefresh: refreshPosts,
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: posts.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index < posts.length) {
+                      return PostView(
+                        key: PageStorageKey(posts[index].id),
+                        post: posts[index],
+                        user: user!,
+                      );
+                    } else if (isLoadMoreRunning) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    } else if (!hasNextPage) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        child: Center(child: Text('Aucune autre publication')),
+                      );
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
+                ),
+              ),
+      ),
     );
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _keyboardFocus.dispose();
     super.dispose();
   }
 }

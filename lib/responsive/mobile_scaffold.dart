@@ -7,6 +7,7 @@ import 'package:social_app/routes/app_router.dart';
 import 'package:social_app/screens/messages/message.dart';
 import 'package:social_app/screens/notification.dart';
 import 'package:social_app/screens/posts/post.dart';
+import 'package:social_app/screens/profile/profile.dart';
 import 'package:social_app/screens/setting.dart';
 
 class MobileScaffold extends ConsumerStatefulWidget {
@@ -20,7 +21,7 @@ class _MobileScaffoldState extends ConsumerState<MobileScaffold> {
   int pageIndex = 0;
   final pages = [
     PostScreen(),
-    NotificationScreen(),
+    ProfileScreen(),
     MessageScreen(),
     SettingScreen(),
   ];

@@ -13,7 +13,7 @@ class UserCircleView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isOnline = ref.watch(webSocketServiceProvider).isConnected(user.id);
-
+    final colorSchema = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -26,42 +26,75 @@ class UserCircleView extends ConsumerWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Container(
+            SizedBox(
               height: 65,
               width: 65,
-              decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.grey.shade300,
-              image: user.photo != null
-                ? DecorationImage(
-                  image: NetworkImage(user.photo!),
-                  fit: BoxFit.cover,
-                  onError: (error, stackTrace) {
-                    if (kDebugMode) {
-                      debugPrint('Error loading user photo: $error');
-                    }
-                  },
-                  )
-                : null,
-              ),
-              child: user.photo == null
-                ? Icon(Icons.account_circle, size: 40, color: Colors.grey.shade600)
-                : null,
+              child: (user.photo == null || user.photo == '')
+                  ? Stack(
+                      children: [
+                        Icon(
+                          Icons.account_circle_outlined,
+                          size: 60,
+                          color: colorSchema.inversePrimary,
+                        ),
+                        if (isOnline)
+                          Positioned(
+                            bottom: 4,
+                            right: 4,
+                            child: Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    )
+                  : Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: colorSchema.inversePrimary,
+                            image: DecorationImage(
+                              image: NetworkImage(user.photo!),
+                              fit: BoxFit.cover,
+                              onError: (error, stackTrace) {
+                                if (kDebugMode) {
+                                  debugPrint(
+                                    'Error loading user photo: $error',
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        if (isOnline)
+                          Positioned(
+                            bottom: 4,
+                            right: 4,
+                            child: Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
             ),
-            if (isOnline)
-              Positioned(
-                bottom: 4,
-                right: 4,
-                child: Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                ),
-              ),
           ],
         ),
       ),

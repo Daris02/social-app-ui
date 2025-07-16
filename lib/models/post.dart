@@ -1,4 +1,3 @@
-
 import 'package:social_app/models/comment.dart';
 import 'package:social_app/models/reaction.dart';
 import 'package:social_app/models/user.dart';
@@ -9,7 +8,7 @@ class Post {
   final String content;
   final User author;
   final DateTime createdAt;
-  final List<String>? imagesUrl;
+  final List<String>? mediaUrls;
   List<Comment> comments;
   List<Reaction> reactions;
 
@@ -21,38 +20,24 @@ class Post {
     required this.createdAt,
     required this.comments,
     required this.reactions,
-    this.imagesUrl,
+    this.mediaUrls,
   });
-
-  // set comments(List<Comment> newComments) {
-  //   comments = newComments;
-  // }
-
-  // set reactions(List<Reaction> newReactions) {
-  //   reactions = newReactions;
-  // }
 
   factory Post.fromJson(Map<String, dynamic> json) {
     List<Reaction> reactions = [];
     List<Comment> comments = [];
-    // if (json['reactions'] != null) {
-    //   for (var reaction in json['reactions']) {
-    //     reactions.add(reaction);
-    //   }
-    // }
-    // if (json['comments'] != null) {
-    //   for (var comment in json['comments']) {
-    //     comments.add(comment);
-    //   }
-    // }
+    final mediaUrls = (json['mediaUrls'] as List<dynamic>?)
+        ?.map((url) => url.toString())
+        .toList();
     return Post(
       id: json['id'],
       title: json['title'],
       content: json['content'],
+      mediaUrls: mediaUrls,
       author: User.fromJson(json['author']),
       reactions: reactions,
       comments: comments,
-      createdAt: DateTime.parse(json['createdAt'])
+      createdAt: DateTime.parse(json['createdAt']),
     );
   }
 }

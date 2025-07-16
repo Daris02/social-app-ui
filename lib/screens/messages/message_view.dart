@@ -11,6 +11,7 @@ import 'package:social_app/services/call_service.dart';
 import 'package:social_app/screens/messages/call_screen.dart';
 import 'package:social_app/screens/messages/components/message_list.dart';
 import 'package:social_app/screens/messages/components/message_input.dart';
+import 'package:social_app/utils/notification_call.dart';
 
 class MessageView extends ConsumerStatefulWidget {
   final User partner;
@@ -32,17 +33,8 @@ class _MessageViewState extends ConsumerState<MessageView> {
   @override
   void initState() {
     super.initState();
-
-    final user = ref.read(userProvider)!;
     partner = widget.partner;
     socket = ref.read(webSocketServiceProvider);
-
-    final callService = ref.read(
-      videoCallServiceProvider(
-        VideoCallParams(user.id.toString(), partner.id.toString()),
-      ),
-    );
-    _registerCallRequestHandler(callService);
 
     _messageSubscription = socket.onMessage((msg) {
       final currentUserId = ref.read(userProvider)!.id;
@@ -78,56 +70,8 @@ class _MessageViewState extends ConsumerState<MessageView> {
     ref.read(webSocketServiceProvider).sendMessage(partner.id, msg.content);
   }
 
-  void _registerCallRequestHandler(VideoCallService callService) {
-    socket.onCallRequest((data) async {
-      if (!mounted) return;
-      debugPrint('📞 call_request reçu ---------');
-
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text('Appel entrant'),
-          content: Text('Accepter l’appel vidéo ?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                callService.refuseCall();
-                Navigator.pop(context);
-              },
-              child: Text('Refuser'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                await callService.connect(false);
-                await Future.delayed(Duration(milliseconds: 100));
-                await callService.acceptCall();
-                if (!mounted) return;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => VideoCallScreen(
-                      callService: callService,
-                      isCaller: false,
-                    ),
-                  ),
-                );
-              },
-              child: Text('Accepter'),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-
   @override
   void dispose() {
-    socket.clearHandlersForEvents([
-      'call_request',
-      'call_accepted',
-      'call_refused',
-    ]);
     _messageSubscription.cancel();
     super.dispose();
   }
@@ -135,14 +79,6 @@ class _MessageViewState extends ConsumerState<MessageView> {
   @override
   Widget build(BuildContext context) {
     final user = ref.read(userProvider)!;
-    final params = VideoCallParams(user.id.toString(), partner.id.toString());
-
-    ref.listen<VideoCallService>(videoCallServiceProvider(params), (
-      previous,
-      next,
-    ) {
-      _registerCallRequestHandler(next);
-    });
     return Scaffold(
       appBar: AppBar(
         title: Text(partner.lastName),

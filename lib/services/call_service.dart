@@ -89,9 +89,15 @@ class VideoCallService {
   }) {
     if (localStream != null) {
       localRenderer.srcObject = localStream;
+      debugPrint(
+        'Local renderer srcObject set with tracks: ${localStream!.getTracks().map((t) => t.kind)}',
+      );
     }
     if (remoteStream != null) {
       remoteRenderer.srcObject = remoteStream;
+      debugPrint(
+        'Remote renderer srcObject set with tracks: ${remoteStream!.getTracks().map((t) => t.kind)}',
+      );
       onRemoteTrackReady?.call();
     }
 
@@ -100,6 +106,13 @@ class VideoCallService {
       remoteRenderer.srcObject = s;
       onRemoteTrackReady?.call();
     };
+  }
+
+  Future<void> get readyFuture {
+    if (_preparingCompleter == null) {
+      return _prepareConnection();
+    }
+    return _preparingCompleter!.future;
   }
 
   Future<void> _prepareConnection() async {
@@ -114,16 +127,32 @@ class VideoCallService {
         'video': true,
       });
       _onLocalStream?.call(localStream!);
+      debugPrint('📷 [callee] Video tracks: ${localStream?.getVideoTracks()}');
+      debugPrint('📷 [callee] Audio tracks: ${localStream?.getAudioTracks()}');
 
       _peerConnection = await createPeerConnection({
         'iceServers': [
-          {'urls': 'stun:stun.l.google.com:19302'},
+          {'urls': 'stun:stun1.l.google.com:19302'},
+          {
+            'urls': 'turn:turn.blackdow.carleon.gov:3478',
+            'username': 'social',
+            'credential': '123',
+          },
+          // {
+          //   'urls': 'turn:relay1.expressturn.com:3480',
+          //   'username': '000000002068012360',
+          //   'credential': '2uHynHKAnrAV1c59Tl8D0AlWbV4=',
+          // },
         ],
       });
+      debugPrint('🛠️ Creating new RTCPeerConnection');
       for (final track in localStream!.getTracks()) {
         _peerConnection!.addTrack(track, localStream!);
       }
       _peerConnection!.onTrack = (event) {
+        debugPrint(
+          '📡 onTrack triggered - kind=${event.track.kind} id=${event.track.id}',
+        );
         if (event.streams.isNotEmpty) {
           remoteStream = event.streams.first;
           if (_onRemoteStream != null) {
@@ -196,6 +225,7 @@ class VideoCallService {
         c['sdpMid'],
         c['sdpMLineIndex'],
       );
+      debugPrint('🌍 Remote ICE Candidate: ${candidate.candidate}');
 
       try {
         final state = _peerConnection!.signalingState;
@@ -212,10 +242,10 @@ class VideoCallService {
       }
     });
 
-    socket.onCallRequest((data) {
-      debugPrint('📞 Appel entrant reçu.');
-      onCallRequest?.call();
-    });
+    // socket.onCallRequest((data) {
+    //   debugPrint('📞 Appel entrant reçu.');
+    //   onCallRequest?.call();
+    // });
 
     socket.onCallAccepted((data) async {
       if (_isCaller) {
@@ -275,7 +305,6 @@ class VideoCallService {
       'offer',
       'answer',
       'candidate',
-      'call_request',
       'call_accepted',
       'call_refused',
     ]);
@@ -289,6 +318,7 @@ class VideoCallService {
   Future<void> dispose() async {
     try {
       await _peerConnection?.close();
+      debugPrint('✅ RTCPeerConnection closed');
       await localStream?.dispose();
       await remoteStream?.dispose();
     } catch (e) {

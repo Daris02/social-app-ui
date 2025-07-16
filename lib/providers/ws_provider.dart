@@ -36,12 +36,10 @@ class WebSocketService {
 
     _socket!.onConnect((_) {
       _isConnected = true;
-      debugPrint('[Socket.io] Connected');
     });
 
     _socket!.onDisconnect((_) {
       _isConnected = false;
-      debugPrint('[Socket.io] Disconnected');
       _connectedUsers.clear();
       _streamController.add(_connectedUsers);
     });
@@ -82,9 +80,9 @@ class WebSocketService {
           }
           break;
         default:
-          debugPrint(
-            '📨 EVENT: $event | DATA: ${data != null ? 'exist' : 'empty'}',
-          );
+          // debugPrint(
+          //   '📨 EVENT: $event | DATA: ${data != null ? 'exist' : 'empty'}',
+          // );
       }
     });
   }
@@ -118,6 +116,19 @@ class WebSocketService {
     return _connectedUsers.contains(userId);
   }
 
+  void sendPostUpdate(String userId, int postId) {
+    send('post_updated', postId);
+  }
+
+  void onPostUpdated(void Function(int postId) callback) {
+    _socket?.on('post_updated', (data) {
+      final postId = data is Map && data['postId'] is int
+          ? data['postId']
+          : null;
+      if (postId != null) callback(postId);
+    });
+  }
+
   void sendCallRequest(String userId, String toUserId, String roomId) {
     send('call_request', {'to': toUserId, 'from': userId, 'roomId': roomId});
   }
@@ -132,6 +143,19 @@ class WebSocketService {
 
   void onCallRequest(void Function(dynamic data) callback) {
     _socket?.on('call_request', callback);
+  }
+
+  bool _isCallRequestHandlerAttached = false;
+
+  void attachGlobalCallRequestHandler(void Function(dynamic data) callback) {
+    if (_isCallRequestHandlerAttached) {
+      debugPrint('📞 Handler déjà attaché');
+      return;
+    }
+
+    debugPrint('📞 [WebSocketService] Attaching global call_request handler');
+    _socket?.on('call_request', callback);
+    _isCallRequestHandlerAttached = true;
   }
 
   void onCallAccepted(void Function(dynamic data) callback) {

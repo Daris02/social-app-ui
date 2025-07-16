@@ -57,10 +57,11 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
       body: Column(
         children: [
           SizedBox(
-            height: 70,
+            height: 80,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: _contacts.length,
+              padding: EdgeInsets.all(10),
               itemBuilder: (context, index) {
                 return UserCircleView(user: _contacts[index]);
               },

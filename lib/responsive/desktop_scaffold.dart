@@ -22,23 +22,29 @@ class _DesktopScaffoldState extends ConsumerState<DesktopScaffold> {
       body: Row(
         children: [
           // open drawer
-          Container(child: myDrawer(context, router, provider)),
+          Container(
+            color: Theme.of(context).colorScheme.surface,
+            child: myDrawer(context, router, provider),
+          ),
 
           // rest of body
           Expanded(
             flex: 2,
-            child: Column(
-              children: [
-                Expanded(
-                  child: PostScreen(),
-                ),
-              ],
-            ),
+            child: Column(children: [Expanded(child: PostScreen())]),
           ),
           Expanded(
             flex: 1,
             child: Column(
-              children: [Expanded(child: Container(color: Colors.amberAccent))],
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      border: Border.all(color: Colors.red, width: 2),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

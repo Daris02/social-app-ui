@@ -116,7 +116,9 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('🎬 isRemoteVideoDisplayed: $_hasRemoteVideo | srcObject=${_remoteRenderer.srcObject}');
+    debugPrint(
+      '🎬 isRemoteVideoDisplayed: $_hasRemoteVideo | srcObject=${_remoteRenderer.srcObject}',
+    );
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(

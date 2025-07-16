@@ -27,11 +27,16 @@ class LastMessageView extends ConsumerWidget {
 
         return ListTile(
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (_) => MessageView(partner: user),
-            ));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => MessageView(partner: user)),
+            );
           },
-          leading: UserCircleView(user: user),
+          leading: Container(
+            height: 70,
+            width: 100,
+            child: UserCircleView(user: user),
+          ),
           title: Text('${user.firstName} ${user.lastName}'),
           subtitle: Text(
             lastMessage,

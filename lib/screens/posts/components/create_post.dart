@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:social_app/services/post_service.dart';
 
 class CreatePostScreen extends StatefulWidget {
@@ -14,13 +14,22 @@ class CreatePostScreen extends StatefulWidget {
 class _CreatePostScreenState extends State<CreatePostScreen> {
   final titleController = TextEditingController();
   final contentController = TextEditingController();
-  XFile? mediaFile;
+  PlatformFile? mediaFile;
+  PlatformFile? pickedFile;
+  bool isLoading = false;
+  String? statusMessage;
+  bool isSuccess = false;
 
   Future<void> pickMedia() async {
-    final ImagePicker picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery); // ou pickVideo
-    if (picked != null) {
-      setState(() => mediaFile = picked);
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.any,
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        mediaFile = result.files.first;
+      });
     }
   }
 
@@ -28,59 +37,147 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     final title = titleController.text.trim();
     final content = contentController.text.trim();
 
-    if (title.isEmpty || content.isEmpty) return;
+    debugPrint('Publishing post ...');
 
-    await PostService.createPost(
-      title,
-      content,
-      file: mediaFile,
-    );
+    if (title.isEmpty) return;
 
-    Navigator.pop(context);
+    setState(() {
+      isLoading = true;
+      statusMessage = null;
+      isSuccess = false;
+    });
+
+    try {
+      await PostService.createPost(title, content, file: mediaFile);
+
+      setState(() {
+        isLoading = false;
+        isSuccess = true;
+        statusMessage = "Publication envoyée avec succès ✅";
+      });
+
+      await Future.delayed(const Duration(seconds: 1));
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        isSuccess = false;
+        statusMessage = "Erreur lors de l’envoi ❌ : $e";
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    Color colorTheme = Theme.of(context).colorScheme.inversePrimary;
     return Scaffold(
       appBar: AppBar(title: const Text("Nouvelle publication")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(labelText: 'Titre'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: contentController,
-              maxLines: 5,
-              decoration: const InputDecoration(labelText: 'Contenu'),
-            ),
-            const SizedBox(height: 12),
-            if (mediaFile != null)
-              Container(
-                height: 150,
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  border: Border.all(),
+      body: Center(
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 500),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: ListView(
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(labelText: 'Titre'),
                 ),
-                child: Image.file(File(mediaFile!.path), fit: BoxFit.cover),
-              ),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.attach_file),
-              label: const Text("Ajouter une image ou vidéo"),
-              onPressed: pickMedia,
+                const SizedBox(height: 12),
+                TextField(
+                  controller: contentController,
+                  maxLines: 5,
+                  decoration: const InputDecoration(labelText: 'Contenu'),
+                ),
+                const SizedBox(height: 12),
+                if (mediaFile != null)
+                  Container(
+                    height: 150,
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(border: Border.all()),
+                    child: _buildFilePreview(mediaFile!),
+                  ),
+
+                const SizedBox(height: 12),
+                // if (mediaFile != null)
+                //   Container(
+                //     height: 150,
+                //     width: double.infinity,
+                //     margin: const EdgeInsets.only(bottom: 12),
+                //     decoration: BoxDecoration(border: Border.all()),
+                //     child: Image.file(
+                //       File(mediaFile!.path!),
+                //       fit: BoxFit.cover,
+                //     ),
+                //   ),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.attach_file, color: colorTheme),
+                  label: Text(
+                    "Ajouter une image ou vidéo",
+                    style: TextStyle(color: colorTheme),
+                  ),
+                  onPressed: pickMedia,
+                ),
+                const SizedBox(height: 24),
+                if (isLoading)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(12),
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+
+                if (statusMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      statusMessage!,
+                      style: TextStyle(
+                        color: isSuccess ? Colors.green : Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ElevatedButton(
+                  onPressed: publishPost,
+                  child: Text("Publier", style: TextStyle(color: colorTheme)),)
+              ],
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: publishPost,
-              child: const Text("Publier"),
-            ),
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  Widget _buildFilePreview(PlatformFile file) {
+    final ext = file.extension?.toLowerCase() ?? '';
+    final path = file.path ?? '';
+
+    debugPrint('Extension: $ext');
+
+    if (['jpg', 'jpeg', 'png', 'gif'].contains(ext)) {
+      debugPrint('Image: $ext');
+      return Image.file(File(path), fit: BoxFit.cover);
+    } else if (['mp4', 'mov', 'mkv', 'webm'].contains(ext)) {
+      return const Center(
+        child: Icon(Icons.videocam, size: 48, color: Colors.grey),
+      );
+    } else {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.insert_drive_file, size: 48, color: Colors.grey),
+            const SizedBox(height: 8),
+            Text(
+              ext.toUpperCase(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
