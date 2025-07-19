@@ -91,10 +91,11 @@ jobs:
       - name: Remove linux_screen.dart to avoid build errors on Windows
         run: | 
           Remove-Item lib/screens/posts/components/video_player/linux_screen.dart -ErrorAction SilentlyContinue
-
+      
       - name: Replace video_player_platform.dart for Windows build
         run: |
-          echo "export 'screen.dart';" > lib/screens/posts/components/video_player_platform.dart
+          Set-Content -Path lib/screens/posts/components/video_player_platform.dart -Value "export 'screen.dart';"
+        shell: pwsh
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
