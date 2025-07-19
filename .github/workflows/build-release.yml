@@ -89,9 +89,8 @@ jobs:
         shell: cmd
 
       - name: Remove linux_screen.dart to avoid build errors on Windows
-        run: |
-          del "lib/screens/posts/components/video_player/linux_screen.dart"
-        shell: cmd
+        run: | 
+          Remove-Item lib/screens/posts/components/video_player/linux_screen.dart -ErrorAction SilentlyContinue
 
       - name: Replace video_player_platform.dart for Windows build
         run: |
