@@ -94,11 +94,11 @@ jobs:
       
       - name: Replace video_player_platform.dart for Windows build
         run: |
-          Set-Content -Path lib/screens/posts/components/video_player_platform.dart -Value "export 'screen.dart';"
+          Set-Content -Path lib/screens/posts/components/video_player/video_player_platform.dart -Value "export 'screen.dart';"
         shell: pwsh
 
       - name:  Show final video_player_platform.dart
-        run: Get-Content lib/screens/posts/components/video_player_platform.dart
+        run: Get-Content lib/screens/posts/components/video_player/video_player_platform.dart
         shell: pwsh
 
       - name: Set up Flutter
