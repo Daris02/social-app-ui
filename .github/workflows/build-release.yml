@@ -97,6 +97,10 @@ jobs:
           Set-Content -Path lib/screens/posts/components/video_player_platform.dart -Value "export 'screen.dart';"
         shell: pwsh
 
+      - name: Show video_player_platform.dart content
+        run: Get-Content lib/screens/posts/components/video_player_platform.dart
+        shell: pwsh
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
