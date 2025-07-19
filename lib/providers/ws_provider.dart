@@ -35,7 +35,7 @@ class WebSocketService {
     );
 
     _socket!.onConnect((_) {
-      _isConnected = true;
+      _isConnected = _socket!.connected;
     });
 
     _socket!.onDisconnect((_) {
@@ -80,11 +80,12 @@ class WebSocketService {
           }
           break;
         default:
-          // debugPrint(
-          //   '📨 EVENT: $event | DATA: ${data != null ? 'exist' : 'empty'}',
-          // );
       }
     });
+  }
+
+  void send(String event, dynamic payload) {
+    _socket?.emit(event, payload);
   }
 
   StreamSubscription<Message> onMessage(void Function(Message) callback) {
@@ -106,10 +107,6 @@ class WebSocketService {
 
   void sendMessage(int toUserId, String message) {
     send('chat', {'to': toUserId, 'content': message});
-  }
-
-  void send(String event, dynamic payload) {
-    _socket?.emit(event, payload);
   }
 
   bool isConnected(int userId) {

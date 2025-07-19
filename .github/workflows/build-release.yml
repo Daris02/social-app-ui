@@ -85,6 +85,9 @@ jobs:
       - name: Enable Windows
         run: flutter config --enable-windows-desktop
 
+      - name: Use pubspec-windows.yaml
+        run: Copy-Item pubspec-windows.yaml pubspec.yaml -Force
+
       - name: Install dependencies
         run: flutter pub get
 

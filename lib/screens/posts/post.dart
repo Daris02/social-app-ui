@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
+import 'package:social_app/routes/app_router.dart';
 import 'package:social_app/screens/posts/components/create_post.dart';
 import 'package:social_app/models/post.dart';
 import 'package:social_app/screens/posts/components/post_view.dart';
@@ -92,14 +94,13 @@ class _PostScreenState extends ConsumerState<PostScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
-
+    final router = ref.read(appRouterProvider);
     return KeyboardListener(
       focusNode: _keyboardFocus..requestFocus(),
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Publications"),
-          centerTitle: true,
           actions: [
             IconButton(
               icon: const Icon(Icons.add),
@@ -112,6 +113,7 @@ class _PostScreenState extends ConsumerState<PostScreen> {
             ),
           ],
         ),
+        drawer: isDesktop(context) ? null : myDrawer(context, router, userProvider),
         body: isFirstLoadRunning
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(

@@ -13,9 +13,7 @@ class AppStartupObserver extends ProviderObserver {
     Object? newValue,
     ProviderContainer container,
   ) {
-    debugPrint('📞 [global] Update provider');
     if (provider == userProvider && newValue != null) {
-      debugPrint('📞 [global] Update provider and confirm value');
       final user = newValue as User;
       final socket = container.read(webSocketServiceProvider);
       _listenToIncomingCalls(container, socket, user);
@@ -27,21 +25,16 @@ class AppStartupObserver extends ProviderObserver {
     WebSocketService socket,
     User user,
   ) {
-    debugPrint('📞 [global] Init listening call request');
-
     void attachHandler() {
       if (socket.hasConnected) {
-        debugPrint('📞 [global] socket connecté, handler attaché');
         socket.attachGlobalCallRequestHandler((data) {
-          debugPrint('📞 [global] Call request venant du socket');
           final peerName = data['fromName'] ?? 'Inconnu';
           final peerId = data['from']?.toString();
           if (peerId == null) return;
           showIncomingCallNotification(peerName, peerId);
         });
       } else {
-        debugPrint('📞 [global] socket pas encore connecté, attente...');
-        Future.delayed(const Duration(milliseconds: 200), attachHandler);
+        Future.delayed(const Duration(milliseconds: 1000), attachHandler);
       }
     }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
 import '../routes/app_router.dart';
 
@@ -17,6 +18,9 @@ class _SettingState extends ConsumerState<SettingScreen> {
     final router = ref.read(appRouterProvider);
     return Scaffold(
       appBar: AppBar(title: Text("Paramètre")),
+      drawer: isDesktop(context)
+          ? null
+          : myDrawer(context, router, userProvider),
       body: Padding(
         padding: EdgeInsetsGeometry.all(20),
         child: Column(

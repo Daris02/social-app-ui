@@ -3,48 +3,37 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/routes/app_router.dart';
-import 'package:social_app/screens/posts/post.dart';
 
-class DesktopScaffold extends ConsumerStatefulWidget {
-  const DesktopScaffold({super.key});
+class DesktopScaffold extends ConsumerWidget {
+  final Widget child;
+  const DesktopScaffold({super.key, required this.child});
 
   @override
-  ConsumerState createState() => _DesktopScaffoldState();
-}
-
-class _DesktopScaffoldState extends ConsumerState<DesktopScaffold> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final provider = ref.read(userProvider.notifier);
     final router = ref.read(appRouterProvider);
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: Row(
         children: [
-          // open drawer
           Container(
             color: Theme.of(context).colorScheme.surface,
             child: myDrawer(context, router, provider),
           ),
 
-          // rest of body
           Expanded(
             flex: 2,
-            child: Column(children: [Expanded(child: PostScreen())]),
+            child: child,
           ),
+
           Expanded(
             flex: 1,
-            child: Column(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      border: Border.all(color: Colors.red, width: 2),
-                    ),
-                  ),
-                ),
-              ],
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                border: Border.all(color: Colors.red, width: 2),
+              ),
             ),
           ),
         ],

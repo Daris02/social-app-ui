@@ -3,20 +3,21 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:social_app/services/post_service.dart';
 
-class VideoPlayerScreen extends StatefulWidget {
+class VideoPlayerScreenLinux extends StatefulWidget {
   final String url;
-  const VideoPlayerScreen({super.key, required this.url});
+  const VideoPlayerScreenLinux({super.key, required this.url});
 
   @override
-  State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
+  State<VideoPlayerScreenLinux> createState() => _VideoPlayerScreenLinuxState();
 }
 
-class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
+class _VideoPlayerScreenLinuxState extends State<VideoPlayerScreenLinux> {
   late final player = Player();
   late final controller = VideoController(player);
 
   @override
   void initState() {
+    MediaKit.ensureInitialized();
     super.initState();
     player.open(Media(widget.url));
   }

@@ -19,9 +19,14 @@ final userInitProvider = FutureProvider<void>((ref) async {
     final user = User.fromJson(jsonDecode(userJson));
     await ref.read(userProvider.notifier).setUser(user);
     final socket = ref.read(webSocketServiceProvider);
+    bool connected = false;
     if (!socket.hasConnected) {
       socket.connect(user.token);
       socket.send('user_connected', {'userId': user.id});
+      connected = true;
+    }
+    if (!connected) {
+      await ref.read(userProvider.notifier).clearUser();
     }
   }
 });
@@ -87,7 +92,9 @@ class UserController extends StateNotifier<User?> {
   Future<bool> register(CreateUser newUser) async {
     try {
       final res = await AuthService.register(newUser);
-      return res;
+      debugPrint('Response: $res');
+      if (res == 'user_created') return true;
+      return false;
     } catch (_) {
       return false;
     }

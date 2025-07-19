@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/main.dart';
-import 'package:social_app/screens/home.dart';
+import 'package:social_app/responsive/desktop_scaffold.dart';
+import 'package:social_app/responsive/mobile_scaffold.dart';
 import 'package:social_app/screens/auth/login.dart';
 import 'package:social_app/screens/auth/register.dart';
 import 'package:social_app/providers/user_provider.dart';
@@ -34,30 +35,36 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: GoRouterRefreshStream(
       ref.watch(userProvider.notifier).stream,
     ),
+    initialLocation: '/login',
     routes: [
       GoRoute(
-        path: '/',
-        builder: (context, state) => HomeScreen(),
-        redirect: (context, state) {
-          final user = ref.read(userProvider);
-          if (user == null) return '/login';
-          return null;
-        },
-      ),
-      GoRoute(
         path: '/login',
-        builder: (context, state) => LoginScreen(),
+        builder: (context, state) => const LoginScreen(),
         redirect: (context, state) {
           final user = ref.read(userProvider);
           if (user != null) return '/';
           return null;
         },
       ),
-      GoRoute(path: '/posts', builder: (context, state) => PostScreen()),
-      GoRoute(path: '/register', builder: (context, state) => RegisterScreen()),
-      GoRoute(path: '/profile', builder: (context, state) => ProfileScreen()),
-      GoRoute(path: '/messages', builder: (context, state) => MessageScreen()),
-      GoRoute(path: '/settings', builder: (context, state) => SettingScreen()),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+
+      ShellRoute(
+        builder: (context, state, child) {
+          final isDesktop = MediaQuery.of(context).size.width >= 900;
+          return isDesktop
+              ? DesktopScaffold(child: child)
+              : MobileScaffold(child: child);
+        },
+        routes: [
+          GoRoute(path: '/', builder: (_, __) => const PostScreen()),
+          GoRoute(path: '/messages', builder: (_, __) => const MessageScreen()),
+          GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+          GoRoute(path: '/settings', builder: (_, __) => const SettingScreen()),
+        ],
+      ),
     ],
   );
 });

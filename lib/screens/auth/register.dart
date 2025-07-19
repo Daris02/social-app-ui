@@ -95,12 +95,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ),
         );
     if (success) {
-      router.go('/login');
+      // router.go('/login');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Inscription reussi'), backgroundColor: Colors.green,));
     } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Échec d\'inscription')));
+      ).showSnackBar(const SnackBar(content: Text('Échec d\'inscription'), backgroundColor: Colors.red,));
     }
+  }
+
+  // Future<bool> _verifyEmail() {
+    
+  // }
+
+  void _emailVerified() {
+    
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +9,10 @@ import 'package:social_app/models/enums/reaction_type.dart';
 import 'package:social_app/models/post.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/ws_provider.dart';
+import 'package:social_app/screens/posts/components/video_player.dart';
 import 'package:social_app/screens/posts/components/video_thumbnail.dart';
-import 'package:social_app/screens/posts/image_view_screen.dart';
-import 'package:social_app/screens/posts/video_player_screen.dart';
+import 'package:social_app/screens/posts/components/image_view.dart';
+import 'package:social_app/screens/posts/components/video_player_linux.dart';
 import 'package:social_app/services/post_service.dart';
 
 class PostView extends ConsumerStatefulWidget {
@@ -277,17 +279,17 @@ class _PostViewState extends ConsumerState<PostView>
                                 ),
                               ),
                             ),
-                            Positioned(
-                              top: 8,
-                              right: 8,
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.download,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () => PostService.downloadMedia(url),
-                              ),
-                            ),
+                            // Positioned(
+                            //   top: 8,
+                            //   right: 8,
+                            //   child: IconButton(
+                            //     icon: const Icon(
+                            //       Icons.download,
+                            //       color: Colors.white,
+                            //     ),
+                            //     onPressed: () => PostService.downloadMedia(url),
+                            //   ),
+                            // ),
                           ],
                         ),
                       );
@@ -342,8 +344,12 @@ class _PostViewState extends ConsumerState<PostView>
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) =>
-                                                VideoPlayerScreen(url: url),
+                                            builder: (_) {
+                                              if (Platform.isLinux) {
+                                                return VideoPlayerScreenLinux(url: url);
+                                              }
+                                              return CachedChewiePlayer(videoUrl: url);
+                                            }
                                           ),
                                         );
                                       },

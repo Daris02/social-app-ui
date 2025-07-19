@@ -30,7 +30,7 @@ class AuthService {
     }
   }
 
-  static dynamic register(CreateUser newUser) async {
+  static Future<String> register(CreateUser newUser) async {
     try {
       final res = await dio.post(
         '/auth/register',
@@ -50,23 +50,19 @@ class AuthService {
           'entryDate': newUser.entryDate.toString(),
         },
       );
-      if (res.statusCode == 201) return true;
-      return false;
+      return 'user_created';
     } on DioException catch (e) {
+      if (e.response?.statusCode == 201) {
+        return 'user_created';
+      }
       if (e.response?.statusCode == 409) {
-        if (kDebugMode) print('Email déjà utilisé.');
         return 'email_exists';
       } else if (e.response?.statusCode == 400) {
-        if (kDebugMode) print('Erreur de validation: ${e.response?.data}');
-        return 'validation_error';
+        return 'validation_error: ${e.response?.data}';
       }
-      if (kDebugMode) print('Erreur serveur: $e');
-      return false;
+      return 'server_error';
     } catch (e) {
-      if (kDebugMode) {
-        print('Error during registration: $e');
-      }
-      return false;
+      return 'error_during_user_creation';
     }
   }
 
@@ -80,6 +76,55 @@ class AuthService {
     } catch (e) {
       if (kDebugMode) {
         print('Error during login: $e');
+      }
+      return false;
+    }
+  }
+
+  static dynamic verifyEmailWithCode(String email, String code) async {
+    try {
+      final res = await dio.post(
+        '/auth/verify-email',
+        data: {'email': email, 'code': code},
+      );
+      return res.statusCode;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error during verification email with code: $e');
+      }
+      return false;
+    }
+  }
+
+  static dynamic forgotPassword(String email) async {
+    try {
+      final res = await dio.post(
+        '/auth/password-forgot',
+        data: {'email': email},
+      );
+      return res.statusCode;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error during forgot password: $e');
+      }
+      return false;
+    }
+  }
+
+  static dynamic resetPassword(
+    String email,
+    String code,
+    String newPassword,
+  ) async {
+    try {
+      final res = await dio.post(
+        '/auth/verify-email',
+        data: {'email': email, 'code': code, 'newPassword': newPassword},
+      );
+      return res.statusCode;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error during reset password: $e');
       }
       return false;
     }

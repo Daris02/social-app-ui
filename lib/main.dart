@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:media_kit/media_kit.dart';
 import 'package:social_app/constant/api.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/messages/call_screen.dart';
@@ -62,7 +61,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   DioClient.init();
-  MediaKit.ensureInitialized();
 
   final initializationSettings = InitializationSettings(
     android: AndroidInitializationSettings('@mipmap/ic_launcher'),
@@ -96,13 +94,17 @@ class MyApp extends ConsumerWidget {
       loading: () => MaterialApp(
         home: const Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
-      error: (err, _) => MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          body: Center(child: Text("Erreur init: ${err.toString()}")),
-        ),
-      ),
+      error: (err, data) {
+        final appRouter = ref.watch(appRouterProvider);
+        debugPrint('Data : $data');
+        return MaterialApp.router(
+          title: 'Flutter App Auth',
+          debugShowCheckedModeBanner: false,
+          routerConfig: appRouter,
+          theme: lightMode,
+          darkTheme: darkMode,
+        );
+      },
       data: (_) {
         final appRouter = ref.watch(appRouterProvider);
         return MaterialApp.router(

@@ -117,6 +117,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('Échec de connexion'),
+                                    backgroundColor: Colors.red,
                                   ),
                                 );
                               }

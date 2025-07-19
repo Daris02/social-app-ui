@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/routes/app_router.dart';
 
@@ -16,12 +18,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final user = ref.watch(userProvider);
     final colorSchema = Theme.of(context).colorScheme;
     final router = ref.read(appRouterProvider);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Profile'),
-        centerTitle: true,
-        actions: [IconButton(onPressed: () {router.push('/settings');}, icon: Icon(Icons.settings))],
+      appBar: AppBar(title: Text('Profile'), centerTitle: true, actions: [
+        ],
       ),
+      drawer: isDesktop(context)
+          ? null
+          : myDrawer(context, router, userProvider),
       body: Center(
         child: Container(
           constraints: BoxConstraints(maxWidth: 400),
@@ -29,9 +33,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             children: [
               Column(
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: NetworkImage(user!.photo!),
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colorSchema.inversePrimary,
+                      image: DecorationImage(
+                        image: NetworkImage(user!.photo!),
+                        fit: BoxFit.cover,
+                        onError: (error, stackTrace) {
+                          if (kDebugMode) {
+                            debugPrint('Error loading user photo: $error');
+                          }
+                        },
+                      ),
+                    ),
                   ),
                   SizedBox(height: 10),
                   Text(
@@ -52,8 +67,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             'Message',
                             style: TextStyle(color: colorSchema.inversePrimary),
                           ),
-                          icon: Icon(Icons.message_rounded, color: colorSchema.inversePrimary,),
-                          
+                          icon: Icon(
+                            Icons.message_rounded,
+                            color: colorSchema.inversePrimary,
+                          ),
                         ),
                         ElevatedButton.icon(
                           onPressed: () {},
@@ -61,7 +78,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             'Call',
                             style: TextStyle(color: colorSchema.inversePrimary),
                           ),
-                          icon: Icon(Icons.call, color: colorSchema.inversePrimary,),
+                          icon: Icon(
+                            Icons.call,
+                            color: colorSchema.inversePrimary,
+                          ),
                         ),
                       ],
                     ),
