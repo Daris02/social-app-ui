@@ -42,6 +42,7 @@ dependencies:
   chewie: ^1.12.1
   cached_video_player_plus: ^4.0.1
   platform_info: ^5.0.0
+  hugeicons: ^0.0.11
 
 dev_dependencies:
   flutter_test:
