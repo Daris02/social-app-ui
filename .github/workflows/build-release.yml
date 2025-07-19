@@ -85,11 +85,11 @@ jobs:
       - name: Enable Windows
         run: flutter config --enable-windows-desktop
 
-      - name: Replace pubspec.yaml with Windows version
-        run: |
-          Remove-Item pubspec.yaml
-          Copy-Item pubspec-windows.yaml pubspec.yaml
-        shell: pwsh
+      # - name: Replace pubspec.yaml with Windows version
+      #   run: |
+      #     Remove-Item pubspec.yaml
+      #     Copy-Item pubspec-windows.yaml pubspec.yaml
+      #   shell: pwsh
 
       # - name: Remove linux_screen.dart to avoid build errors on Windows
       #   run: Remove-Item lib/screens/posts/components/video_player/linux_screen.dart -ErrorAction SilentlyContinue
