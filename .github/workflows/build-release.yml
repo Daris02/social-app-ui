@@ -90,11 +90,20 @@ jobs:
       - name: Enable Windows
         run: flutter config --enable-windows-desktop
 
+      - name: Replace pubspec.yaml for Windows
+        run: |
+          del pubspec.yaml
+          rename pubspec-windows.yaml pubspec.yaml
+        shell: cmd
+
       - name: Install dependencies
         run: flutter pub get
 
       - name: Create .env
         run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Clean Flutter
+        run: flutter clean
 
       - name: Build Windows
         run: flutter build windows
