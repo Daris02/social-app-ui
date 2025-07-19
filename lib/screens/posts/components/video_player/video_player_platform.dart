@@ -1,1 +1,2 @@
-export 'screen.dart' if (dart.library.ffi) 'linux_screen.dart';
+export 'screen.dart'
+    if (dart.library.ffi) 'linux_screen.dart';
