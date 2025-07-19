@@ -3,23 +3,23 @@ import 'package:chewie/chewie.dart';
 import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:social_app/services/post_service.dart';
 
-class VideoPlayerScreenDefault extends StatefulWidget {
-  final String videoUrl;
+class VideoPlayerScreen extends StatefulWidget {
+  final String url;
   final bool autoPlay;
   final bool looping;
 
-  const VideoPlayerScreenDefault({
+  const VideoPlayerScreen({
     super.key,
-    required this.videoUrl,
+    required this.url,
     this.autoPlay = true,
     this.looping = false,
   });
 
   @override
-  State<VideoPlayerScreenDefault> createState() => _VideoPlayerScreenDefaultState();
+  State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
 }
 
-class _VideoPlayerScreenDefaultState extends State<VideoPlayerScreenDefault> {
+class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   late CachedVideoPlayerPlus _videoPlayerController;
   ChewieController? _chewieController;
 
@@ -31,7 +31,7 @@ class _VideoPlayerScreenDefaultState extends State<VideoPlayerScreenDefault> {
 
   Future<void> _initializePlayer() async {
     _videoPlayerController = CachedVideoPlayerPlus.networkUrl(
-      Uri.parse(widget.videoUrl),
+      Uri.parse(widget.url),
     );
 
     await _videoPlayerController.initialize();
@@ -68,7 +68,7 @@ class _VideoPlayerScreenDefaultState extends State<VideoPlayerScreenDefault> {
         actions: [
           IconButton(
             icon: const Icon(Icons.download_rounded),
-            onPressed: () => PostService.downloadMedia(widget.videoUrl),
+            onPressed: () => PostService.downloadMedia(widget.url),
           ),
         ],
       ),

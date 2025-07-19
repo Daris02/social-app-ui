@@ -95,6 +95,15 @@ jobs:
           del pubspec.yaml
           rename pubspec-windows.yaml pubspec.yaml
         shell: cmd
+      
+      - name: Remove linux_screen.dart to avoid build errors on Windows
+        run: |
+          del lib/screens/posts/components/video_player/linux_screen.dart
+        shell: cmd
+
+      - name: Replace video_player_platform.dart for Windows build
+        run: |
+          echo "export 'screen.dart';" > lib/screens/posts/components/video_player_platform.dart
 
       - name: Install dependencies
         run: flutter pub get
