@@ -77,6 +77,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Replace pubspec.yaml with Windows version
+        run: |
+          Remove-Item pubspec.yaml
+          Copy-Item pubspec-windows.yaml pubspec.yaml
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -84,9 +89,6 @@ jobs:
 
       - name: Enable Windows
         run: flutter config --enable-windows-desktop
-
-      - name: Use pubspec-windows.yaml
-        run: Copy-Item pubspec-windows.yaml pubspec.yaml -Force
 
       - name: Install dependencies
         run: flutter pub get
