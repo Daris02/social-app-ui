@@ -3,12 +3,12 @@ import 'package:chewie/chewie.dart';
 import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:social_app/services/post_service.dart';
 
-class CachedChewiePlayer extends StatefulWidget {
+class VideoPlayerScreenDefault extends StatefulWidget {
   final String videoUrl;
   final bool autoPlay;
   final bool looping;
 
-  const CachedChewiePlayer({
+  const VideoPlayerScreenDefault({
     super.key,
     required this.videoUrl,
     this.autoPlay = true,
@@ -16,10 +16,10 @@ class CachedChewiePlayer extends StatefulWidget {
   });
 
   @override
-  State<CachedChewiePlayer> createState() => _CachedChewiePlayerState();
+  State<VideoPlayerScreenDefault> createState() => _VideoPlayerScreenDefaultState();
 }
 
-class _CachedChewiePlayerState extends State<CachedChewiePlayer> {
+class _VideoPlayerScreenDefaultState extends State<VideoPlayerScreenDefault> {
   late CachedVideoPlayerPlus _videoPlayerController;
   ChewieController? _chewieController;
 
