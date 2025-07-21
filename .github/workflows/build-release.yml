@@ -102,7 +102,7 @@ jobs:
         run: echo "${{ secrets.ENV_FILE }}" > .env
 
       - name: Build Windows
-        run: flutter build windows
+        run: flutter build windows -v
 
       - name: Zip .exe
         run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath windows-build.zip
