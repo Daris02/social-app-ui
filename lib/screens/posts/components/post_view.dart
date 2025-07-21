@@ -9,7 +9,6 @@ import 'package:social_app/models/post.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/screens/posts/components/video_player/video_player.dart';
-import 'package:social_app/screens/posts/components/video_thumbnail.dart';
 import 'package:social_app/screens/posts/components/image_view.dart';
 import 'package:social_app/services/post_service.dart';
 
@@ -292,32 +291,13 @@ class _PostViewState extends ConsumerState<PostView>
                         ),
                       );
                     } else if (isVideo) {
-                      return FutureBuilder<Uint8List?>(
-                        future: getVideoThumbnail(url),
-                        builder: (context, snapshot) {
-                          Widget thumbnailWidget;
-
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            thumbnailWidget = Container(
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Stack(
+                          children: [
+                            Container(
                               height: 200,
-                              alignment: Alignment.center,
-                              child: const CircularProgressIndicator(),
-                            );
-                          } else if (snapshot.hasData &&
-                              snapshot.data != null) {
-                            thumbnailWidget = ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.memory(
-                                snapshot.data!,
-                                height: 200,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            );
-                          } else {
-                            thumbnailWidget = Container(
-                              height: 200,
+                              width: double.infinity,
                               color: Colors.black12,
                               child: const Center(
                                 child: Icon(
@@ -326,41 +306,32 @@ class _PostViewState extends ConsumerState<PostView>
                                   color: Colors.black45,
                                 ),
                               ),
-                            );
-                          }
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Stack(
-                              children: [
-                                thumbnailWidget,
-                                Positioned.fill(
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) =>
-                                                VideoPlayerScreen(url: url),
-                                          ),
-                                        );
-                                      },
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.play_circle_fill,
-                                          size: 64,
-                                          color: Colors.white,
-                                        ),
+                            ),
+                            Positioned.fill(
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            VideoPlayerScreen(url: url),
                                       ),
+                                    );
+                                  },
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.play_circle_fill,
+                                      size: 64,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          );
-                        },
+                          ],
+                        ),
                       );
                     } else {
                       return const SizedBox();
