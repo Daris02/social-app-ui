@@ -93,7 +93,7 @@ jobs:
         shell: pwsh
 
       - name: Replace video_player_platform.dart for Windows build
-        run: echo "export 'screen.dart';" > lib/screens/posts/components/video_player/video_player_platform.dart
+        run: echo "export 'mobile_screen.dart';" > lib/screens/posts/components/video_player/video_player_platform.dart
         shell: bash
 
       - name: Show final video_player_platform.dart
