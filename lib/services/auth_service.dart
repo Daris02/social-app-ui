@@ -50,6 +50,7 @@ class AuthService {
           'entryDate': newUser.entryDate.toString(),
         },
       );
+      debugPrint('Response: ${res.data}');
       return 'user_created';
     } on DioException catch (e) {
       if (e.response?.statusCode == 201) {

@@ -92,7 +92,6 @@ class UserController extends StateNotifier<User?> {
   Future<bool> register(CreateUser newUser) async {
     try {
       final res = await AuthService.register(newUser);
-      debugPrint('Response: $res');
       if (res == 'user_created') return true;
       return false;
     } catch (_) {

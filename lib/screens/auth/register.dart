@@ -38,6 +38,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   DateTime? _entryDate;
   bool _senator = false;
 
+  // Step 4
+  final _verificationCode = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -96,6 +99,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         );
     if (success) {
       // router.go('/login');
+      setState(() => _step++);
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOut,
+      );
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Inscription reussi'), backgroundColor: Colors.green,));
@@ -266,6 +274,64 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             labelText: "Service",
                           ),
                           const SizedBox(height: 12),
+                          DropdownButtonFormField<Direction>(
+                            value: _direction,
+                            items: Direction.values
+                                .map(
+                                  (direction) => DropdownMenuItem(
+                                    value: direction,
+                                    child: Text(direction.name),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (v) => setState(() => _direction = v),
+                            decoration: const InputDecoration(
+                              labelText: "Direction",
+                            ),
+                            validator: (v) =>
+                                v == null ? "Sélectionnez une direction" : null,
+                          ),
+                          const SizedBox(height: 12),
+                          ListTile(
+                            title: Text(
+                              _entryDate == null
+                                  ? "Date d'entrée au Sénat"
+                                  : DateFormat(
+                                      'yyyy-MM-dd',
+                                    ).format(_entryDate!),
+                            ),
+                            trailing: const Icon(Icons.calendar_today),
+                            onTap: () async {
+                              final picked = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(1950),
+                                lastDate: DateTime.now(),
+                              );
+                              if (picked != null) {
+                                setState(() => _entryDate = picked);
+                              }
+                            },
+                          ),
+                          CheckboxListTile(
+                            value: _senator,
+                            onChanged: (v) => setState(() => _senator = v!),
+                            title: const Text("secretaire particullier"),
+                          ),
+                        ],
+                      ),
+                      // Step 4: Verifcation par email
+                      ListView(
+                        padding: const EdgeInsets.all(16),
+                        children: [
+                          const Text(
+                            "Email verification code",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
                           DropdownButtonFormField<Direction>(
                             value: _direction,
                             items: Direction.values
