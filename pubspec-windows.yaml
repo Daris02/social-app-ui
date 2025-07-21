@@ -35,9 +35,7 @@ dependencies:
   http_parser: ^4.1.2
   permission_handler: ^12.0.1
   video_player: ^2.10.0
-  video_player_win:
-    git:
-      url: https://github.com/Daris02/video_player_win
+  # video_player_win: ^2.0.0
   video_thumbnail: ^0.5.6
   chewie: ^1.12.1
   cached_video_player_plus: ^4.0.1
