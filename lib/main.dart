@@ -82,7 +82,6 @@ void main() async {
     onDidReceiveBackgroundNotificationResponse: onNotificationResponse,
   );
   VideoPlayerMediaKit.ensureInitialized(
-    windows: true,
     linux: true,
   );
   runApp(ProviderScope(observers: [AppStartupObserver()], child: MyApp()));

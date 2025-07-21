@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_webrtc
   media_kit_video
   permission_handler_windows
+  video_player_win
   volume_controller
 )
 
