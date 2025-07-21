@@ -108,15 +108,7 @@ jobs:
 
       - name: Create .env
         run: echo "${{ secrets.ENV_FILE }}" > .env
-      
-      - name: Patch video_player_win CMakeLists.txt
-        run: |
-          $file = Get-ChildItem -Path "$env:USERPROFILE\.pub-cache\hosted" -Recurse -Filter "CMakeLists.txt" | Where-Object { $_.FullName -like "*video_player_win*windows*" } | Select-Object -First 1
-          if ($file) {
-            (Get-Content $file.FullName) -replace "add_custom_command\(TARGET flutter_video_player POST_BUILD DEPENDS", "add_custom_command(TARGET flutter_video_player POST_BUILD" | Set-Content $file.FullName
-            Write-Output "Patched $($file.FullName)"
-          }
-          
+
       - name: Build Windows
         run: flutter build windows
 
