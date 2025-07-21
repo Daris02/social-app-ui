@@ -88,10 +88,25 @@ class AuthService {
         '/auth/verify-email',
         data: {'email': email, 'code': code},
       );
-      return res.statusCode;
+      return res.statusCode == 201;
     } catch (e) {
       if (kDebugMode) {
         print('Error during verification email with code: $e');
+      }
+      return false;
+    }
+  }
+
+  static dynamic resendCode(String email) async {
+    try {
+      final res = await dio.post(
+        '/auth/resend-code',
+        data: {'email': email},
+      );
+      return res.statusCode == 201;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error during resending code to email with code: $e');
       }
       return false;
     }

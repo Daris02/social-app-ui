@@ -2,6 +2,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/enums/position.dart';
+import 'package:social_app/screens/auth/components/my_button.dart';
+import 'package:social_app/services/auth_service.dart';
 import '../../routes/app_router.dart';
 import 'package:social_app/models/create_user.dart';
 import 'package:social_app/providers/user_provider.dart';
@@ -17,6 +19,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _pageController = PageController();
+  bool _loading = false;
 
   // Step 1
   final _firstName = TextEditingController();
@@ -104,23 +107,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeOut,
       );
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Inscription reussi'), backgroundColor: Colors.green,));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Inscription reussi'),
+          backgroundColor: Colors.green,
+        ),
+      );
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Échec d\'inscription'), backgroundColor: Colors.red,));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Échec d\'inscription'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
   // Future<bool> _verifyEmail() {
-    
+
   // }
 
-  void _emailVerified() {
-    
-  }
+  void _emailVerified() {}
 
   @override
   Widget build(BuildContext context) {
@@ -332,49 +339,56 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          DropdownButtonFormField<Direction>(
-                            value: _direction,
-                            items: Direction.values
-                                .map(
-                                  (direction) => DropdownMenuItem(
-                                    value: direction,
-                                    child: Text(direction.name),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (v) => setState(() => _direction = v),
-                            decoration: const InputDecoration(
-                              labelText: "Direction",
-                            ),
-                            validator: (v) =>
-                                v == null ? "Sélectionnez une direction" : null,
+                          MyTextField(
+                            labelText: 'Code de verfication',
+                            obscureText: false,
+                            controller: _verificationCode,
+                            validator: (v) => (v!.isEmpty && (v.length < 6))
+                                ? "Champ requis et 6 caractères min."
+                                : null,
                           ),
-                          const SizedBox(height: 12),
-                          ListTile(
-                            title: Text(
-                              _entryDate == null
-                                  ? "Date d'entrée au Sénat"
-                                  : DateFormat(
-                                      'yyyy-MM-dd',
-                                    ).format(_entryDate!),
-                            ),
-                            trailing: const Icon(Icons.calendar_today),
+                          const SizedBox(height: 16),
+                          MyButton(
+                            text: "Verifier",
+                            loading: _loading,
+                            onTap: _loading
+                                ? null
+                                : () async {
+                                    setState(() => _loading = true);
+                                    try {
+                                      final isValide =
+                                          await AuthService.verifyEmailWithCode(
+                                            _email.text,
+                                            _verificationCode.text,
+                                          );
+                                      if (isValide) {
+                                        router.go('/login');
+                                      } else {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Échec de verification du code',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    } finally {
+                                      setState(() => _loading = false);
+                                    }
+                                  },
+                          ),
+                          const SizedBox(height: 16),
+                          GestureDetector(
                             onTap: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1950),
-                                lastDate: DateTime.now(),
-                              );
-                              if (picked != null) {
-                                setState(() => _entryDate = picked);
-                              }
+                              await AuthService.resendCode(_email.text);
                             },
-                          ),
-                          CheckboxListTile(
-                            value: _senator,
-                            onChanged: (v) => setState(() => _senator = v!),
-                            title: const Text("secretaire particullier"),
+                            child: Text(
+                              "Renvoyer le code de verification",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ],
                       ),
@@ -387,7 +401,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ? MainAxisAlignment.end
                       : MainAxisAlignment.spaceBetween,
                   children: [
-                    if (_step > 0)
+                    if (_step > 0 && _step < 3)
                       OutlinedButton(
                         onPressed: _prevStep,
                         child: Text(
