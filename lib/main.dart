@@ -7,6 +7,7 @@ import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/messages/call_screen.dart';
 import 'package:social_app/services/call_service.dart';
 import 'package:social_app/utils/app_startup_observer.dart';
+import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'routes/app_router.dart';
 import 'package:social_app/theme/dark_mode.dart';
 import 'package:social_app/theme/light_mode.dart';
@@ -79,6 +80,10 @@ void main() async {
     initializationSettings,
     onDidReceiveNotificationResponse: onNotificationResponse,
     onDidReceiveBackgroundNotificationResponse: onNotificationResponse,
+  );
+  VideoPlayerMediaKit.ensureInitialized(
+    windows: true,
+    linux: true,
   );
   runApp(ProviderScope(observers: [AppStartupObserver()], child: MyApp()));
 }
