@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart';
 import 'package:social_app/services/post_service.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
@@ -21,37 +20,52 @@ class VideoPlayerScreen extends StatefulWidget {
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   late VideoPlayerController _videoController;
-  ChewieController? _chewieController;
+  bool _isInitialized = false;
+  bool _isPlaying = false;
 
   @override
   void initState() {
     super.initState();
-    _initializePlayer();
+    _initializeVideo();
   }
 
-  Future<void> _initializePlayer() async {
+  Future<void> _initializeVideo() async {
     _videoController = VideoPlayerController.networkUrl(Uri.parse(widget.url));
     await _videoController.initialize();
+    _videoController.setLooping(widget.looping);
 
-    _chewieController = ChewieController(
-      videoPlayerController: _videoController,
-      autoPlay: widget.autoPlay,
-      looping: widget.looping,
-      allowFullScreen: false,
-      allowPlaybackSpeedChanging: true,
-      errorBuilder: (context, errorMessage) {
-        return Center(child: Text(errorMessage, style: TextStyle(color: Colors.white)));
-      },
-    );
+    if (widget.autoPlay) {
+      await _videoController.play();
+      _isPlaying = true;
+    }
 
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {
+        _isInitialized = true;
+      });
+    }
+
+    _videoController.addListener(() {
+      if (mounted) {
+        setState(() {
+          _isPlaying = _videoController.value.isPlaying;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
-    _chewieController?.dispose();
     _videoController.dispose();
     super.dispose();
+  }
+
+  void _togglePlayPause() {
+    if (_videoController.value.isPlaying) {
+      _videoController.pause();
+    } else {
+      _videoController.play();
+    }
   }
 
   @override
@@ -67,9 +81,31 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           ),
         ],
       ),
-      body: (_chewieController == null || !_videoController.value.isInitialized)
-          ? const Center(child: CircularProgressIndicator())
-          : Chewie(controller: _chewieController!),
+      body: Center(
+        child: !_isInitialized
+            ? const CircularProgressIndicator()
+            : Stack(
+                alignment: Alignment.center,
+                children: [
+                  AspectRatio(
+                    aspectRatio: _videoController.value.aspectRatio,
+                    child: VideoPlayer(_videoController),
+                  ),
+                  GestureDetector(
+                    onTap: _togglePlayPause,
+                    child: AnimatedOpacity(
+                      opacity: _isPlaying ? 0.0 : 1.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: const Icon(
+                        Icons.play_circle_fill,
+                        size: 64,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 }

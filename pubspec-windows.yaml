@@ -35,7 +35,6 @@ dependencies:
   permission_handler: ^12.0.1
   video_player: ^2.10.0
   video_player_win: ^2.0.0
-  chewie: ^1.12.1
   platform_info: ^5.0.0
   hugeicons: ^0.0.11
 
