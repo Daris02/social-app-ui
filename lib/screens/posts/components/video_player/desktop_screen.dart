@@ -1,65 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:video_player_media_kit/video_player_media_kit.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:social_app/services/post_service.dart';
-import 'package:chewie/chewie.dart';
-import 'package:video_player/video_player.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String url;
-  final bool autoPlay;
-  final bool looping;
-
-  const VideoPlayerScreen({
-    super.key,
-    required this.url,
-    this.autoPlay = true,
-    this.looping = false,
-  });
+  const VideoPlayerScreen({super.key, required this.url});
 
   @override
   State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late VideoPlayerController _videoPlayerController;
-  ChewieController? _chewieController;
+  late final Player _player;
+  late final VideoController _videoController;
 
   @override
   void initState() {
-    VideoPlayerMediaKit.ensureInitialized(linux: true);
+    MediaKit.ensureInitialized();
     super.initState();
-    _initializePlayer();
-  }
-
-  Future<void> _initializePlayer() async {
-    _videoPlayerController = VideoPlayerController.networkUrl(
-      Uri.parse(widget.url),
-    );
-    await _videoPlayerController.initialize();
-
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController,
-      autoPlay: widget.autoPlay,
-      looping: widget.looping,
-      allowFullScreen: true,
-      allowPlaybackSpeedChanging: true,
-      errorBuilder: (context, errorMessage) {
-        return Center(
-          child: Text(
-            errorMessage,
-            style: const TextStyle(color: Colors.white),
-          ),
-        );
-      },
-    );
-
-    if (mounted) setState(() {});
+    _player = Player();
+    _videoController = VideoController(_player);
+    _player.open(Media(widget.url));
   }
 
   @override
   void dispose() {
-    _chewieController?.dispose();
-    _videoPlayerController.dispose();
+    _player.dispose();
     super.dispose();
   }
 
@@ -76,11 +43,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           ),
         ],
       ),
-      body:
-          (_chewieController == null ||
-              !_videoPlayerController.value.isInitialized)
-          ? const Center(child: CircularProgressIndicator())
-          : Chewie(controller: _chewieController!),
+      body: Center(child: Video(controller: _videoController)),
     );
   }
 }

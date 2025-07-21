@@ -1,71 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:social_app/services/post_service.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String url;
-  final bool autoPlay;
-  final bool looping;
-
-  const VideoPlayerScreen({
-    super.key,
-    required this.url,
-    this.autoPlay = true,
-    this.looping = false,
-  });
+  const VideoPlayerScreen({super.key, required this.url});
 
   @override
   State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late VideoPlayerController _videoController;
-  bool _isInitialized = false;
-  bool _isPlaying = false;
+  late final Player _player;
+  late final VideoController _videoController;
 
   @override
   void initState() {
+    MediaKit.ensureInitialized();
     super.initState();
-    _initializeVideo();
-  }
-
-  Future<void> _initializeVideo() async {
-    _videoController = VideoPlayerController.networkUrl(Uri.parse(widget.url));
-    await _videoController.initialize();
-    _videoController.setLooping(widget.looping);
-
-    if (widget.autoPlay) {
-      await _videoController.play();
-      _isPlaying = true;
-    }
-
-    if (mounted) {
-      setState(() {
-        _isInitialized = true;
-      });
-    }
-
-    _videoController.addListener(() {
-      if (mounted) {
-        setState(() {
-          _isPlaying = _videoController.value.isPlaying;
-        });
-      }
-    });
+    _player = Player();
+    _videoController = VideoController(_player);
+    _player.open(Media(widget.url));
   }
 
   @override
   void dispose() {
-    _videoController.dispose();
+    _player.dispose();
     super.dispose();
-  }
-
-  void _togglePlayPause() {
-    if (_videoController.value.isPlaying) {
-      _videoController.pause();
-    } else {
-      _videoController.play();
-    }
   }
 
   @override
@@ -81,31 +43,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: !_isInitialized
-            ? const CircularProgressIndicator()
-            : Stack(
-                alignment: Alignment.center,
-                children: [
-                  AspectRatio(
-                    aspectRatio: _videoController.value.aspectRatio,
-                    child: VideoPlayer(_videoController),
-                  ),
-                  GestureDetector(
-                    onTap: _togglePlayPause,
-                    child: AnimatedOpacity(
-                      opacity: _isPlaying ? 0.0 : 1.0,
-                      duration: const Duration(milliseconds: 300),
-                      child: const Icon(
-                        Icons.play_circle_fill,
-                        size: 64,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-      ),
+      body: Center(child: Video(controller: _videoController)),
     );
   }
 }
