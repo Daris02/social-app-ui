@@ -25,7 +25,7 @@ class UserService {
       '/users/$id',
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
-    return User.fromJson(res as Map<String, dynamic>);
+    return User.fromJson(res.data);
   }
  
   static Future<User> updateUser(User user) async {
@@ -36,6 +36,6 @@ class UserService {
       '/users/${user.id}',
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
-    return User.fromJson(res as Map<String, dynamic>);
+    return User.fromJson(res.data as Map<String, dynamic>);
   }
 }
