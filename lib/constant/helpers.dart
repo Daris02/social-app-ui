@@ -42,14 +42,14 @@ Drawer myDrawer(BuildContext context, dynamic router, dynamic userProvider) {
           },
         ),
 
-        ListTile(
-          leading: const Icon(Icons.person),
-          title: const Text('P R O F I L E'),
-          onTap: () {
-            closeDrawerIfNeeded();
-            router.go('/profile');
-          },
-        ),
+        // ListTile(
+        //   leading: const Icon(Icons.person),
+        //   title: const Text('P R O F I L E'),
+        //   onTap: () {
+        //     closeDrawerIfNeeded();
+        //     router.go('/profile');
+        //   },
+        // ),
 
         ListTile(
           leading: const Icon(Icons.settings),
