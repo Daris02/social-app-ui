@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/routes/app_router.dart';
+import 'package:social_app/screens/messages/message.dart';
 
 class DesktopScaffold extends ConsumerWidget {
   final Widget child;
@@ -31,9 +32,9 @@ class DesktopScaffold extends ConsumerWidget {
             flex: 1,
             child: Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                border: Border.all(color: Colors.red, width: 2),
+                color: Theme.of(context).colorScheme.surface,
               ),
+              // child: (child.==(MessageScreen)) ? Center(child: Text('message'),): null,
             ),
           ),
         ],
