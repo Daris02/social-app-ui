@@ -1,31 +1,36 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/constant/helpers.dart';
+import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/user_provider.dart';
-import 'package:social_app/routes/app_router.dart';
+import 'package:social_app/screens/messages/chat_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
-  const ProfileScreen({super.key});
+  final User user;
+  const ProfileScreen({super.key, required this.user});
 
   @override
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  late User user;
+
+  @override
+  void initState() {
+    super.initState();
+    user = widget.user;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(userProvider);
     final colorSchema = Theme.of(context).colorScheme;
-    final router = ref.read(appRouterProvider);
-
     return Scaffold(
-      appBar: AppBar(title: Text('Profile'), centerTitle: true, actions: [
-        ],
+      appBar: AppBar(
+        title: Text('${user.firstName} ${user.lastName}'),
+        centerTitle: true,
+        actions: [],
       ),
-      drawer: isDesktop(context)
-          ? null
-          : myDrawer(context, router, userProvider),
       body: Center(
         child: Container(
           constraints: BoxConstraints(maxWidth: 400),
@@ -38,7 +43,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       shape: BoxShape.circle,
                       color: colorSchema.inversePrimary,
                       image: DecorationImage(
-                        image: NetworkImage(user!.photo!),
+                        image: NetworkImage(user.photo!),
                         fit: BoxFit.cover,
                         onError: (error, stackTrace) {
                           if (kDebugMode) {
@@ -49,10 +54,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  Text(
-                    '${user.firstName} ${user.lastName}',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  // Text(
+                  //   '${user.firstName} ${user.lastName}',
+                  //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  // ),
                   Text('Direction: ${user.direction?.name}'),
                   Text('Attribution: ${user.attribution}'),
                   SizedBox(height: 20),
@@ -62,7 +67,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MessageView(partner: user),
+                              ),
+                            );
+                          },
                           label: Text(
                             'Message',
                             style: TextStyle(color: colorSchema.inversePrimary),

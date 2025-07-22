@@ -11,7 +11,7 @@ import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/messages/message.dart';
 import 'package:social_app/screens/posts/post.dart';
 import 'package:social_app/screens/profile/profile.dart';
-import 'package:social_app/screens/setting.dart';
+import 'package:social_app/screens/settings/setting.dart';
 
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
@@ -61,7 +61,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(path: '/', builder: (_, __) => const PostScreen()),
           GoRoute(path: '/messages', builder: (_, __) => const MessageScreen()),
-          GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+          // GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
           GoRoute(path: '/settings', builder: (_, __) => const SettingScreen()),
         ],
       ),
