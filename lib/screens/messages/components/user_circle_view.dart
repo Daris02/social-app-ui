@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/ws_provider.dart';
-import 'package:social_app/screens/messages/message_view.dart';
+import 'package:social_app/screens/messages/chat_screen.dart';
 
 class UserCircleView extends ConsumerWidget {
   final User user;

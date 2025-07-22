@@ -11,7 +11,6 @@ import 'package:social_app/services/call_service.dart';
 import 'package:social_app/screens/messages/call_screen.dart';
 import 'package:social_app/screens/messages/components/message_list.dart';
 import 'package:social_app/screens/messages/components/message_input.dart';
-import 'package:social_app/utils/notification_call.dart';
 
 class MessageView extends ConsumerStatefulWidget {
   final User partner;

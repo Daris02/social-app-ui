@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/services/message_service.dart';
-import 'package:social_app/screens/messages/message_view.dart';
+import 'package:social_app/screens/messages/chat_screen.dart';
 import 'package:social_app/screens/messages/components/user_circle_view.dart';
 
 class LastMessageView extends ConsumerWidget {

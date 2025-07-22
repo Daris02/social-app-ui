@@ -6,9 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/routes/app_router.dart';
-import 'package:social_app/screens/posts/components/create_post.dart';
+import 'package:social_app/screens/posts/create_post.dart';
 import 'package:social_app/models/post.dart';
-import 'package:social_app/screens/posts/components/post_view.dart';
+import 'package:social_app/screens/posts/components/post_item.dart';
 import 'package:social_app/services/post_service.dart';
 
 class PostScreen extends ConsumerStatefulWidget {
@@ -101,9 +101,11 @@ class _PostScreenState extends ConsumerState<PostScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Publications"),
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               icon: const Icon(Icons.add),
+              tooltip: 'Creer une publication',
               onPressed: () {
                 Navigator.push(
                   context,

@@ -10,7 +10,10 @@ import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/screens/posts/components/video_player/video_player.dart';
 import 'package:social_app/screens/posts/components/image_view.dart';
+import 'package:social_app/screens/profile/profile.dart';
+import 'package:social_app/screens/settings/setting.dart';
 import 'package:social_app/services/post_service.dart';
+import 'package:social_app/services/user_service.dart';
 
 class PostView extends ConsumerStatefulWidget {
   final Post post;
@@ -168,9 +171,31 @@ class _PostViewState extends ConsumerState<PostView>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "${author.firstName} ${author.lastName}",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          GestureDetector(
+                            onTap: () async {
+                              final isMe = currentUser.id == author.id;
+                              if (isMe) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => SettingScreen(),
+                                  ),
+                                );
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ProfileScreen(user: author),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Text(
+                              "${author.firstName} ${author.lastName}",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                           Text(
                             dateStr,
@@ -500,7 +525,7 @@ class _PostViewState extends ConsumerState<PostView>
                                       } else if (value == 'delete') {
                                         final confirm = await showDialog<bool>(
                                           context: context,
-                                          builder: (_) => AlertDialog(
+                                          builder: (context) => AlertDialog(
                                             title: const Text(
                                               'Supprimer ce commentaire ?',
                                             ),
@@ -531,18 +556,18 @@ class _PostViewState extends ConsumerState<PostView>
                                             post.id,
                                             comment.id,
                                           );
-
-                                          final comments =
-                                              await PostService.getCommentsByPostId(
-                                                post.id,
-                                              );
-                                          setState(() {
-                                            post.comments = comments;
-                                            totalComment = comments.length;
-                                          });
                                           Navigator.pop(context);
-                                          commentPost();
                                         }
+
+                                        final comments =
+                                            await PostService.getCommentsByPostId(
+                                              post.id,
+                                            );
+                                        setState(() {
+                                          post.comments = comments;
+                                          totalComment = comments.length;
+                                        });
+                                        commentPost();
                                       }
                                     },
                                     itemBuilder: (_) => const [

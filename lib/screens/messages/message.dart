@@ -10,8 +10,7 @@ import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/routes/app_router.dart';
 import 'package:social_app/services/user_service.dart';
-import 'package:social_app/screens/messages/components/user_circle_view.dart';
-import 'package:social_app/screens/messages/components/last_message_view.dart';
+import 'package:social_app/screens/messages/components/last_message_item.dart';
 
 class MessageScreen extends ConsumerStatefulWidget {
   const MessageScreen({super.key});
@@ -63,17 +62,6 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
           : myDrawer(context, router, userProvider),
       body: Column(
         children: [
-          SizedBox(
-            height: 80,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _contacts.length,
-              padding: EdgeInsets.all(10),
-              itemBuilder: (context, index) {
-                return UserCircleView(user: _contacts[index]);
-              },
-            ),
-          ),
           SizedBox(height: 20),
           Expanded(
             child:
@@ -99,7 +87,10 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
     return ListView.builder(
       itemCount: _contacts.length,
       itemBuilder: (context, index) {
-        return LastMessageView(user: _contacts[index]);
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: LastMessageView(user: _contacts[index]),
+        );
       },
     );
   }
