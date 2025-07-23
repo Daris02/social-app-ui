@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
+import 'package:video_player/video_player.dart';
 import 'package:social_app/services/post_service.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
@@ -12,21 +11,21 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late final Player _player;
-  late final VideoController _videoController;
+  late final VideoPlayerController _controller;
 
   @override
   void initState() {
-    MediaKit.ensureInitialized();
     super.initState();
-    _player = Player();
-    _videoController = VideoController(_player);
-    _player.open(Media(widget.url));
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+      ..initialize().then((_) {
+        setState(() {});
+        _controller.play();
+      });
   }
 
   @override
   void dispose() {
-    _player.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -43,7 +42,17 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           ),
         ],
       ),
-      body: Center(child: Video(controller: _videoController)),
+      body: Center(
+        child: AspectRatio(
+          aspectRatio: _controller.value.aspectRatio,
+          child: VideoPlayer(_controller),
+        ),
+      ),
+      // } else {
+      //   return const Center(child: CircularProgressIndicator());
+      // }
+      // },
+      // ),
     );
   }
 }
