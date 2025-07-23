@@ -1,31 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:social_app/services/post_service.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String url;
-  const VideoPlayerScreen({super.key, required this.url});
+  final bool autoPlay;
+  final bool looping;
+
+  const VideoPlayerScreen({
+    super.key,
+    required this.url,
+    this.autoPlay = true,
+    this.looping = false,
+  });
 
   @override
   State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late final VideoPlayerController _controller;
+  late VideoPlayerController _videoPlayerController;
+  ChewieController? _chewieController;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
-      ..initialize().then((_) {
-        setState(() {});
-        _controller.play();
-      });
+    _initializePlayer();
+  }
+
+  Future<void> _initializePlayer() async {
+    _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    await _videoPlayerController.initialize();
+
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController,
+      autoPlay: widget.autoPlay,
+      looping: widget.looping,
+      allowFullScreen: true,
+      allowPlaybackSpeedChanging: true,
+      errorBuilder: (context, errorMessage) {
+        return Center(
+          child: Text(errorMessage, style: const TextStyle(color: Colors.white)),
+        );
+      },
+    );
+
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _chewieController?.dispose();
+    _videoPlayerController.dispose();
     super.dispose();
   }
 
@@ -42,17 +69,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: AspectRatio(
-          aspectRatio: _controller.value.aspectRatio,
-          child: VideoPlayer(_controller),
-        ),
-      ),
-      // } else {
-      //   return const Center(child: CircularProgressIndicator());
-      // }
-      // },
-      // ),
+      body: (_chewieController == null || !_videoPlayerController.value.isInitialized)
+          ? const Center(child: CircularProgressIndicator())
+          : Chewie(controller: _chewieController!),
     );
   }
 }
