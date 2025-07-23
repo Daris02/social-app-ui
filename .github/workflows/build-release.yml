@@ -76,10 +76,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install Desktop C++ build tools
+
+      - name: Install C++ Desktop Build Tools & SDK (incl. ATL/MFC)
         run: |
-          choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --quiet --norestart" -y
+          choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.ATLMFC --includeRecommended --quiet --norestart" -y
           choco install windows-sdk-10-version-2104-all -y
 
       - name: Set up Flutter
