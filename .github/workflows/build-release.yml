@@ -76,6 +76,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Install Desktop C++ build tools
+        run: |
+          choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --quiet --norestart" -y
+          choco install windows-sdk-10-version-2104-all -y
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
