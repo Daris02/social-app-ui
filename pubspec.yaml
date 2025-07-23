@@ -27,8 +27,8 @@ dependencies:
   flutter_dotenv: ^5.2.1
   flutter_local_notifications: ^19.3.0
   drawerbehavior: ^3.0.4
-  flutter_local_notifications_linux: ^6.0.0
-  flutter_local_notifications_windows: ^1.0.0
+  # flutter_local_notifications_linux: ^6.0.0
+  # flutter_local_notifications_windows: ^1.0.0
   mime: ^2.0.0
   file_picker: ^10.2.0
   http_parser: ^4.1.2
