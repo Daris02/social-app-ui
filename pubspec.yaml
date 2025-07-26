@@ -25,7 +25,6 @@ dependencies:
   google_nav_bar: ^5.0.7
   hero_animation: ^1.1.4
   flutter_dotenv: ^5.2.1
-  flutter_local_notifications: ^19.3.1
   drawerbehavior: ^3.0.4
   mime: ^2.0.0
   file_picker: ^10.2.0
@@ -39,6 +38,7 @@ dependencies:
   media_kit_libs_windows_video: any
   media_kit_libs_linux: any
   chewie: ^1.12.1
+  awesome_notifications: ^0.10.0
 
 dev_dependencies:
   flutter_test:

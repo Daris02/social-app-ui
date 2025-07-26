@@ -1,6 +1,6 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/constant/api.dart';
 import 'package:social_app/providers/user_provider.dart';
@@ -12,50 +12,6 @@ import 'routes/app_router.dart';
 import 'package:social_app/theme/dark_mode.dart';
 import 'package:social_app/theme/light_mode.dart';
 
-final FlutterLocalNotificationsPlugin localNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
-
-@pragma('vm:entry-point')
-void onNotificationResponse(NotificationResponse response) async {
-  debugPrint('🔔 Notification action: ${response.actionId}');
-  debugPrint('🔔 Notification payload: ${response.payload}');
-  final payload = response.payload;
-  if (payload == null || !payload.startsWith('incoming_call|')) return;
-
-  final parts = payload.split('|');
-  if (parts.length < 3) return;
-
-  final peerId = parts[1];
-  final peerName = parts[2];
-  final action = response.actionId;
-
-  final container = ProviderScope.containerOf(
-    navigatorKey.currentContext!,
-    listen: false,
-  );
-  final user = container.read(userProvider);
-  final params = VideoCallParams(user!.id.toString(), peerId);
-  final callService = container.read(videoCallServiceProvider(params));
-
-  if (action == 'ACCEPT' || action == null) {
-    await callService.connect(false);
-    await callService.readyFuture;
-    await callService.acceptCall();
-
-    await localNotificationsPlugin.cancel(1);
-
-    navigatorKey.currentState?.push(
-      MaterialPageRoute(
-        builder: (_) =>
-            VideoCallScreen(callService: callService, isCaller: false),
-      ),
-    );
-  } else if (action == 'DECLINE') {
-    await localNotificationsPlugin.cancel(1);
-    callService.refuseCall();
-  }
-}
-
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
@@ -63,25 +19,70 @@ void main() async {
   await dotenv.load(fileName: ".env");
   DioClient.init();
 
-  final initializationSettings = InitializationSettings(
-    android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-    linux: LinuxInitializationSettings(
-      defaultActionName: 'Ouvrir',
-      defaultIcon: AssetsLinuxIcon('icons/app_icon.png'),
-    ),
-    windows: WindowsInitializationSettings(
-      appName: 'Social App',
-      appUserModelId: '',
-      guid: '',
-    ),
+  // Initialize Awesome Notifications
+  await AwesomeNotifications().initialize(
+    null,
+    [
+      NotificationChannel(
+        channelKey: 'calls',
+        channelName: 'Calls',
+        channelDescription: 'Channel for incoming video calls',
+        importance: NotificationImportance.High,
+        defaultColor: Colors.teal,
+        ledColor: Colors.white,
+        channelShowBadge: true,
+        locked: true,
+        criticalAlerts: true,
+      ),
+    ],
+    debug: true,
   );
 
-  await localNotificationsPlugin.initialize(
-    initializationSettings,
-    onDidReceiveNotificationResponse: onNotificationResponse,
-    onDidReceiveBackgroundNotificationResponse: onNotificationResponse,
-  );
+  // Request permissions
+  await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+    if (!isAllowed) {
+      AwesomeNotifications().requestPermissionToSendNotifications();
+    }
+  });
 
+  // Listen to notification actions
+  AwesomeNotifications().setListeners(
+    onActionReceivedMethod: (ReceivedAction action) async {
+      final payload = action.payload;
+      final actionId = action.buttonKeyPressed;
+
+      if (payload == null || !payload.containsKey('peerId') || !payload.containsKey('peerName')) return;
+
+      final peerId = payload['peerId']!;
+      final peerName = payload['peerName']!;
+
+      final container = ProviderScope.containerOf(
+        navigatorKey.currentContext!,
+        listen: false,
+      );
+
+      final user = container.read(userProvider);
+      final params = VideoCallParams(user!.id.toString(), peerId);
+      final callService = container.read(videoCallServiceProvider(params));
+
+      if (actionId == 'ACCEPT' || actionId.isEmpty) {
+        await callService.connect(false);
+        await callService.readyFuture;
+        await callService.acceptCall();
+
+        AwesomeNotifications().cancel(1);
+
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(
+            builder: (_) => VideoCallScreen(callService: callService, isCaller: false),
+          ),
+        );
+      } else if (actionId == 'DECLINE') {
+        AwesomeNotifications().cancel(1);
+        callService.refuseCall();
+      }
+    },
+  );
   VideoPlayerMediaKit.ensureInitialized(linux: true, windows: true);
   runApp(ProviderScope(observers: [AppStartupObserver()], child: MyApp()));
 }
