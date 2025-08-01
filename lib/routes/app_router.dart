@@ -10,7 +10,6 @@ import 'package:social_app/screens/auth/register.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/messages/message.dart';
 import 'package:social_app/screens/posts/post.dart';
-import 'package:social_app/screens/profile/profile.dart';
 import 'package:social_app/screens/settings/setting.dart';
 
 class GoRouterRefreshStream extends ChangeNotifier {

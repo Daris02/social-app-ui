@@ -32,7 +32,7 @@ class LastMessageView extends ConsumerWidget {
               MaterialPageRoute(builder: (_) => MessageView(partner: user)),
             );
           },
-          leading: Container(
+          leading: SizedBox(
             height: 70,
             width: 100,
             child: UserCircleView(user: user),

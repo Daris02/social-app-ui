@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/routes/app_router.dart';
-import 'package:social_app/screens/messages/message.dart';
 
 class DesktopScaffold extends ConsumerWidget {
   final Widget child;

@@ -13,7 +13,6 @@ import 'package:social_app/screens/posts/components/image_view.dart';
 import 'package:social_app/screens/profile/profile.dart';
 import 'package:social_app/screens/settings/setting.dart';
 import 'package:social_app/services/post_service.dart';
-import 'package:social_app/services/user_service.dart';
 
 class PostView extends ConsumerStatefulWidget {
   final Post post;
@@ -117,7 +116,7 @@ class _PostViewState extends ConsumerState<PostView>
     final colorSchema = Theme.of(context).colorScheme;
     return Center(
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
+        constraints: const BoxConstraints(maxWidth: 500),
         child: Card(
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           shape: RoundedRectangleBorder(
@@ -156,7 +155,7 @@ class _PostViewState extends ConsumerState<PostView>
                                       onError: (error, stackTrace) {
                                         if (kDebugMode) {
                                           debugPrint(
-                                            'Error loading authot photo: $error',
+                                            'Error loading author photo: $error',
                                           );
                                         }
                                       },

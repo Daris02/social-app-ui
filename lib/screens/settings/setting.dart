@@ -58,7 +58,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
                 'Compte',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: Row(
                   children: [
