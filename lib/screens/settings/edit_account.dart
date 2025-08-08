@@ -18,7 +18,7 @@ class _EditAccountScreenState extends ConsumerState<EditAccountScreen> {
           IconButton(
             onPressed: () { },
             style: IconButton.styleFrom(
-              backgroundColor: Colors.lightBlueAccent,
+              // backgroundColor: Colors.lightBlueAccent,
             ),
             icon: Icon(Icons.check, color: colorSchema.inversePrimary,),
           ),

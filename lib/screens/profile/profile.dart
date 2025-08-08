@@ -70,7 +70,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => MessageView(partner: user),
+                                builder: (_) => ChatScreen(partner: user),
                               ),
                             );
                           },

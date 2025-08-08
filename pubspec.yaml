@@ -39,6 +39,7 @@ dependencies:
   media_kit_libs_linux: any
   chewie: ^1.12.1
   awesome_notifications: ^0.10.0
+  cached_video_player_plus: ^4.0.3
 
 dev_dependencies:
   flutter_test:

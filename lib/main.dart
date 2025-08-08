@@ -6,11 +6,10 @@ import 'package:social_app/constant/api.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/messages/call_screen.dart';
 import 'package:social_app/services/call_service.dart';
+import 'package:social_app/theme/theme_provider.dart';
 import 'package:social_app/utils/app_startup_observer.dart';
 import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'routes/app_router.dart';
-import 'package:social_app/theme/dark_mode.dart';
-import 'package:social_app/theme/light_mode.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -65,7 +64,7 @@ void main() async {
       final params = VideoCallParams(user!.id.toString(), peerId);
       final callService = container.read(videoCallServiceProvider(params));
 
-      if (actionId == 'ACCEPT' || actionId.isEmpty) {
+      if (actionId == 'ACCEPT') {
         await callService.connect(false);
         await callService.readyFuture;
         await callService.acceptCall();
@@ -77,7 +76,7 @@ void main() async {
             builder: (_) => VideoCallScreen(callService: callService, isCaller: false),
           ),
         );
-      } else if (actionId == 'DECLINE') {
+      } else if (actionId == 'DECLINE' || actionId.isEmpty) {
         AwesomeNotifications().cancel(1);
         callService.refuseCall();
       }
@@ -93,6 +92,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final init = ref.watch(userInitProvider);
+    final theme = ref.watch(themeProvider);
 
     return init.when(
       loading: () => MaterialApp(
@@ -105,8 +105,7 @@ class MyApp extends ConsumerWidget {
           title: 'Flutter App Auth',
           debugShowCheckedModeBanner: false,
           routerConfig: appRouter,
-          theme: lightMode,
-          darkTheme: darkMode,
+          theme: theme,
         );
       },
       data: (_) {
@@ -115,8 +114,7 @@ class MyApp extends ConsumerWidget {
           title: 'Flutter App Auth',
           debugShowCheckedModeBanner: false,
           routerConfig: appRouter,
-          theme: lightMode,
-          darkTheme: darkMode,
+          theme: theme,
         );
       },
     );

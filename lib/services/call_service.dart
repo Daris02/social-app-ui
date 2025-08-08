@@ -124,13 +124,8 @@ class VideoCallService {
 
       _peerConnection = await createPeerConnection({
         'iceServers': [
-          {'urls': 'stun:stun1.l.google.com:19302'},
-          // {
-          //   'urls': 'turn:turn.blackdow.carleon.gov:3478',
-          //   'username': 'social',
-          //   'credential': '123',
-          // },
-        ],
+          // {'urls': 'stun:stun.l.google.com:19302'},
+        ]
       });
       for (final track in localStream!.getTracks()) {
         _peerConnection!.addTrack(track, localStream!);

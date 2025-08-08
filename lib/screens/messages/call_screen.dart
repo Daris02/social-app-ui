@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -28,6 +29,7 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
   bool _hasRemoteVideo = false;
   bool _isRendererDisposed = false;
 
+  bool _showControls = true;
   late final WebSocketService socket;
 
   @override
@@ -50,38 +52,14 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
 
         final hasVideo =
             _remoteRenderer.srcObject?.getVideoTracks().any((t) => t.enabled) ??
-            false;
+                false;
 
-        debugPrint('[VideoCallScreen] Remote track ready ----');
-        setState(() {
-          _hasRemoteVideo = hasVideo;
-        });
+        setState(() => _hasRemoteVideo = hasVideo);
       },
     );
 
-    Future.delayed(Duration(milliseconds: 300), () {
-      if (mounted &&
-          !_isRendererDisposed &&
-          _remoteRenderer.srcObject != null) {
-        final hasVideo =
-            _remoteRenderer.srcObject?.getVideoTracks().any((t) => t.enabled) ??
-            false;
-
-        if (hasVideo && !_hasRemoteVideo) {
-          setState(() {
-            _remoteRenderer.srcObject = widget.callService.currentRemoteStream;
-            _hasRemoteVideo =
-                _remoteRenderer.srcObject?.getVideoTracks().any(
-                  (t) => t.enabled,
-                ) ??
-                false;
-          });
-        }
-      }
-    });
     socket.onCallEnded((_) async {
       if (!mounted) return;
-
       await widget.callService.hangUp(ref, notifyPeer: false);
       if (mounted) {
         if (Navigator.canPop(context)) {
@@ -107,6 +85,10 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
     });
   }
 
+  // void _switchCamera() {
+  //   widget.callService.switchCamera();
+  // }
+
   void _hangUp() async {
     if (!mounted) return;
     await widget.callService.hangUp(ref, notifyPeer: true);
@@ -119,108 +101,141 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
     }
   }
 
+  void _toggleControls() {
+    setState(() => _showControls = !_showControls);
+  }
+
   @override
   void dispose() {
     _isRendererDisposed = true;
     _localRenderer.srcObject = null;
     _remoteRenderer.srcObject = null;
-
-    try {
-      _localRenderer.dispose();
-    } catch (e) {
-      debugPrint("_localRenderer dispose failed: $e");
-    }
-
-    try {
-      _remoteRenderer.dispose();
-    } catch (e) {
-      debugPrint("_remoteRenderer dispose failed: $e");
-    }
-
+    _localRenderer.dispose();
+    _remoteRenderer.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(
-      '🎬 isRemoteVideoDisplayed: $_hasRemoteVideo | srcObject=${_remoteRenderer.srcObject}',
-    );
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          // Remote video ou fallback
-          Positioned.fill(
-            child: _hasRemoteVideo
-                ? RTCVideoView(
-                    _remoteRenderer,
-                    objectFit:
-                        RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                    mirror: false,
-                  )
-                : Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.videocam_off, size: 80, color: Colors.grey),
-                        SizedBox(height: 16),
-                        Text(
-                          'En attente de la vidéo distante...',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
+      body: GestureDetector(
+        onTap: _toggleControls,
+        child: Stack(
+          children: [
+            // Remote video or placeholder
+            Positioned.fill(
+              child: _hasRemoteVideo
+                  ? RTCVideoView(
+                      _remoteRenderer,
+                      objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                      mirror: false,
+                    )
+                  : const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.videocam_off, size: 80, color: Colors.grey),
+                          SizedBox(height: 16),
+                          Text(
+                            'En attente de la vidéo distante...',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+            ),
+
+            // Local video preview
+            if (_localRenderer.srcObject != null)
+              Positioned(
+                top: 32,
+                right: 16,
+                child: GestureDetector(
+                  onTap: () {},//_switchCamera,
+                  child: Container(
+                    width: 120,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white24),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: RTCVideoView(_localRenderer, mirror: true),
                     ),
                   ),
-          ),
-
-          // Local video
-          if (_localRenderer.srcObject != null)
-            Positioned(
-              top: 32,
-              right: 16,
-              child: Container(
-                width: 120,
-                height: 160,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white24),
-                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: RTCVideoView(_localRenderer, mirror: true),
               ),
-            ),
 
-          // Boutons de contrôle
-          Positioned(
-            bottom: 32,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                FloatingActionButton(
-                  heroTag: 'mute',
-                  backgroundColor: isMuted ? Colors.red : Colors.blue,
-                  onPressed: _toggleMute,
-                  child: Icon(isMuted ? Icons.mic_off : Icons.mic),
-                ),
-                FloatingActionButton(
-                  heroTag: 'camera',
-                  backgroundColor: isCameraOff ? Colors.red : Colors.blue,
-                  onPressed: _toggleCamera,
-                  child: Icon(
-                    isCameraOff ? Icons.videocam_off : Icons.videocam,
+            // Floating Bottom Navigation Controls
+            Positioned(
+              bottom: 32,
+              left: 0,
+              right: 0,
+              child: SafeArea(
+                child: AnimatedOpacity(
+                  opacity: _showControls ? 1 : 0,
+                  duration: const Duration(milliseconds: 300),
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildControlButton(
+                            icon: isMuted ? Icons.mic_off : Icons.mic,
+                            color: isMuted ? Colors.red : Colors.white,
+                            onTap: _toggleMute,
+                          ),
+                          const SizedBox(width: 16),
+                          _buildControlButton(
+                            icon: isCameraOff ? Icons.videocam_off : Icons.videocam,
+                            color: isCameraOff ? Colors.red : Colors.white,
+                            onTap: _toggleCamera,
+                          ),
+                          if (Platform.isAndroid || Platform.isIOS) ...[
+                            const SizedBox(width: 16),
+                            _buildControlButton(
+                              icon: Icons.flip_camera_ios,
+                              color: Colors.white,
+                              onTap: () {},//_switchCamera,
+                            ),
+                          ],
+                          const SizedBox(width: 16),
+                          _buildControlButton(
+                            icon: Icons.call_end,
+                            color: Colors.red,
+                            onTap: _hangUp,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                FloatingActionButton(
-                  heroTag: 'hangup',
-                  backgroundColor: Colors.red,
-                  onPressed: _hangUp,
-                  child: const Icon(Icons.call_end),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildControlButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: CircleAvatar(
+        backgroundColor: Colors.black26,
+        radius: 28,
+        child: Icon(icon, color: color, size: 28),
       ),
     );
   }

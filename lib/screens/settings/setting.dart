@@ -5,6 +5,9 @@ import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/settings/components/setting_switch.dart';
 import 'package:social_app/screens/settings/edit_account.dart';
+import 'package:social_app/theme/dark_mode.dart';
+import 'package:social_app/theme/theme_provider.dart';
+import 'package:social_app/utils/main_drawer.dart';
 import '../../routes/app_router.dart';
 import 'components/forward_button.dart';
 import 'components/setting_item.dart';
@@ -23,26 +26,24 @@ class _SettingState extends ConsumerState<SettingScreen> {
     final user = ref.read(userProvider);
     final router = ref.read(appRouterProvider);
     final colorSchema = Theme.of(context).colorScheme;
+    final theme = ref.watch(themeProvider);
     if (user == null) {
       return CircularProgressIndicator();
+    }
+    if (theme == darkMode) {
+      isDarkMode = true;
+    } else {
+      isDarkMode = false;
     }
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Se déconnecter',
-            onPressed: () async {
-              final success = await ref.read(userProvider.notifier).logout();
-              if (success) router.go('/login');
-            },
-          ),
         ],
         leadingWidth: 80,
       ),
       drawer: isDesktop(context)
           ? null
-          : myDrawer(context, router, userProvider),
+          : MainDrawer(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -133,9 +134,12 @@ class _SettingState extends ConsumerState<SettingScreen> {
                 value: isDarkMode,
                 bgColor: Colors.purple.shade100,
                 iconColor: Colors.purple,
-                icon: HugeIcons.strokeRoundedEarth,
+                icon: isDarkMode
+                    ? HugeIcons.strokeRoundedMoonEclipse
+                    : HugeIcons.strokeRoundedMoon,
                 onTap: (value) {
                   setState(() {
+                    ref.read(themeProvider.notifier).toggleTheme();
                     isDarkMode = value;
                   });
                 },
@@ -143,60 +147,21 @@ class _SettingState extends ConsumerState<SettingScreen> {
               const SizedBox(height: 20),
               SettingItem(
                 colorSchema: colorSchema,
-                title: 'Aide',
+                title: 'Se déconnecter',
                 bgColor: Colors.red.shade100,
                 iconColor: Colors.red,
-                icon: HugeIcons.strokeRoundedEarth,
-                onTap: () {},
+                icon: HugeIcons.strokeRoundedLogout01,
+                onTap: () async {
+                  final success = await ref
+                      .read(userProvider.notifier)
+                      .logout();
+                  if (success) router.go('/login');
+                },
               ),
             ],
           ),
         ),
       ),
-      //   Padding(
-      //     padding: EdgeInsetsGeometry.all(20),
-      //     child: Column(
-      //       mainAxisAlignment: MainAxisAlignment.start,
-      //       spacing: 20,
-      //       children: [
-      //         Row(
-      //           crossAxisAlignment: CrossAxisAlignment.start,
-      //           spacing: 10,
-      //           children: [
-      //             Icon(Icons.person),
-      //             Text('${user?.firstName} ${user?.lastName}'),
-      //           ],
-      //         ),
-      //         Row(
-      //           crossAxisAlignment: CrossAxisAlignment.start,
-      //           spacing: 10,
-      //           children: [Icon(Icons.email), Text('${user?.email}')],
-      //         ),
-      //         Row(
-      //           crossAxisAlignment: CrossAxisAlignment.start,
-      //           spacing: 10,
-      //           children: [Icon(Icons.phone), Text('${user?.phone}')],
-      //         ),
-      //         Row(
-      //           crossAxisAlignment: CrossAxisAlignment.start,
-      //           spacing: 10,
-      //           children: [Icon(Icons.info), Text('Info plus ...')],
-      //         ),
-
-      //         GestureDetector(
-      //           onTap: () async {
-      //             final success = await ref.read(userProvider.notifier).logout();
-      //             if (success) router.go('/login');
-      //           },
-      //           child: Row(
-      //             crossAxisAlignment: CrossAxisAlignment.start,
-      //             spacing: 10,
-      //             children: [Icon(Icons.exit_to_app), Text('Se déconnecter')],
-      //           ),
-      //         ),
-      //       ],
-      //     ),
-      //   ),
     );
   }
 }

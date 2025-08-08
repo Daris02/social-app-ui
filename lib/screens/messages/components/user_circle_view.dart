@@ -18,7 +18,7 @@ class UserCircleView extends ConsumerWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => MessageView(partner: user)),
+          MaterialPageRoute(builder: (_) => ChatScreen(partner: user)),
         );
       },
       child: Padding(
@@ -32,28 +32,22 @@ class UserCircleView extends ConsumerWidget {
               child: (user.photo == null || user.photo == '')
                   ? Stack(
                       children: [
-                        Icon(
-                          Icons.account_circle_outlined,
-                          size: 60,
-                          color: colorSchema.inversePrimary,
-                        ),
-                        if (isOnline)
-                          Positioned(
-                            bottom: 4,
-                            right: 4,
-                            child: Container(
-                              width: 14,
-                              height: 14,
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
-                              ),
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isOnline ? Colors.green : Colors.grey,
+                              width: 2,
                             ),
                           ),
+                          child: Center(
+                            child: Icon(
+                              Icons.account_circle_outlined,
+                              size: 45,
+                              color: colorSchema.inversePrimary,
+                            ),
+                          ),
+                        ),
                       ],
                     )
                   : Stack(
@@ -62,6 +56,10 @@ class UserCircleView extends ConsumerWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: colorSchema.inversePrimary,
+                            border: Border.all(
+                              color: isOnline ? Colors.green : Colors.grey,
+                              width: 2,
+                            ),
                             image: DecorationImage(
                               image: NetworkImage(user.photo!),
                               fit: BoxFit.cover,
@@ -75,23 +73,6 @@ class UserCircleView extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        if (isOnline)
-                          Positioned(
-                            bottom: 4,
-                            right: 4,
-                            child: Container(
-                              width: 14,
-                              height: 14,
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                          ),
                       ],
                     ),
             ),

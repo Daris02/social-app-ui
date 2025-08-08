@@ -6,11 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/models/user.dart';
-import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/providers/ws_provider.dart';
-import 'package:social_app/routes/app_router.dart';
 import 'package:social_app/services/user_service.dart';
 import 'package:social_app/screens/messages/components/last_message_item.dart';
+import 'package:social_app/utils/main_drawer.dart';
 
 class MessageScreen extends ConsumerStatefulWidget {
   const MessageScreen({super.key});
@@ -54,12 +53,11 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final router = ref.read(appRouterProvider);
     return Scaffold(
       appBar: AppBar(title: Text('Messages')),
       drawer: isDesktop(context)
           ? null
-          : myDrawer(context, router, userProvider),
+          : MainDrawer(),
       body: Column(
         children: [
           SizedBox(height: 20),

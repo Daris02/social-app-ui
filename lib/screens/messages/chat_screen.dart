@@ -12,16 +12,16 @@ import 'package:social_app/screens/messages/call_screen.dart';
 import 'package:social_app/screens/messages/components/message_list.dart';
 import 'package:social_app/screens/messages/components/message_input.dart';
 
-class MessageView extends ConsumerStatefulWidget {
+class ChatScreen extends ConsumerStatefulWidget {
   final User partner;
 
-  const MessageView({super.key, required this.partner});
+  const ChatScreen({super.key, required this.partner});
 
   @override
-  ConsumerState<MessageView> createState() => _MessageViewState();
+  ConsumerState<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _MessageViewState extends ConsumerState<MessageView> {
+class _ChatScreenState extends ConsumerState<ChatScreen> {
   late final WebSocketService socket;
   late final User partner;
   late final String roomId;

@@ -5,11 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
-import 'package:social_app/routes/app_router.dart';
 import 'package:social_app/screens/posts/create_post.dart';
 import 'package:social_app/models/post.dart';
-import 'package:social_app/screens/posts/components/post_item.dart';
+import 'package:social_app/screens/posts/post_item/post_item.dart';
 import 'package:social_app/services/post_service.dart';
+import 'package:social_app/utils/main_drawer.dart';
 
 class PostScreen extends ConsumerStatefulWidget {
   const PostScreen({super.key});
@@ -92,9 +92,15 @@ class _PostScreenState extends ConsumerState<PostScreen> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    _keyboardFocus.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
-    final router = ref.read(appRouterProvider);
     return KeyboardListener(
       focusNode: _keyboardFocus..requestFocus(),
       onKeyEvent: _handleKeyEvent,
@@ -115,7 +121,7 @@ class _PostScreenState extends ConsumerState<PostScreen> {
             ),
           ],
         ),
-        drawer: isDesktop(context) ? null : myDrawer(context, router, userProvider),
+        drawer: isDesktop(context) ? null : MainDrawer(),
         body: isFirstLoadRunning
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(
@@ -125,7 +131,7 @@ class _PostScreenState extends ConsumerState<PostScreen> {
                   itemCount: posts.length + 1,
                   itemBuilder: (context, index) {
                     if (index < posts.length) {
-                      return PostView(
+                      return PostItem(
                         key: PageStorageKey(posts[index].id),
                         post: posts[index],
                         user: user!,
@@ -148,12 +154,5 @@ class _PostScreenState extends ConsumerState<PostScreen> {
               ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    _keyboardFocus.dispose();
-    super.dispose();
   }
 }

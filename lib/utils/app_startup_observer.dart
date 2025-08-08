@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/user_provider.dart';
@@ -25,15 +28,23 @@ class AppStartupObserver extends ProviderObserver {
     User user,
   ) {
     void attachHandler() {
+      debugPrint('Attaching handler ...');
       if (socket.hasConnected) {
         socket.attachGlobalCallRequestHandler((data) {
           final peerName = data['fromName'] ?? 'Inconnu';
           final peerId = data['from']?.toString();
           if (peerId == null) return;
-          showIncomingCallNotification(peerName, peerId);
+          if (Platform.isAndroid || Platform.isIOS) {
+            // Envoie une notification
+            showIncomingCallNotification(peerName, peerId);
+          } else {
+            // Ouvre directement un écran dans l'app
+            debugPrint('In coming call ...');
+            showInAppIncomingCallScreen(peerName, peerId);
+          }
         });
       } else {
-        Future.delayed(const Duration(milliseconds: 1000), attachHandler);
+        Future.delayed(const Duration(milliseconds: 500), attachHandler);
       }
     }
 

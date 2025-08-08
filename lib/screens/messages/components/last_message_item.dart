@@ -29,7 +29,7 @@ class LastMessageView extends ConsumerWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => MessageView(partner: user)),
+              MaterialPageRoute(builder: (_) => ChatScreen(partner: user)),
             );
           },
           leading: SizedBox(
