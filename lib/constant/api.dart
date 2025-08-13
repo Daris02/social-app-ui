@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DioClient {
   static late Dio dio;
+  static late String baseApiUrl;
   static late String baseSocket;
 
   static void init() {
@@ -14,7 +15,7 @@ class DioClient {
 
     final baseApiUrlLocal = 'http://$host:4000';
     final baseApiUrlProd = 'https://$hostProd';
-    final baseApiUrl = env == 'dev' ? baseApiUrlLocal : baseApiUrlProd;
+    baseApiUrl = env == 'dev' ? baseApiUrlLocal : baseApiUrlProd;
 
     debugPrint('Base URL : $baseApiUrl');
 

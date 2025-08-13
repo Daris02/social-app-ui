@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
-import 'package:video_player/video_player.dart';
+import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:social_app/services/post_service.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late VideoPlayerController _videoPlayerController;
+  late CachedVideoPlayerPlus _videoPlayerController;
   ChewieController? _chewieController;
 
   @override
@@ -30,18 +30,21 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   Future<void> _initializePlayer() async {
-    _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    _videoPlayerController = CachedVideoPlayerPlus.networkUrl(
+      Uri.parse(widget.url),
+    );
+
     await _videoPlayerController.initialize();
 
     _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController,
+      videoPlayerController: _videoPlayerController.controller,
       autoPlay: widget.autoPlay,
       looping: widget.looping,
       allowFullScreen: true,
       allowPlaybackSpeedChanging: true,
       errorBuilder: (context, errorMessage) {
         return Center(
-          child: Text(errorMessage, style: const TextStyle(color: Colors.white)),
+          child: Text(errorMessage, style: TextStyle(color: Colors.white)),
         );
       },
     );
@@ -69,7 +72,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           ),
         ],
       ),
-      body: (_chewieController == null || !_videoPlayerController.value.isInitialized)
+      body: (_chewieController == null || !_videoPlayerController.isInitialized)
           ? const Center(child: CircularProgressIndicator())
           : Chewie(controller: _chewieController!),
     );

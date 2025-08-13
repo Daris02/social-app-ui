@@ -19,23 +19,19 @@ void main() async {
   DioClient.init();
 
   // Initialize Awesome Notifications
-  await AwesomeNotifications().initialize(
-    null,
-    [
-      NotificationChannel(
-        channelKey: 'calls',
-        channelName: 'Calls',
-        channelDescription: 'Channel for incoming video calls',
-        importance: NotificationImportance.High,
-        defaultColor: Colors.teal,
-        ledColor: Colors.white,
-        channelShowBadge: true,
-        locked: true,
-        criticalAlerts: true,
-      ),
-    ],
-    debug: true,
-  );
+  await AwesomeNotifications().initialize(null, [
+    NotificationChannel(
+      channelKey: 'calls',
+      channelName: 'Calls',
+      channelDescription: 'Channel for incoming video calls',
+      importance: NotificationImportance.High,
+      defaultColor: Colors.teal,
+      ledColor: Colors.white,
+      channelShowBadge: true,
+      locked: true,
+      criticalAlerts: true,
+    ),
+  ], debug: true);
 
   // Request permissions
   await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
@@ -50,7 +46,10 @@ void main() async {
       final payload = action.payload;
       final actionId = action.buttonKeyPressed;
 
-      if (payload == null || !payload.containsKey('peerId') || !payload.containsKey('peerName')) return;
+      if (payload == null ||
+          !payload.containsKey('peerId') ||
+          !payload.containsKey('peerName'))
+        return;
 
       final peerId = payload['peerId']!;
       final peerName = payload['peerName']!;
@@ -65,15 +64,16 @@ void main() async {
       final callService = container.read(videoCallServiceProvider(params));
 
       if (actionId == 'ACCEPT') {
-        await callService.connect(false);
-        await callService.readyFuture;
-        await callService.acceptCall();
+        // await callService.connect(false);
+        // await callService.readyFuture;
+        // await callService.acceptCall();
 
-        AwesomeNotifications().cancel(1);
+        // AwesomeNotifications().cancel(1);
 
         navigatorKey.currentState?.push(
           MaterialPageRoute(
-            builder: (_) => VideoCallScreen(callService: callService, isCaller: false),
+            builder: (_) =>
+                VideoCallScreen(callService: callService, isCaller: false),
           ),
         );
       } else if (actionId == 'DECLINE' || actionId.isEmpty) {
@@ -96,6 +96,7 @@ class MyApp extends ConsumerWidget {
 
     return init.when(
       loading: () => MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: const Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
       error: (err, data) {

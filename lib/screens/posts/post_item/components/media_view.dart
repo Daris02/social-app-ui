@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:social_app/models/post.dart';
 import 'package:social_app/screens/posts/post_item/components/image_view.dart';
 
-import '../../video_player/video_player.dart';
+import 'video_player.dart';
 
 class MediaView extends StatelessWidget {
   const MediaView({

@@ -13,7 +13,7 @@ class LastMessageView extends ConsumerWidget {
   Future<String> _getLastMessage(int partnerId) async {
     final messages = await MessageService.getMessages(partnerId);
     if (messages.isNotEmpty) {
-      return messages.first.content;
+      return messages.first.content ?? 'Aucun message';
     }
     return 'Aucun message récent';
   }

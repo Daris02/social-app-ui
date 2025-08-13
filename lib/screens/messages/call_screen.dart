@@ -6,14 +6,17 @@ import 'package:go_router/go_router.dart';
 import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/services/call_service.dart';
 
+// ignore: must_be_immutable
 class VideoCallScreen extends ConsumerStatefulWidget {
   final VideoCallService callService;
   final bool isCaller;
+  bool isDesktopApp;
 
-  const VideoCallScreen({
+  VideoCallScreen({
     super.key,
     required this.callService,
     required this.isCaller,
+    this.isDesktopApp = false,
   });
 
   @override
@@ -39,6 +42,11 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
   }
 
   Future<void> _initRenderers() async {
+    if (!widget.isCaller && widget.isDesktopApp == false) {
+      await widget.callService.connect(false);
+      await widget.callService.readyFuture;
+      await widget.callService.acceptCall();
+    }
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
     socket = ref.read(webSocketServiceProvider);
@@ -52,7 +60,7 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
 
         final hasVideo =
             _remoteRenderer.srcObject?.getVideoTracks().any((t) => t.enabled) ??
-                false;
+            false;
 
         setState(() => _hasRemoteVideo = hasVideo);
       },
@@ -128,14 +136,19 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
               child: _hasRemoteVideo
                   ? RTCVideoView(
                       _remoteRenderer,
-                      objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
                       mirror: false,
                     )
                   : const Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.videocam_off, size: 80, color: Colors.grey),
+                          Icon(
+                            Icons.videocam_off,
+                            size: 80,
+                            color: Colors.grey,
+                          ),
                           SizedBox(height: 16),
                           Text(
                             'En attente de la vidéo distante...',
@@ -152,7 +165,7 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
                 top: 32,
                 right: 16,
                 child: GestureDetector(
-                  onTap: () {},//_switchCamera,
+                  onTap: () {}, //_switchCamera,
                   child: Container(
                     width: 120,
                     height: 160,
@@ -179,7 +192,10 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
                   duration: const Duration(milliseconds: 300),
                   child: Center(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black54,
                         borderRadius: BorderRadius.circular(40),
@@ -194,7 +210,9 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
                           ),
                           const SizedBox(width: 16),
                           _buildControlButton(
-                            icon: isCameraOff ? Icons.videocam_off : Icons.videocam,
+                            icon: isCameraOff
+                                ? Icons.videocam_off
+                                : Icons.videocam,
                             color: isCameraOff ? Colors.red : Colors.white,
                             onTap: _toggleCamera,
                           ),
@@ -203,7 +221,7 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
                             _buildControlButton(
                               icon: Icons.flip_camera_ios,
                               color: Colors.white,
-                              onTap: () {},//_switchCamera,
+                              onTap: () {}, //_switchCamera,
                             ),
                           ],
                           const SizedBox(width: 16),

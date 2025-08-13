@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -75,7 +73,6 @@ class AuthService {
         '/auth/whoami',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
-      debugPrint('Error during login: ${res.statusCode}');
       return res.statusCode;
     } on DioException catch (e) {
       debugPrint('Error during login: ${e.message}');

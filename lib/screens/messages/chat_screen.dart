@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/user.dart';
@@ -54,19 +55,59 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
   }
 
-  void sendMessage(String message) {
+  void sendMessage({
+    required String? text,
+    required List<PlatformFile>? files,
+    String? mediaType,
+  }) async {
     final user = ref.read(userProvider)!;
-    final msg = Message(
-      content: message,
-      from: user.id,
-      to: partner.id,
-      createdAt: DateTime.now(),
-    );
-    setState(() {
-      messages.add(msg);
-      messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    });
-    ref.read(webSocketServiceProvider).sendMessage(partner.id, msg.content);
+
+    try {
+      List<String> uploadedUrls = [];
+      if (files != null && files.isNotEmpty) {
+        uploadedUrls = await MessageService.uploadFiles(
+          files: files,
+          onUploadProgress: (sent, total) {
+            // progress UI update possible
+          },
+        );
+      }
+
+      final message = Message(
+        content: text,
+        from: user.id,
+        to: partner.id,
+        createdAt: DateTime.now(),
+        mediaUrls: uploadedUrls.isNotEmpty ? uploadedUrls : null,
+        mediaType: mediaType,
+      );
+
+      socket.sendMessage(message);
+
+      // setState(() {
+      //   messages.add(
+      //     Message(
+      //       content: text,
+      //       from: user.id,
+      //       to: partner.id,
+      //       createdAt: DateTime.now(),
+      //       mediaUrls: files?.map((f) => f.name).toList(),
+      //       mediaType: mediaType,
+      //       isLocal: true,
+      //     ),
+      //   );
+      // });
+
+      setState(() {
+        messages.removeWhere((m) => m.isLocal == true);
+        messages.add(message);
+        messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Échec de l’envoi: $e')));
+    }
   }
 
   @override

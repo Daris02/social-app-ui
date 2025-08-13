@@ -35,11 +35,8 @@ class AppStartupObserver extends ProviderObserver {
           final peerId = data['from']?.toString();
           if (peerId == null) return;
           if (Platform.isAndroid || Platform.isIOS) {
-            // Envoie une notification
             showIncomingCallNotification(peerName, peerId);
           } else {
-            // Ouvre directement un écran dans l'app
-            debugPrint('In coming call ...');
             showInAppIncomingCallScreen(peerName, peerId);
           }
         });

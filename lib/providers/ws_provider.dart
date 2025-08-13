@@ -105,8 +105,8 @@ class WebSocketService {
     return subscription;
   }
 
-  void sendMessage(int toUserId, String message) {
-    send('chat', {'to': toUserId, 'content': message});
+  void sendMessage(Message message) {
+    send('chat', {'to': message.to, 'message': message});
   }
 
   bool isConnected(int userId) {

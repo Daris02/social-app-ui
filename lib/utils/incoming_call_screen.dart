@@ -5,7 +5,7 @@ import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/messages/call_screen.dart';
 import 'package:social_app/services/call_service.dart';
 
-class InAppIncomingCallScreen extends StatelessWidget {
+class InAppIncomingCallScreen extends ConsumerWidget {
   final String peerName;
   final String peerId;
 
@@ -16,13 +16,11 @@ class InAppIncomingCallScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorTheme = Theme.of(context).colorScheme;
-
-    final container = ProviderScope.containerOf(context, listen: false);
-    final user = container.read(userProvider);
+    final user = ref.read(userProvider);
     final params = VideoCallParams(user!.id.toString(), peerId);
-    final callService = container.read(videoCallServiceProvider(params));
+    final callService = ref.read(videoCallServiceProvider(params));
     return Scaffold(
       body: Center(
         child: SizedBox(
@@ -73,12 +71,13 @@ class InAppIncomingCallScreen extends StatelessWidget {
                           await callService.connect(false);
                           await callService.readyFuture;
                           await callService.acceptCall();
-          
+
                           navigatorKey.currentState?.push(
                             MaterialPageRoute(
                               builder: (_) => VideoCallScreen(
                                 callService: callService,
                                 isCaller: false,
+                                isDesktopApp: true,
                               ),
                             ),
                           );

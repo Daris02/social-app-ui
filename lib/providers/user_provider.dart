@@ -16,7 +16,6 @@ final userInitProvider = FutureProvider<void>((ref) async {
   final prefs = await SharedPreferences.getInstance();
   final userJson = prefs.getString('current_user');
   final token = prefs.getString('token');
-  debugPrint('Token: $token');
   if (userJson != null && token != null) {
     final validToken = await tokenIsValid(token);
     if (!validToken) {
@@ -43,7 +42,6 @@ final userInitProvider = FutureProvider<void>((ref) async {
 
 tokenIsValid(String token) async {
   final statusCode = await AuthService.whoami(token);
-  debugPrint('Status Code: $statusCode');
   if (statusCode == 200) {
     return true;
   }
@@ -55,15 +53,6 @@ class UserController extends StateNotifier<User?> {
   static const _userKey = 'current_user';
 
   UserController(this.ref) : super(null);
-
-  Future<void> _loadUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userData = prefs.getString(_userKey);
-    if (userData != null) {
-      final user = User.fromJson(jsonDecode(userData));
-      state = user;
-    }
-  }
 
   Future<User?> getUserById(int id) async {
     try {

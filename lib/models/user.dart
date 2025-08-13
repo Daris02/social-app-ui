@@ -21,7 +21,6 @@ class User {
   bool? senator;
   bool? secretaireParticullier;
   BureauPermanent? bureau;
-  String token;
 
   User({
     required this.id,
@@ -37,7 +36,6 @@ class User {
     required this.entryDate,
     required this.role,
     this.senator,
-    required this.token,
     this.direction,
     this.photo,
     this.bureau,
@@ -63,7 +61,6 @@ class User {
         json['entryDate'] ?? DateTime.now().toIso8601String(),
       ),
       senator: json['senator'],
-      token: json['token'] ?? '',
       bureau: bureauFromString(json['bureau']),
       secretaireParticullier: json['secretaireParticullier'] ?? false,
     );
@@ -82,7 +79,6 @@ class User {
     'role': role.name,
     'entryDate': entryDate.toIso8601String(),
     'senator': senator,
-    'token': token,
     'photo': photo,
     'secretaireParticullier': secretaireParticullier,
     'bureau': bureau?.name,
