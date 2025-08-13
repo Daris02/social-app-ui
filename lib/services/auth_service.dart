@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,7 +22,7 @@ class AuthService {
       final user = User.fromJson(userData);
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', token);
-      user.token = token;
+      // user.token = token;
       return user;
     } catch (e) {
       if (kDebugMode) {
@@ -67,18 +69,17 @@ class AuthService {
     }
   }
 
-  static dynamic whoami(String token) async {
+  static Future<int?> whoami(String token) async {
     try {
-      final res = await dio.post(
+      final res = await dio.get(
         '/auth/whoami',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
-      return res.data;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error during login: $e');
-      }
-      return false;
+      debugPrint('Error during login: ${res.statusCode}');
+      return res.statusCode;
+    } on DioException catch (e) {
+      debugPrint('Error during login: ${e.message}');
+      return e.response?.statusCode;
     }
   }
 
@@ -99,10 +100,7 @@ class AuthService {
 
   static dynamic resendCode(String email) async {
     try {
-      final res = await dio.post(
-        '/auth/resend-code',
-        data: {'email': email},
-      );
+      final res = await dio.post('/auth/resend-code', data: {'email': email});
       return res.statusCode == 201;
     } catch (e) {
       if (kDebugMode) {

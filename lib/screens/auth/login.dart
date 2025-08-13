@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/routes/app_router.dart';
 import 'package:social_app/providers/user_provider.dart';
@@ -31,6 +32,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void login() async {
     setState(() => _loading = true);
     try {
+      final prefs = await SharedPreferences.getInstance();
       if (_formKey.currentState!.validate()) {
         final success = await ref
             .read(userProvider.notifier)
@@ -39,7 +41,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ref.read(userProvider.notifier).setUser(success);
           final socket = ref.read(webSocketServiceProvider);
           if (!socket.hasConnected) {
-            socket.connect(success.token);
+            final token = prefs.getString('token');
+            socket.connect(token!);
             socket.send('user_connected', {'userId': success.id});
           }
           router.go('/');
@@ -87,34 +90,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     size: 80,
                     color: Theme.of(context).colorScheme.inversePrimary,
                   ),
-      
+
                   const SizedBox(height: 25),
-      
+
                   // app name
                   Text("S O C I A L", style: TextStyle(fontSize: 20)),
-      
+
                   const SizedBox(height: 50),
-      
+
                   // email
                   MyTextField(
                     labelText: 'Email',
                     obscureText: false,
                     controller: _email,
-                    validator: (v) => v!.contains('@') ? null : "Email invalide",
+                    validator: (v) =>
+                        v!.contains('@') ? null : "Email invalide",
                   ),
-      
+
                   const SizedBox(height: 10),
-      
+
                   // password
                   MyTextField(
                     labelText: 'Password',
                     obscureText: true,
                     controller: _password,
-                    validator: (v) => v!.length < 3 ? "3 caractères min." : null,
+                    validator: (v) =>
+                        v!.length < 3 ? "3 caractères min." : null,
                   ),
-      
+
                   const SizedBox(height: 10),
-      
+
                   // // forgot
                   // Row(
                   //   mainAxisAlignment: MainAxisAlignment.end,
@@ -128,16 +133,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   //   ],
                   // ),
                   const SizedBox(height: 10),
-      
+
                   // sign in
                   MyButton(
                     text: "Se connecter",
                     loading: _loading,
                     onTap: _loading ? null : login,
                   ),
-      
+
                   const SizedBox(height: 20),
-      
+
                   // register link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

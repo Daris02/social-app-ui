@@ -15,21 +15,40 @@ final userProvider = StateNotifierProvider<UserController, User?>((ref) {
 final userInitProvider = FutureProvider<void>((ref) async {
   final prefs = await SharedPreferences.getInstance();
   final userJson = prefs.getString('current_user');
-  if (userJson != null) {
+  final token = prefs.getString('token');
+  debugPrint('Token: $token');
+  if (userJson != null && token != null) {
+    final validToken = await tokenIsValid(token);
+    if (!validToken) {
+      await prefs.remove('current_user');
+      await prefs.remove('token');
+      return;
+    }
     final user = User.fromJson(jsonDecode(userJson));
     await ref.read(userProvider.notifier).setUser(user);
     final socket = ref.read(webSocketServiceProvider);
     bool connected = false;
     if (!socket.hasConnected) {
-      socket.connect(user.token);
+      socket.connect(token);
       socket.send('user_connected', {'userId': user.id});
       connected = true;
     }
     if (!connected) {
       await ref.read(userProvider.notifier).clearUser();
     }
+  } else {
+    await ref.read(userProvider.notifier).clearUser();
   }
 });
+
+tokenIsValid(String token) async {
+  final statusCode = await AuthService.whoami(token);
+  debugPrint('Status Code: $statusCode');
+  if (statusCode == 200) {
+    return true;
+  }
+  return false;
+}
 
 class UserController extends StateNotifier<User?> {
   final Ref ref;
