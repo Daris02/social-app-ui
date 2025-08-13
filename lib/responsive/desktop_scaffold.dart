@@ -22,15 +22,15 @@ class DesktopScaffold extends ConsumerWidget {
             child: child,
           ),
 
-          Expanded(
-            flex: 1,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-              ),
-              // child: (child.==(MessageScreen)) ? Center(child: Text('message'),): null,
-            ),
-          ),
+          // Expanded(
+          //   flex: 1,
+          //   child: Container(
+          //     decoration: BoxDecoration(
+          //       color: Theme.of(context).colorScheme.surface,
+          //     ),
+          //     // child: (child.==(MessageScreen)) ? Center(child: Text('message'),): null,
+          //   ),
+          // ),
         ],
       ),
     );

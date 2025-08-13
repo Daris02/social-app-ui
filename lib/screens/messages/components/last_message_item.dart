@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/services/message_service.dart';
-import 'package:social_app/screens/messages/chat_screen.dart';
 import 'package:social_app/screens/messages/components/user_circle_view.dart';
 
 class LastMessageView extends ConsumerWidget {
   final User user;
+  final bool isSelected;
+  final VoidCallback onTap;
 
-  const LastMessageView({super.key, required this.user});
+  const LastMessageView({
+    super.key,
+    required this.user,
+    required this.onTap,
+    this.isSelected = false,
+  });
+
 
   Future<String> _getLastMessage(int partnerId) async {
     final messages = await MessageService.getMessages(partnerId);
@@ -26,12 +33,8 @@ class LastMessageView extends ConsumerWidget {
         final lastMessage = snapshot.data ?? 'Chargement...';
 
         return ListTile(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => ChatScreen(partner: user)),
-            );
-          },
+          selected: isSelected,
+          onTap: onTap,
           leading: SizedBox(
             height: 70,
             width: 100,

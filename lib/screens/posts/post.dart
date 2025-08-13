@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/constant/helpers.dart';
+import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/posts/create_post.dart';
 import 'package:social_app/models/post.dart';
@@ -85,7 +86,7 @@ class _PostScreenState extends ConsumerState<PostScreen> {
 
   void _handleKeyEvent(KeyEvent event) {
     if (event is KeyDownEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.f5) {
+      if (event.logicalKey == LogicalKeyboardKey.f5 || event.logicalKey == LogicalKeyboardKey.browserRefresh) {
         refreshPosts();
       }
     }
@@ -126,33 +127,37 @@ class _PostScreenState extends ConsumerState<PostScreen> {
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(
                 onRefresh: refreshPosts,
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: posts.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index < posts.length) {
-                      return PostItem(
-                        key: PageStorageKey(posts[index].id),
-                        post: posts[index],
-                        user: user!,
-                      );
-                    } else if (isLoadMoreRunning) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20),
-                        child: Center(child: CircularProgressIndicator()),
-                      );
-                    } else if (!hasNextPage) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20),
-                        child: Center(child: Text('Aucune autre publication')),
-                      );
-                    } else {
-                      return const SizedBox.shrink();
-                    }
-                  },
-                ),
+                child: postBuilder(user),
               ),
       ),
+    );
+  }
+
+  ListView postBuilder(User? user) {
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: posts.length + 1,
+      itemBuilder: (context, index) {
+        if (index < posts.length) {
+          return PostItem(
+            key: PageStorageKey(posts[index].id),
+            post: posts[index],
+            user: user!,
+          );
+        } else if (isLoadMoreRunning) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        } else if (!hasNextPage) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: Center(child: Text('Aucune autre publication')),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
     );
   }
 }

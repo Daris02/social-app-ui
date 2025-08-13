@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/models/message.dart';
 import 'package:social_app/providers/ws_provider.dart';
@@ -84,20 +85,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
       socket.sendMessage(message);
 
-      // setState(() {
-      //   messages.add(
-      //     Message(
-      //       content: text,
-      //       from: user.id,
-      //       to: partner.id,
-      //       createdAt: DateTime.now(),
-      //       mediaUrls: files?.map((f) => f.name).toList(),
-      //       mediaType: mediaType,
-      //       isLocal: true,
-      //     ),
-      //   );
-      // });
-
       setState(() {
         messages.removeWhere((m) => m.isLocal == true);
         messages.add(message);
@@ -119,66 +106,77 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.read(userProvider)!;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(partner.lastName),
-        actions: [
-          IconButton(
-            onPressed: _isPreparingCall
-                ? null
-                : () async {
-                    setState(() => _isPreparingCall = true);
-                    final params = VideoCallParams(
-                      user.id.toString(),
-                      partner.id.toString(),
-                    );
-                    ref.invalidate(videoCallServiceProvider(params));
-                    final callService = ref.read(
-                      videoCallServiceProvider(params),
-                    );
+    return isDesktop(context)
+        ? Column(
+            children: [
+              Expanded(
+                child: MessageList(messages: messages, currentUserId: user.id),
+              ),
+              MessageInput(onSend: sendMessage),
+            ],
+          )
+        : Scaffold(
+            appBar: AppBar(
+              title: Text(partner.lastName),
+              actions: [
+                IconButton(
+                  onPressed: _isPreparingCall
+                      ? null
+                      : () async {
+                          setState(() => _isPreparingCall = true);
+                          final params = VideoCallParams(
+                            user.id.toString(),
+                            partner.id.toString(),
+                          );
+                          ref.invalidate(videoCallServiceProvider(params));
+                          final callService = ref.read(
+                            videoCallServiceProvider(params),
+                          );
 
-                    callService.onCallAccepted = () async {
-                      if (!mounted) return;
-                      setState(() => _isPreparingCall = false);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => VideoCallScreen(
-                            callService: callService,
-                            isCaller: true,
-                          ),
-                        ),
-                      );
-                    };
+                          callService.onCallAccepted = () async {
+                            if (!mounted) return;
+                            setState(() => _isPreparingCall = false);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => VideoCallScreen(
+                                  callService: callService,
+                                  isCaller: true,
+                                ),
+                              ),
+                            );
+                          };
 
-                    callService.onCallRefused = () {
-                      setState(() => _isPreparingCall = false);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('L’appel a été refusé')),
-                      );
-                    };
+                          callService.onCallRefused = () {
+                            setState(() => _isPreparingCall = false);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('L’appel a été refusé'),
+                              ),
+                            );
+                          };
 
-                    await callService.connect(true);
-                    await callService.startCall();
-                  },
+                          await callService.connect(true);
+                          await callService.startCall();
+                        },
 
-            icon: Icon(Icons.video_call),
-          ),
-        ],
-      ),
-      body: _isPreparingCall
-          ? LinearProgressIndicator()
-          : Column(
-              children: [
-                Expanded(
-                  child: MessageList(
-                    messages: messages,
-                    currentUserId: user.id,
-                  ),
+                  icon: Icon(Icons.video_call),
                 ),
-                MessageInput(onSend: sendMessage),
               ],
             ),
-    );
+            body: _isPreparingCall
+                ? LinearProgressIndicator()
+                : Column(
+                    children: [
+                      Expanded(
+                        child: MessageList(
+                          messages: messages,
+                          currentUserId: user.id,
+                        ),
+                      ),
+                      MessageInput(onSend: sendMessage),
+                    ],
+                  ),
+          );
   }
 }
