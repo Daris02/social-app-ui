@@ -12,96 +12,193 @@ class ProfileScreen extends ConsumerStatefulWidget {
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTickerProviderStateMixin {
   late User user;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     user = widget.user;
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildProfileHeader(BuildContext context) {
+    final colorSchema = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorSchema.primaryContainer,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+          )
+        ],
+      ),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: colorSchema.inversePrimary.withOpacity(0.3),
+            backgroundImage: user.photo != null
+                ? NetworkImage(user.photo!)
+                : null,
+            onBackgroundImageError: (error, stackTrace) {
+              if (kDebugMode) {
+                debugPrint('Error loading user photo: $error');
+              }
+            },
+            child: user.photo == null
+                ? Icon(Icons.person, size: 50, color: colorSchema.onPrimaryContainer)
+                : null,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            "${user.firstName} ${user.lastName}",
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            user.attribution,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorSchema.primary,
+                  foregroundColor: colorSchema.onPrimary,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChatScreen(partner: user),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.message_rounded),
+                label: const Text('Message'),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  // TODO: Call logic
+                },
+                icon: const Icon(Icons.call),
+                label: const Text('Call'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPostsTab() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: 5,
+      itemBuilder: (context, index) => Card(
+        child: ListTile(
+          leading: const Icon(Icons.article_outlined),
+          title: Text("Post #$index"),
+          subtitle: const Text("Ceci est un exemple de publication"),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        ListTile(
+          leading: const Icon(Icons.badge_outlined),
+          title: const Text("Nom complet"),
+          subtitle: Text("${user.firstName} ${user.lastName}"),
+        ),
+        ListTile(
+          leading: const Icon(Icons.email_outlined),
+          title: const Text("Email"),
+          subtitle: Text(user.email),
+        ),
+        ListTile(
+          leading: const Icon(Icons.phone_outlined),
+          title: const Text("Téléphone"),
+          subtitle: Text(user.phone),
+        ),
+        if (user.address.isNotEmpty)
+          ListTile(
+            leading: const Icon(Icons.home_outlined),
+            title: const Text("Adresse"),
+            subtitle: Text(user.address),
+          ),
+        if (user.direction != null)
+          ListTile(
+            leading: const Icon(Icons.apartment_outlined),
+            title: const Text("Direction"),
+            subtitle: Text(user.direction!.name),
+          ),
+        ListTile(
+          leading: const Icon(Icons.calendar_today_outlined),
+          title: const Text("Date d'entrée"),
+          subtitle: Text("${user.entryDate.toLocal()}".split(' ')[0]),
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorSchema = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: Text('${user.firstName} ${user.lastName}'),
+        title: const Text('Profile'),
         centerTitle: true,
-        actions: [],
       ),
-      body: Center(
-        child: Container(
-          constraints: BoxConstraints(maxWidth: 400),
-          child: ListView(
-            children: [
-              Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colorSchema.inversePrimary,
-                      image: DecorationImage(
-                        image: NetworkImage(user.photo!),
-                        fit: BoxFit.cover,
-                        onError: (error, stackTrace) {
-                          if (kDebugMode) {
-                            debugPrint('Error loading user photo: $error');
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  // Text(
-                  //   '${user.firstName} ${user.lastName}',
-                  //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  // ),
-                  Text('Direction: ${user.direction?.name}'),
-                  Text('Attribution: ${user.attribution}'),
-                  SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ChatScreen(partner: user),
-                              ),
-                            );
-                          },
-                          label: Text(
-                            'Message',
-                            style: TextStyle(color: colorSchema.inversePrimary),
-                          ),
-                          icon: Icon(
-                            Icons.message_rounded,
-                            color: colorSchema.inversePrimary,
-                          ),
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: () {},
-                          label: Text(
-                            'Call',
-                            style: TextStyle(color: colorSchema.inversePrimary),
-                          ),
-                          icon: Icon(
-                            Icons.call,
-                            color: colorSchema.inversePrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
+      body: Column(
+        children: [
+          _buildProfileHeader(context),
+          Material(
+            color: Theme.of(context).colorScheme.surface,
+            child: TabBar(
+              controller: _tabController,
+              labelColor: Theme.of(context).colorScheme.primary,
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: Theme.of(context).colorScheme.primary,
+              tabs: const [
+                Tab(icon: Icon(Icons.article_outlined), text: "Publications"),
+                Tab(icon: Icon(Icons.info_outline), text: "Informations"),
+              ],
+            ),
           ),
-        ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildPostsTab(),
+                _buildInfoTab(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

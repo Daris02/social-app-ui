@@ -18,9 +18,11 @@ class WebSocketService {
   final List<void Function(Message)> _messageListeners = [];
   final _connectedUsers = <int>{};
   final _streamController = StreamController<Set<int>>.broadcast();
+  final _connectionStream = StreamController<bool>.broadcast();
 
   bool get hasConnected => _isConnected;
   Stream<Set<int>> get connectedUsersStream => _streamController.stream;
+  Stream<bool> get connectionStream => _connectionStream.stream;
 
   void connect(String token) {
     if (_isConnected) {
@@ -36,11 +38,13 @@ class WebSocketService {
 
     _socket!.onConnect((_) {
       _isConnected = _socket!.connected;
+      _connectionStream.add(true);
     });
 
     _socket!.onDisconnect((_) {
       _isConnected = false;
       _connectedUsers.clear();
+      _connectionStream.add(false);
       _streamController.add(_connectedUsers);
     });
 
@@ -109,6 +113,10 @@ class WebSocketService {
     send('chat', {'to': message.to, 'message': message});
   }
 
+  void onChatUpdate(void Function(dynamic data) callback) {
+    _socket?.on('chat_update', callback);
+  }
+
   bool isConnected(int userId) {
     return _connectedUsers.contains(userId);
   }
@@ -149,15 +157,15 @@ class WebSocketService {
 
   bool _isCallRequestHandlerAttached = false;
 
-  void attachGlobalCallRequestHandler(void Function(dynamic data) callback) {
+  bool attachGlobalCallRequestHandler(void Function(dynamic data) callback) {
     if (_isCallRequestHandlerAttached) {
-      debugPrint('📞 Handler déjà attaché');
-      return;
+      return true;
+    } else {
+      _socket?.off('call_request');
+      _socket?.on('call_request', callback);
+      _isCallRequestHandlerAttached = true;
+      return _isCallRequestHandlerAttached;
     }
-
-    debugPrint('📞 [WebSocketService] Attaching global call_request handler');
-    _socket?.on('call_request', callback);
-    _isCallRequestHandlerAttached = true;
   }
 
   void onCallAccepted(void Function(dynamic data) callback) {
@@ -209,6 +217,91 @@ class WebSocketService {
 
   void off(String event) {
     _socket?.off(event);
+  }
+
+  void joinRoom(String roomId) => send('room_join', {'roomId': roomId});
+  void leaveRoom(String roomId) => send('room_leave', {'roomId': roomId});
+
+  void onRoomUsers(void Function(String roomId, List<int> userIds) cb) {
+    _socket?.on('room_users', (data) {
+      final roomId = data['roomId'] as String;
+      final users =
+          (data['users'] as List?)?.whereType<int>().toList() ?? <int>[];
+      cb(roomId, users);
+    });
+  }
+
+  void onRoomUserJoined(void Function(String roomId, int userId) cb) {
+    _socket?.on('room_user_joined', (data) {
+      cb(data['roomId'] as String, data['userId'] as int);
+    });
+  }
+
+  void onRoomUserLeft(void Function(String roomId, int userId) cb) {
+    _socket?.on('room_user_left', (data) {
+      cb(data['roomId'] as String, data['userId'] as int);
+    });
+  }
+
+  // ---- Signaling multi (évite l'interférence avec 1-1) ----
+  void sendGroupOffer(
+    String roomId,
+    int toUserId,
+    int fromUserId,
+    dynamic sdp,
+  ) {
+    send('group_offer', {
+      'roomId': roomId,
+      'toUserId': toUserId,
+      'fromUserId': fromUserId,
+      'sdp': sdp,
+    });
+  }
+
+  void sendGroupAnswer(
+    String roomId,
+    int toUserId,
+    int fromUserId,
+    dynamic sdp,
+  ) {
+    send('group_answer', {
+      'roomId': roomId,
+      'toUserId': toUserId,
+      'fromUserId': fromUserId,
+      'sdp': sdp,
+    });
+  }
+
+  void sendGroupCandidate(
+    String roomId,
+    int toUserId,
+    int fromUserId,
+    dynamic candidate,
+  ) {
+    send('group_candidate', {
+      'roomId': roomId,
+      'toUserId': toUserId,
+      'fromUserId': fromUserId,
+      'candidate': candidate,
+    });
+  }
+
+  void onGroupOffer(void Function(dynamic data) cb) =>
+      _socket?.on('group_offer', cb);
+  void onGroupAnswer(void Function(dynamic data) cb) =>
+      _socket?.on('group_answer', cb);
+  void onGroupCandidate(void Function(dynamic data) cb) =>
+      _socket?.on('group_candidate', cb);
+
+  void endGroup(String roomId, int byUserId) {
+    send('group_end', {'roomId': roomId, 'by': byUserId});
+  }
+
+  void onGroupEnded(void Function(String roomId, int by) cb) {
+    _socket?.on(
+      'group_ended',
+      (data) => cb(data['roomId'] as String, data['by'] as int),
+    );
   }
 
   void disconnect() {

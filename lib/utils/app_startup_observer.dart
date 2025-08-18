@@ -1,6 +1,6 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/user_provider.dart';
@@ -8,6 +8,9 @@ import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/utils/notification_call.dart';
 
 class AppStartupObserver extends ProviderObserver {
+  bool _isListeningToCalls = false;
+  StreamSubscription<bool>? _connectionSub;
+
   @override
   void didUpdateProvider(
     ProviderBase provider,
@@ -15,9 +18,11 @@ class AppStartupObserver extends ProviderObserver {
     Object? newValue,
     ProviderContainer container,
   ) {
-    if (provider == userProvider && newValue != null) {
+    if (provider == userProvider && newValue != null && !_isListeningToCalls) {
+      _isListeningToCalls = true;
       final user = newValue as User;
       final socket = container.read(webSocketServiceProvider);
+
       _listenToIncomingCalls(container, socket, user);
     }
   }
@@ -27,9 +32,8 @@ class AppStartupObserver extends ProviderObserver {
     WebSocketService socket,
     User user,
   ) {
-    void attachHandler() {
-      debugPrint('Attaching handler ...');
-      if (socket.hasConnected) {
+    _connectionSub = socket.connectionStream.listen((connected) {
+      if (connected) {
         socket.attachGlobalCallRequestHandler((data) {
           final peerName = data['fromName'] ?? 'Inconnu';
           final peerId = data['from']?.toString();
@@ -37,14 +41,11 @@ class AppStartupObserver extends ProviderObserver {
           if (Platform.isAndroid || Platform.isIOS) {
             showIncomingCallNotification(peerName, peerId);
           } else {
-            showInAppIncomingCallScreen(peerName, peerId);
+            showDesktopIncomingCallNotification(peerName, peerId);
           }
         });
-      } else {
-        Future.delayed(const Duration(milliseconds: 500), attachHandler);
+        _connectionSub?.cancel();
       }
-    }
-
-    attachHandler();
+    });
   }
 }

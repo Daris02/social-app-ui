@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:social_app/models/post.dart';
 import 'package:social_app/screens/posts/post_item/components/image_view.dart';
 
-import 'video_player.dart';
+import '../../../../utils/video_player.dart';
 
 class MediaView extends StatelessWidget {
   const MediaView({
@@ -44,7 +44,7 @@ class MediaView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
                       url,
-                      height: 200,
+                      height: 300,
                       width: double.infinity,
                       fit: BoxFit.cover,
                       loadingBuilder: (context, child, progress) {

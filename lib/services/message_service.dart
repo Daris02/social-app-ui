@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/constant/api.dart';
 import 'package:social_app/models/message.dart';
@@ -16,7 +15,6 @@ class MessageService {
       '/messages/$partnerId',
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
-    debugPrint('Messages: ${response.data}');
     final data = response.data;
     if (data is List) {
       return data.map((e) => Message.fromJson(e)).toList();

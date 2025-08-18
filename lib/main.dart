@@ -1,13 +1,15 @@
+import 'dart:io';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_notifier/local_notifier.dart';
 import 'package:social_app/constant/api.dart';
 import 'package:social_app/providers/user_provider.dart';
-import 'package:social_app/screens/messages/call_screen.dart';
-import 'package:social_app/services/call_service.dart';
 import 'package:social_app/theme/theme_provider.dart';
 import 'package:social_app/utils/app_startup_observer.dart';
+import 'package:social_app/utils/notification_call.dart';
 import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'routes/app_router.dart';
 
@@ -15,6 +17,14 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    await localNotifier.setup(
+      appName: 'Social App',
+      shortcutPolicy: ShortcutPolicy.requireCreate,
+    );
+  }
+  
   await dotenv.load(fileName: ".env");
   DioClient.init();
 
@@ -42,46 +52,9 @@ void main() async {
 
   // Listen to notification actions
   AwesomeNotifications().setListeners(
-    onActionReceivedMethod: (ReceivedAction action) async {
-      final payload = action.payload;
-      final actionId = action.buttonKeyPressed;
-
-      if (payload == null ||
-          !payload.containsKey('peerId') ||
-          !payload.containsKey('peerName'))
-        return;
-
-      final peerId = payload['peerId']!;
-      final peerName = payload['peerName']!;
-
-      final container = ProviderScope.containerOf(
-        navigatorKey.currentContext!,
-        listen: false,
-      );
-
-      final user = container.read(userProvider);
-      final params = VideoCallParams(user!.id.toString(), peerId);
-      final callService = container.read(videoCallServiceProvider(params));
-
-      if (actionId == 'ACCEPT') {
-        // await callService.connect(false);
-        // await callService.readyFuture;
-        // await callService.acceptCall();
-
-        // AwesomeNotifications().cancel(1);
-
-        navigatorKey.currentState?.push(
-          MaterialPageRoute(
-            builder: (_) =>
-                VideoCallScreen(callService: callService, isCaller: false),
-          ),
-        );
-      } else if (actionId == 'DECLINE' || actionId.isEmpty) {
-        AwesomeNotifications().cancel(1);
-        callService.refuseCall();
-      }
-    },
+    onActionReceivedMethod: onActionReceivedMethod,
   );
+
   VideoPlayerMediaKit.ensureInitialized(linux: true, windows: true);
   runApp(ProviderScope(observers: [AppStartupObserver()], child: MyApp()));
 }

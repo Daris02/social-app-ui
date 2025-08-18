@@ -16,9 +16,8 @@ class LastMessageView extends ConsumerWidget {
     this.isSelected = false,
   });
 
-
-  Future<String> _getLastMessage(int partnerId) async {
-    final messages = await MessageService.getMessages(partnerId);
+  Future<String> _getLastMessage() async {
+    final messages = await MessageService.getMessages(user.id);
     if (messages.isNotEmpty) {
       return messages.first.content ?? 'Aucun message';
     }
@@ -28,7 +27,7 @@ class LastMessageView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FutureBuilder<String>(
-      future: _getLastMessage(user.id),
+      future: _getLastMessage(),
       builder: (context, snapshot) {
         final lastMessage = snapshot.data ?? 'Chargement...';
 

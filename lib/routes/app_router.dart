@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/main.dart';
+import 'package:social_app/models/user.dart';
 import 'package:social_app/responsive/desktop_scaffold.dart';
 import 'package:social_app/responsive/mobile_scaffold.dart';
 import 'package:social_app/screens/auth/login.dart';
@@ -11,6 +12,7 @@ import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/messages/messages.dart';
 import 'package:social_app/screens/posts/post.dart';
 import 'package:social_app/screens/profile/profile.dart';
+import 'package:social_app/screens/search/search_screen.dart';
 import 'package:social_app/screens/settings/setting.dart';
 
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -61,7 +63,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(path: '/', builder: (_, __) => const PostScreen()),
           GoRoute(path: '/messages', builder: (_, __) => const MessageScreen()),
-          // GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen(user: ,)),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) {
+              final user = state.extra as User;
+              return ProfileScreen(user: user);
+            },
+          ),
+          GoRoute(
+            path: '/search',
+            builder: (context, state) {
+              final valueSearch = state.extra as String;
+              return SearchScreen(valueSearch: valueSearch);
+            },
+          ),
           GoRoute(path: '/settings', builder: (_, __) => const SettingScreen()),
         ],
       ),

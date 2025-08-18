@@ -106,6 +106,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.read(userProvider)!;
+    final params = VideoCallParams(user.id.toString(), partner.id.toString());
+    ref.invalidate(videoCallServiceProvider(params));
+    final callService = ref.read(videoCallServiceProvider(params));
     return isDesktop(context)
         ? Column(
             children: [
@@ -119,19 +122,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             appBar: AppBar(
               title: Text(partner.lastName),
               actions: [
-                IconButton(
-                  onPressed: _isPreparingCall
-                      ? null
-                      : () async {
+                ?_isPreparingCall
+                    ? null
+                    : IconButton(
+                        onPressed: () async {
                           setState(() => _isPreparingCall = true);
-                          final params = VideoCallParams(
-                            user.id.toString(),
-                            partner.id.toString(),
-                          );
-                          ref.invalidate(videoCallServiceProvider(params));
-                          final callService = ref.read(
-                            videoCallServiceProvider(params),
-                          );
 
                           callService.onCallAccepted = () async {
                             if (!mounted) return;
@@ -160,12 +155,35 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           await callService.startCall();
                         },
 
-                  icon: Icon(Icons.video_call),
-                ),
+                        icon: Icon(Icons.video_call),
+                      ),
               ],
             ),
             body: _isPreparingCall
-                ? LinearProgressIndicator()
+                ? Column(
+                    children: [
+                      LinearProgressIndicator(),
+                      SizedBox(height: 300),
+                      Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              'Appel ${partner.firstName} ${partner.lastName} ...',
+                            ),
+                            const SizedBox(height: 12),
+                            IconButton(
+                              icon: Icon(Icons.call_end, color: Colors.red),
+                              iconSize: 75,
+                              onPressed: () async {
+                                callService.hangUp(ref);
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
                 : Column(
                     children: [
                       Expanded(

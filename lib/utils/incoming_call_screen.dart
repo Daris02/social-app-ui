@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/main.dart';
 import 'package:social_app/providers/user_provider.dart';
+import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/screens/messages/call_screen.dart';
 import 'package:social_app/services/call_service.dart';
 
@@ -21,6 +22,10 @@ class InAppIncomingCallScreen extends ConsumerWidget {
     final user = ref.read(userProvider);
     final params = VideoCallParams(user!.id.toString(), peerId);
     final callService = ref.read(videoCallServiceProvider(params));
+    final socket = ref.read(webSocketServiceProvider);
+    socket.onCallEnded((data) async {
+      Navigator.of(context).pop();
+    });
     return Scaffold(
       body: Center(
         child: SizedBox(

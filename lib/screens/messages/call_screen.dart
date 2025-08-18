@@ -42,7 +42,7 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
   }
 
   Future<void> _initRenderers() async {
-    if (!widget.isCaller && widget.isDesktopApp == false) {
+    if (!widget.isCaller) {
       await widget.callService.connect(false);
       await widget.callService.readyFuture;
       await widget.callService.acceptCall();

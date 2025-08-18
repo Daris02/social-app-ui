@@ -111,7 +111,7 @@ class _PostItemState extends ConsumerState<PostItem>
     final colorSchema = Theme.of(context).colorScheme;
     return Center(
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
+        constraints: const BoxConstraints(maxWidth: 500),
         child: Card(
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           shape: RoundedRectangleBorder(
@@ -157,26 +157,41 @@ class _PostItemState extends ConsumerState<PostItem>
                 MediaView(post: post),
 
               // Footer
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        isLiked ? Icons.thumb_up : Icons.thumb_up_alt_outlined,
-                        color: isLiked ? Colors.blue : null,
-                      ),
-                      onPressed: toggleLike,
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      children: [
+                        Text('     ${totalReaction == 0 ? '' : totalReaction}'),
+                        const Spacer(),
+                        Text('${totalComment == 0 ? '' : totalComment}     '),
+                      ],
                     ),
-                    Text('$totalReaction'),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.comment_outlined),
-                      onPressed: commentPost,
+                  ),
+                  const Divider(height: 0, thickness: 0.2),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            isLiked
+                                ? Icons.thumb_up
+                                : Icons.thumb_up_alt_outlined,
+                            color: isLiked ? Colors.blue : null,
+                          ),
+                          onPressed: toggleLike,
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.comment_outlined),
+                          onPressed: commentPost,
+                        ),
+                      ],
                     ),
-                    Text('$totalComment'),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),

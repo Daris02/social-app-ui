@@ -28,6 +28,21 @@ class PostService {
     return (res.data['items'] as List).map((e) => Post.fromJson(e)).toList();
   }
 
+  static Future<List<Post>?> searchPosts(String search) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final res = await DioClient.dio.get(
+        '/posts/search?query=$search',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      return (res.data as List).map((e) => Post.fromJson(e)).toList();
+    } on DioException {
+      return [];
+    }
+  }
+
   static Future<Post> getPostById(int id) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');

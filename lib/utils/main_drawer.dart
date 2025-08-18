@@ -1,16 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/src/router.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/routes/app_router.dart';
 
-class MainDrawer extends ConsumerWidget {
+class MainDrawer extends ConsumerStatefulWidget {
   MainDrawer({super.key});
+
+  @override
+  ConsumerState<MainDrawer> createState() => _MainDrawerState();
+}
+
+class _MainDrawerState extends ConsumerState<MainDrawer> {
+  final _searchController = TextEditingController();
+  final FocusNode _keyboardFocus = FocusNode();
   final padding = EdgeInsets.symmetric(horizontal: 5);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    _keyboardFocus.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final router = ref.read(appRouterProvider);
     final urlImage = 'assets/logos/logo-senat.png';
@@ -33,9 +48,7 @@ class MainDrawer extends ConsumerWidget {
               child: SizedBox(
                 child: Container(
                   decoration: BoxDecoration(
-                    border: BoxBorder.all(
-                      color: Colors.transparent,
-                    )
+                    border: BoxBorder.all(color: Colors.transparent),
                   ),
                   child: buildHeader(
                     urlImage: urlImage,
@@ -50,7 +63,38 @@ class MainDrawer extends ConsumerWidget {
               padding: padding,
               child: Column(
                 children: [
-                  buildSearchField(colorScheme),
+                  KeyboardListener(
+                    focusNode: _keyboardFocus..requestFocus(),
+                    onKeyEvent: (KeyEvent event) {
+                      if (event is KeyDownEvent) {
+                        if (event.logicalKey == LogicalKeyboardKey.enter) {
+                          if (!isDesktop(context)) Navigator.pop(context);
+                          router.replace(
+                            '/search',
+                            extra: _searchController.text,
+                          );
+                        }
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        Expanded(child: buildSearchField(colorScheme)),
+                        IconButton(
+                          icon: Icon(
+                            Icons.search,
+                            color: colorScheme.inversePrimary,
+                          ),
+                          onPressed: () {
+                            if (!isDesktop(context)) Navigator.pop(context);
+                            router.replace(
+                              '/search',
+                              extra: _searchController.text,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   buildMenuItem(
                     text: 'Message',
@@ -110,11 +154,11 @@ class MainDrawer extends ConsumerWidget {
     final color = colorScheme.inversePrimary;
     return TextField(
       style: TextStyle(color: color),
+      controller: _searchController,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-        hintText: 'Search',
-        hintStyle: TextStyle(color: color),
-        prefixIcon: Icon(Icons.search, color: color),
+        hintText: 'Rechercher ...',
+        hintStyle: TextStyle(color: color.withAlpha(150)),
         filled: true,
         fillColor: color.withAlpha(12),
         enabledBorder: OutlineInputBorder(

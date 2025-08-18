@@ -123,12 +123,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
-  // Future<bool> _verifyEmail() {
-
-  // }
-
-  void _emailVerified() {}
-
   @override
   Widget build(BuildContext context) {
     final router = ref.read(appRouterProvider);

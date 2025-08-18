@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:social_app/constant/api.dart';
 import 'package:social_app/models/message.dart';
-import 'package:social_app/screens/posts/post_item/components/video_player.dart';
+import 'package:social_app/utils/video_player.dart';
 
 class MessageList extends StatelessWidget {
   final List<Message> messages;
@@ -28,7 +28,9 @@ class MessageList extends StatelessWidget {
 
   Widget buildMessageItem(Message message) {
     final isMe = message.from == currentUserId;
-    final String baseUrl = DioClient.baseApiUrl;
+    final String baseUrl = DioClient.baseApiUrl.contains('http://')
+        ? ''
+        : DioClient.baseApiUrl;
     
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -46,6 +48,7 @@ class MessageList extends StatelessWidget {
               if (message.mediaUrls != null && message.mediaUrls!.isNotEmpty)
                 ...message.mediaUrls!.map((url) {
                   if (message.mediaType == 'image') {
+                    debugPrint('Image URL: $baseUrl$url');
                     return Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Image.network('$baseUrl$url', width: 400),

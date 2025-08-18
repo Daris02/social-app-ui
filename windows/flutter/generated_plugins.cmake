@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   awesome_notifications
   flutter_webrtc
+  local_notifier
   media_kit_libs_windows_video
   media_kit_video
   permission_handler_windows

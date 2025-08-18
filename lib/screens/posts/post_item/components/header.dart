@@ -5,7 +5,6 @@ import 'package:social_app/models/post.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/routes/app_router.dart';
-import 'package:social_app/screens/profile/profile.dart';
 import 'package:social_app/services/post_service.dart';
 
 class PostItemHeader extends ConsumerWidget {
@@ -92,15 +91,9 @@ class PostItemHeader extends ConsumerWidget {
                   onTap: () async {
                     final isMe = currentUser.id == author.id;
                     if (isMe) {
-                      router.go('/settings');
+                      router.push('/settings');
                     } else {
-                      // router.go('/profile', extra: author);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ProfileScreen(user: author),
-                        ),
-                      );
+                      router.push('/profile', extra: author);
                     }
                   },
                   child: Text(
