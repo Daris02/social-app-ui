@@ -184,7 +184,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
               },
               child: _buildListView(),
             ),
-      floatingActionButton: IconButton(
+      floatingActionButton: isDesktop(context) ? null : IconButton(
         onPressed: startGroupCall,
         icon: Icon(Icons.group),
       ),
@@ -198,24 +198,28 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
         final user = _contacts[index];
         return Padding(
           padding: const EdgeInsets.all(8.0),
-          child: LastMessageView(
-            user: user,
-            isSelected: _selectedContact?.id == user.id,
-            onTap: () {
-              if (isDesktop(context)) {
-                setState(() {
-                  _selectedContact = user;
-                });
-              } else {
-                setState(() {
-                  _selectedContact = null;
-                });
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => ChatScreen(partner: user)),
-                );
-              }
-            },
+          child: Column(
+            children: [
+              LastMessageView(
+                user: user,
+                isSelected: _selectedContact?.id == user.id,
+                onTap: () {
+                  if (isDesktop(context)) {
+                    setState(() {
+                      _selectedContact = user;
+                    });
+                  } else {
+                    setState(() {
+                      _selectedContact = null;
+                    });
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => ChatScreen(partner: user)),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
         );
       },
