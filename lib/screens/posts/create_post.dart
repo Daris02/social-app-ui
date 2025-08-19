@@ -14,21 +14,21 @@ class CreatePostScreen extends StatefulWidget {
 class _CreatePostScreenState extends State<CreatePostScreen> {
   final titleController = TextEditingController();
   final contentController = TextEditingController();
-  PlatformFile? mediaFile;
-  PlatformFile? pickedFile;
+  List<PlatformFile>? mediaFiles;
+  List<PlatformFile>? pickedFiles;
   bool isLoading = false;
   String? statusMessage;
   bool isSuccess = false;
 
   Future<void> pickMedia() async {
     final result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
+      allowMultiple: true,
       type: FileType.any,
     );
 
     if (result != null && result.files.isNotEmpty) {
       setState(() {
-        mediaFile = result.files.first;
+        mediaFiles = result.files;
       });
     }
   }
@@ -48,7 +48,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     });
 
     try {
-      await PostService.createPost(title, content, file: mediaFile);
+      await PostService.createPost(title, content, files: mediaFiles);
 
       setState(() {
         isLoading = false;
@@ -90,27 +90,23 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   decoration: const InputDecoration(labelText: 'Contenu'),
                 ),
                 const SizedBox(height: 12),
-                if (mediaFile != null)
+                if (mediaFiles != null)
                   Container(
                     height: 150,
                     width: double.infinity,
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(border: Border.all()),
-                    child: _buildFilePreview(mediaFile!),
+                    child: ListView.builder(
+                      itemCount: mediaFiles?.length,
+                      itemBuilder: (context, index) {
+                        if (mediaFiles!.isEmpty) return null;
+                        final mediaFile = mediaFiles?[index];
+                        return _buildFilePreview(mediaFile!);
+                      },
+                    ),
                   ),
 
                 const SizedBox(height: 12),
-                // if (mediaFile != null)
-                //   Container(
-                //     height: 150,
-                //     width: double.infinity,
-                //     margin: const EdgeInsets.only(bottom: 12),
-                //     decoration: BoxDecoration(border: Border.all()),
-                //     child: Image.file(
-                //       File(mediaFile!.path!),
-                //       fit: BoxFit.cover,
-                //     ),
-                //   ),
                 ElevatedButton.icon(
                   icon: Icon(Icons.attach_file, color: colorTheme),
                   label: Text(
@@ -154,8 +150,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Widget _buildFilePreview(PlatformFile file) {
     final ext = file.extension?.toLowerCase() ?? '';
     final path = file.path ?? '';
-
-    debugPrint('Extension: $ext');
 
     if (['jpg', 'jpeg', 'png', 'gif'].contains(ext)) {
       debugPrint('Image: $ext');

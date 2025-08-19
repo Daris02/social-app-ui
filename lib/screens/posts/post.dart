@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/user_provider.dart';
+import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/screens/posts/create_post.dart';
 import 'package:social_app/models/post.dart';
 import 'package:social_app/screens/posts/post_item/post_item.dart';
@@ -30,12 +31,19 @@ class _PostScreenState extends ConsumerState<PostScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController searchController = TextEditingController();
   final FocusNode _keyboardFocus = FocusNode();
+  late final WebSocketService socket;
 
   @override
   void initState() {
     super.initState();
     firstLoad();
     _scrollController.addListener(scrollListener);
+
+    socket = ref.read(webSocketServiceProvider);
+    socket.onPostUpdated((postId) async {
+      debugPrint('Post $postId Update');
+      setState(() {});
+    });
   }
 
   void firstLoad() async {
@@ -86,10 +94,17 @@ class _PostScreenState extends ConsumerState<PostScreen> {
 
   void _handleKeyEvent(KeyEvent event) {
     if (event is KeyDownEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.f5 || event.logicalKey == LogicalKeyboardKey.browserRefresh) {
+      if (event.logicalKey == LogicalKeyboardKey.f5 ||
+          event.logicalKey == LogicalKeyboardKey.browserRefresh) {
         refreshPosts();
       }
     }
+  }
+
+  void deletePost(int id) async {
+    await PostService.deletePost(id);
+    refreshPosts();
+    setState(() {});
   }
 
   @override
@@ -143,6 +158,7 @@ class _PostScreenState extends ConsumerState<PostScreen> {
             key: PageStorageKey(posts[index].id),
             post: posts[index],
             user: user!,
+            onDelete: deletePost,
           );
         } else if (isLoadMoreRunning) {
           return const Padding(

@@ -42,6 +42,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     setState(() {});
   }
 
+  void deletePost(int id) async {
+    await PostService.deletePost(id);
+    _postsFuture = PostService.searchPosts(
+      widget.valueSearch,
+    ).then((value) => value ?? []);
+    setState(() {});
+  }
+
   @override
   void didUpdateWidget(covariant SearchScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -114,7 +122,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                     itemCount: posts.length,
                     itemBuilder: (context, index) {
                       final post = posts[index];
-                      return PostItem(post: post, user: user!);
+                      return PostItem(
+                        post: post,
+                        user: user!,
+                        onDelete: (int id) {
+                          deletePost(posts[index].id);
+                        },
+                      );
                     },
                   ),
                 ),

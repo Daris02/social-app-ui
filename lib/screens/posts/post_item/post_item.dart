@@ -15,8 +15,14 @@ import 'package:social_app/services/post_service.dart';
 class PostItem extends ConsumerStatefulWidget {
   final Post post;
   final User user;
+  final Function(int id) onDelete;
 
-  const PostItem({super.key, required this.post, required this.user});
+  const PostItem({
+    super.key,
+    required this.post,
+    required this.user,
+    required this.onDelete,
+  });
 
   @override
   ConsumerState<PostItem> createState() => _PostItemState();
@@ -127,6 +133,7 @@ class _PostItemState extends ConsumerState<PostItem>
                 currentUser: currentUser,
                 author: author,
                 dateStr: dateStr,
+                onDelete: widget.onDelete,
               ),
 
               // Titre & contenu

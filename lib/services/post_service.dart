@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
-import 'package:mime/mime.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,32 +55,19 @@ class PostService {
   static Future<void> createPost(
     String title,
     String content, {
-    PlatformFile? file,
+    List<PlatformFile>? files,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-    final formData = FormData();
-
-    formData.fields.addAll([
-      MapEntry('title', title),
-      MapEntry('content', content),
-    ]);
-
-    if (file != null && file.path != null) {
-      final mimeType = lookupMimeType(file.path!) ?? 'application/octet-stream';
-
-      formData.files.add(
-        MapEntry(
-          'files',
-          await MultipartFile.fromFile(
-            file.path!,
-            filename: file.name,
-            contentType: MediaType.parse(mimeType),
-          ),
-        ),
-      );
-    }
+    final formData = FormData.fromMap({
+      'title': title,
+      'content': content,
+      'files': files?.map(
+              (file) =>
+                  MultipartFile.fromFileSync(file.path!, filename: file.name),
+            ).toList(),
+    });
 
     var result = await dio.post(
       '/posts/upload',
@@ -94,7 +79,6 @@ class PostService {
         },
       ),
     );
-    debugPrint('Result: ${result.data}');
   }
 
   static Future<void> deletePost(int id) async {

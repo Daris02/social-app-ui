@@ -5,7 +5,6 @@ import 'package:social_app/models/post.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/routes/app_router.dart';
-import 'package:social_app/services/post_service.dart';
 
 class PostItemHeader extends ConsumerWidget {
   const PostItemHeader({
@@ -15,6 +14,7 @@ class PostItemHeader extends ConsumerWidget {
     required this.currentUser,
     required this.author,
     required this.dateStr,
+    required this.onDelete,
   });
 
   final Post post;
@@ -22,6 +22,7 @@ class PostItemHeader extends ConsumerWidget {
   final User currentUser;
   final User author;
   final String dateStr;
+  final Function(int id) onDelete;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -113,10 +114,7 @@ class PostItemHeader extends ConsumerWidget {
               if (value == 'edit') {
                 // TODO: Navigue vers l'édition
               } else if (value == 'delete') {
-                await PostService.deletePost(post.id);
-                // setState(() {
-                //   posts.removeWhere((p) => p.id == post.id);
-                // });
+                onDelete(post.id);
               } else if (value == 'save') {
                 // TODO: Enregistrer le post
               }
