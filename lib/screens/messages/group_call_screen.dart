@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:social_app/services/group_call_service.dart';
@@ -12,8 +14,8 @@ class GroupCallScreen extends StatefulWidget {
 
 class _GroupCallScreenState extends State<GroupCallScreen> {
   final _localRenderer = RTCVideoRenderer();
-  bool _micMuted = true;
-  bool _camOff = true;
+  bool _micMuted = false;
+  bool _camOff = false;
 
   @override
   void initState() {
@@ -28,13 +30,19 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       _localRenderer.srcObject = widget.service.localStream;
     }
     await widget.service.join();
+    setState(() {
+      _camOff = true;
+      widget.service.toggleCamera(_camOff);
+      _micMuted = true;
+      widget.service.toggleMic(_micMuted);
+    });
   }
 
   @override
   void dispose() {
     _localRenderer.srcObject = null;
     _localRenderer.dispose();
-    widget.service.leave(); // cleanup
+    widget.service.leave();
     super.dispose();
   }
 
@@ -104,37 +112,59 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                FloatingActionButton(
-                  heroTag: 'mic',
-                  backgroundColor: _micMuted ? Colors.red : Colors.blue,
-                  onPressed: () {
+                _buildControlButton(
+                  icon: _micMuted ? Icons.mic_off : Icons.mic,
+                  color: _micMuted ? Colors.red : Colors.white,
+                  onTap: () {
                     setState(() => _micMuted = !_micMuted);
                     widget.service.toggleMic(_micMuted);
                   },
-                  child: Icon(_micMuted ? Icons.mic_off : Icons.mic),
                 ),
-                FloatingActionButton(
-                  heroTag: 'cam',
-                  backgroundColor: _camOff ? Colors.red : Colors.blue,
-                  onPressed: () {
+                const SizedBox(width: 16),
+                _buildControlButton(
+                  icon: _camOff ? Icons.videocam_off : Icons.videocam,
+                  color: _camOff ? Colors.red : Colors.white,
+                  onTap: () {
                     setState(() => _camOff = !_camOff);
                     widget.service.toggleCamera(_camOff);
                   },
-                  child: Icon(_camOff ? Icons.videocam_off : Icons.videocam),
                 ),
-                FloatingActionButton(
-                  heroTag: 'leave',
-                  backgroundColor: Colors.red,
-                  onPressed: () async {
+                if (Platform.isAndroid || Platform.isIOS) ...[
+                  const SizedBox(width: 16),
+                  _buildControlButton(
+                    icon: Icons.flip_camera_ios,
+                    color: Colors.white,
+                    onTap: () {}, //_switchCamera,
+                  ),
+                ],
+                const SizedBox(width: 16),
+                _buildControlButton(
+                  icon: Icons.call_end,
+                  color: Colors.red,
+                  onTap: () async {
                     await widget.service.leave();
                     if (mounted) Navigator.pop(context);
                   },
-                  child: const Icon(Icons.call_end),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildControlButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: CircleAvatar(
+        backgroundColor: Colors.black26,
+        radius: 28,
+        child: Icon(icon, color: color, size: 28),
       ),
     );
   }

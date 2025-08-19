@@ -184,10 +184,11 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
               },
               child: _buildListView(),
             ),
-      floatingActionButton: isDesktop(context) ? null : IconButton(
-        onPressed: startGroupCall,
-        icon: Icon(Icons.group),
-      ),
+      floatingActionButton: FloatingActionButton(
+              onPressed: startGroupCall,
+              child: Icon(Icons.group),
+            ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
     );
   }
 
@@ -214,7 +215,9 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
                     });
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => ChatScreen(partner: user)),
+                      MaterialPageRoute(
+                        builder: (_) => ChatScreen(partner: user),
+                      ),
                     );
                   }
                 },

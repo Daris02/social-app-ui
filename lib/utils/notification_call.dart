@@ -9,6 +9,7 @@ import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/messages/call_screen.dart';
 import 'package:social_app/services/call_service.dart';
 
+// Mobile config call notification
 void showIncomingCallNotification(String partnerName, String partnerId) async {
   final content = NotificationContent(
     id: 1,
@@ -78,6 +79,7 @@ Future<void> onActionReceivedMethod(ReceivedAction action) async {
   }
 }
 
+// Desktop config call notification
 LocalNotification? _activeCallNotification;
 
 void showDesktopIncomingCallNotification(String partnerName, String partnerId) {
@@ -118,7 +120,6 @@ void showDesktopIncomingCallNotification(String partnerName, String partnerId) {
         ),
       );
     } else if (actionId == 1) {
-      // Decline
       callService.refuseCall();
     }
 
