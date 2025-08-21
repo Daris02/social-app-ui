@@ -25,11 +25,11 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   late final WebSocketService socket;
-  late final User partner;
+  late User partner;
   late final String roomId;
   List<Message> messages = [];
   bool _isPreparingCall = false;
-  late StreamSubscription<Message> _messageSubscription;
+  StreamSubscription<Message>? _messageSub;
 
   @override
   void initState() {
@@ -37,22 +37,32 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     partner = widget.partner;
     socket = ref.read(webSocketServiceProvider);
 
-    _messageSubscription = socket.onMessage((msg) {
-      final currentUserId = ref.read(userProvider)!.id;
-      if (msg.from == currentUserId) return;
-      if (messages.any((m) => m.id == msg.id)) return;
-      setState(() => messages.add(msg));
-      messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    _messageSub = socket.messages.listen((msg) {
+      if (!mounted) return;
+      setState(() {
+        final idx = messages.indexWhere(
+          (m) =>
+              (m.tempId != null && m.tempId == msg.tempId) ||
+              (m.id != null && m.id == msg.id),
+        );
+
+        if (idx != -1) {
+          messages[idx] = msg.copyWith(status: MessageStatus.sent);
+        } else {
+          messages.add(msg.copyWith(status: MessageStatus.sent));
+        }
+
+        messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      });
     });
 
     fetchMessages();
   }
 
-  void fetchMessages() async {
-    final fetched = await MessageService.getMessages(partner.id);
+  Future<void> fetchMessages() async {
+    final fetched = await MessageService.getMessages(widget.partner.id);
     setState(() {
-      messages = List.from(fetched)
-        ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      messages = fetched..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     });
   }
 
@@ -62,44 +72,60 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     String? mediaType,
   }) async {
     final user = ref.read(userProvider)!;
+    final tempId = DateTime.now().millisecondsSinceEpoch;
+
+    var tempMessage = Message(
+      id: null,
+      tempId: tempId,
+      from: user.id,
+      to: widget.partner.id,
+      content: text,
+      createdAt: DateTime.now(),
+      mediaType: mediaType,
+      status: MessageStatus.sending,
+    );
+
+    setState(() {
+      messages.add(tempMessage);
+      messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    });
 
     try {
       List<String> uploadedUrls = [];
       if (files != null && files.isNotEmpty) {
-        uploadedUrls = await MessageService.uploadFiles(
-          files: files,
-          onUploadProgress: (sent, total) {
-            // progress UI update possible
-          },
-        );
+        uploadedUrls = await MessageService.uploadFiles(files: files);
       }
 
-      final message = Message(
-        content: text,
-        from: user.id,
-        to: partner.id,
-        createdAt: DateTime.now(),
-        mediaUrls: uploadedUrls.isNotEmpty ? uploadedUrls : null,
-        mediaType: mediaType,
-      );
-
-      socket.sendMessage(message);
-
-      setState(() {
-        messages.removeWhere((m) => m.isLocal == true);
-        messages.add(message);
-        messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-      });
+      final finalMsg = tempMessage.copyWith(mediaUrls: uploadedUrls);
+      socket.sendMessage(finalMsg);
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Échec de l’envoi: $e')));
+      setState(() {
+        final idx = messages.indexWhere((m) => m.tempId == tempId);
+        if (idx != -1) {
+          messages[idx] = tempMessage.copyWith(status: MessageStatus.failed);
+        }
+      });
     }
+  }
+
+  deleteMessage(int id) {
+    MessageService.removeMessage(id);
+    setState(() {
+      messages.removeWhere((m) => m.id == id);
+    });
+  }
+
+  updateMessage(msg) {
+    // final updatedMsg = await MessageService.updateMessage(msg);
+    setState(() {
+      final idx = messages.indexWhere((m) => m.id == msg.id);
+      // if (idx != -1) messages[idx] = updatedMsg;
+    });
   }
 
   @override
   void dispose() {
-    _messageSubscription.cancel();
+    _messageSub?.cancel();
     super.dispose();
   }
 
@@ -190,6 +216,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         child: MessageList(
                           messages: messages,
                           currentUserId: user.id,
+                          onDelete: (msg) => deleteMessage(msg.id!),
+                          onUpdate: (msg) => updateMessage(msg),
                         ),
                       ),
                       MessageInput(onSend: sendMessage),

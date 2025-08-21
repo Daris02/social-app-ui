@@ -1,8 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:social_app/models/post.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/screens/messages/chat_screen.dart';
+import 'package:social_app/screens/posts/post_item/components/image_view.dart';
+import 'package:social_app/screens/posts/post_item/post_item.dart';
+import 'package:social_app/services/post_service.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   final User user;
@@ -12,7 +16,8 @@ class ProfileScreen extends ConsumerStatefulWidget {
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTickerProviderStateMixin {
+class _ProfileScreenState extends ConsumerState<ProfileScreen>
+    with SingleTickerProviderStateMixin {
   late User user;
   late TabController _tabController;
 
@@ -40,38 +45,55 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
           bottomRight: Radius.circular(30),
         ),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-          )
+          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10),
         ],
       ),
       child: Column(
         children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundColor: colorSchema.inversePrimary.withOpacity(0.3),
-            backgroundImage: user.photo != null
-                ? NetworkImage(user.photo!)
-                : null,
-            onBackgroundImageError: (error, stackTrace) {
-              if (kDebugMode) {
-                debugPrint('Error loading user photo: $error');
+          GestureDetector(
+            onTap: () {
+              if (user.photo != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ImageViewerScreen(url: user.photo!),
+                  ),
+                );
               }
             },
-            child: user.photo == null
-                ? Icon(Icons.person, size: 50, color: colorSchema.onPrimaryContainer)
-                : null,
+            child: CircleAvatar(
+              radius: 50,
+              backgroundColor: colorSchema.inversePrimary.withOpacity(0.3),
+              backgroundImage: user.photo != null
+                  ? NetworkImage(user.photo!)
+                  : null,
+              onBackgroundImageError: (error, stackTrace) {
+                if (kDebugMode) {
+                  debugPrint('Error loading user photo: $error');
+                }
+              },
+              child: user.photo == null
+                  ? Icon(
+                      Icons.person,
+                      size: 50,
+                      color: colorSchema.onPrimaryContainer,
+                    )
+                  : null,
+            ),
           ),
           const SizedBox(height: 10),
           Text(
             "${user.firstName} ${user.lastName}",
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text(
             user.attribution,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
           ),
           const SizedBox(height: 12),
           Row(
@@ -113,16 +135,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
   }
 
   Widget _buildPostsTab() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: 5,
-      itemBuilder: (context, index) => Card(
-        child: ListTile(
-          leading: const Icon(Icons.article_outlined),
-          title: Text("Post #$index"),
-          subtitle: const Text("Ceci est un exemple de publication"),
-        ),
-      ),
+    return FutureBuilder<List<Post>>(
+      future: PostService.getPostByAuthorId(user.id),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          debugPrint('Error: ${snapshot.error.toString()}');
+          return Center(
+            child: Text("Erreur lors du chargement des publications"),
+          );
+        }
+        final posts = snapshot.data ?? [];
+        if (posts.isEmpty) {
+          return const Center(child: Text("Aucune publication"));
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: posts.length,
+          itemBuilder: (context, index) =>
+              PostItem(post: posts[index], user: user, onDelete: (_) {}),
+        );
+      },
     );
   }
 
@@ -169,10 +204,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Profile'), centerTitle: true),
       body: Column(
         children: [
           _buildProfileHeader(context),
@@ -192,10 +224,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
-                _buildPostsTab(),
-                _buildInfoTab(),
-              ],
+              children: [_buildPostsTab(), _buildInfoTab()],
             ),
           ),
         ],

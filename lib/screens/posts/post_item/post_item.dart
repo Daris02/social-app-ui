@@ -161,7 +161,7 @@ class _PostItemState extends ConsumerState<PostItem>
 
               // Media
               if (post.mediaUrls != null && post.mediaUrls!.isNotEmpty)
-                MediaView(post: post),
+                MediaView(mediaUrls: post.mediaUrls!),
 
               // Footer
               Column(

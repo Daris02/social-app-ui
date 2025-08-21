@@ -23,6 +23,20 @@ class MessageService {
     }
   }
 
+  static Future<bool> removeMessage(int messageId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await dio.delete(
+      '/messages/$messageId',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    if (response.statusCode == 200) {
+      return true;
+    }
+    return false;
+  }
+
   static Future<List<String>> uploadFiles({
     required List<PlatformFile> files,
     Function(int sent, int total)? onUploadProgress,
