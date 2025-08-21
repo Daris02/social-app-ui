@@ -52,6 +52,17 @@ class PostService {
     return Post.fromJson(res.data);
   }
 
+  static Future<List<Post>> getPostByAuthorId(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final res = await DioClient.dio.get(
+      '/posts/author/$id',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return (res.data as List).map((e) => Post.fromJson(e)).toList();
+  }
+
   static Future<void> createPost(
     String title,
     String content, {
