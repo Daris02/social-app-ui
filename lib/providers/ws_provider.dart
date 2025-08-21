@@ -15,29 +15,38 @@ final webSocketServiceProvider = Provider<WebSocketService>((ref) {
 class WebSocketService {
   IO.Socket? _socket;
   bool _isConnected = false;
-  final List<void Function(Message)> _messageListeners = [];
   final _connectedUsers = <int>{};
+  final _messageController = StreamController<Message>.broadcast();
   final _streamController = StreamController<Set<int>>.broadcast();
   final _connectionStream = StreamController<bool>.broadcast();
 
   bool get hasConnected => _isConnected;
+  Stream<Message> get messages => _messageController.stream;
   Stream<Set<int>> get connectedUsersStream => _streamController.stream;
   Stream<bool> get connectionStream => _connectionStream.stream;
 
   void connect(String token) {
-    if (_isConnected) {
-      return;
+    if (_socket != null) {
+      _socket!.disconnect();
+      _socket!.destroy();
+      _socket = null;
+      _isConnected = false;
     }
 
     _socket = IO.io(
       DioClient.baseSocket,
-      IO.OptionBuilder().setTransports(['websocket']).setQuery({
-        'token': token,
-      }).build(),
+      IO.OptionBuilder().setTransports(['websocket'])
+        .disableAutoConnect()
+        .enableForceNew()
+        .setQuery({
+            'token': token,
+          }).build(),
     );
 
+    _socket!.connect();
+
     _socket!.onConnect((_) {
-      _isConnected = _socket!.connected;
+      _isConnected = true;
       _connectionStream.add(true);
     });
 
@@ -74,13 +83,13 @@ class WebSocketService {
     _socket!.onAny((event, data) async {
       switch (event) {
         case 'chat':
-          try {
-            final msg = Message.fromJson(data);
-            for (var listener in _messageListeners) {
-              listener(msg);
+          if (event == 'chat' || event == 'chat_updated') {
+            try {
+              final msg = Message.fromJson(data);
+              _messageController.add(msg);
+            } catch (e) {
+              debugPrint('Erreur parsing message: $e');
             }
-          } catch (e) {
-            debugPrint('Erreur de parsing message: $e');
           }
           break;
         default:
@@ -92,29 +101,12 @@ class WebSocketService {
     _socket?.emit(event, payload);
   }
 
-  StreamSubscription<Message> onMessage(void Function(Message) callback) {
-    final controller = StreamController<Message>();
-    void listener(Message msg) {
-      controller.add(msg);
-    }
-
-    _messageListeners.add(listener);
-
-    final subscription = controller.stream.listen(callback);
-    subscription.onDone(() {
-      _messageListeners.remove(listener);
-      controller.close();
-    });
-
-    return subscription;
-  }
-
   void sendMessage(Message message) {
-    send('chat', {'to': message.to, 'message': message});
-  }
-
-  void onChatUpdate(void Function(dynamic data) callback) {
-    _socket?.on('chat_update', callback);
+    send('chat', {
+      'tempId': message.tempId,
+      'to': message.to,
+      'message': message,
+    });
   }
 
   bool isConnected(int userId) {
@@ -152,7 +144,6 @@ class WebSocketService {
 
   void onCallRequest(void Function(dynamic data) callback) {
     _socket?.on('call_request', callback);
-    debugPrint('Call Request Coming ...');
   }
 
   bool _isCallRequestHandlerAttached = false;
@@ -304,9 +295,12 @@ class WebSocketService {
     );
   }
 
-  void disconnect() {
-    _socket?.disconnect();
-    _socket = null;
+  Future<void> disconnect() async {
+    if (_socket != null) {
+      _socket!.disconnect();
+      _socket!.close();
+      _socket = null;
+    }
     _isConnected = false;
     _connectedUsers.clear();
     _streamController.add(_connectedUsers);
@@ -314,6 +308,7 @@ class WebSocketService {
 
   void dispose() {
     disconnect();
+    _messageController.close();
     _streamController.close();
   }
 }

@@ -77,16 +77,18 @@ class UserController extends StateNotifier<User?> {
   }
 
   Future<void> clearUser() async {
+    await ref.read(webSocketServiceProvider).disconnect();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_userKey);
+    await prefs.remove('current_user');
     await prefs.remove('token');
+    await prefs.reload();
     state = null;
   }
 
   Future<dynamic> login(String email, String password) async {
     try {
       final user = await AuthService.login(email, password);
-      if (user == null || user == 'Fail login') return false;
+      if (user == false) return false;
       await setUser(user);
       return user;
     } catch (err) {

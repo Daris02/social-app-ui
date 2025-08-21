@@ -19,7 +19,8 @@ class AuthService {
       final userData = res.data['user'];
       final user = User.fromJson(userData);
       final prefs = await SharedPreferences.getInstance();
-      prefs.setString('token', token);
+      await prefs.remove('token');
+      await prefs.setString('token', token);
       // user.token = token;
       return user;
     } catch (e) {
@@ -75,7 +76,7 @@ class AuthService {
       );
       return res.statusCode;
     } on DioException catch (e) {
-      debugPrint('Error during login: ${e.message}');
+      debugPrint('Error during who am i: ${e.message}');
       return e.response?.statusCode;
     }
   }
