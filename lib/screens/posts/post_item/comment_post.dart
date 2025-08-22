@@ -6,7 +6,7 @@ Future<void> CommentPost(
   post,
   currentUser,
   setState,
-  _commentController,
+  commentController,
   totalComment,
 ) {
   return showModalBottomSheet(
@@ -159,7 +159,7 @@ Future<void> CommentPost(
                                         post,
                                         currentUser,
                                         setState,
-                                        _commentController,
+                                        commentController,
                                         totalComment,
                                       );
                                     }
@@ -183,20 +183,20 @@ Future<void> CommentPost(
             ),
             const Divider(),
             TextField(
-              controller: _commentController,
+              controller: commentController,
               decoration: InputDecoration(
                 hintText: "Ajouter un commentaire...",
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: () async {
-                    final content = _commentController.text.trim();
+                    final content = commentController.text.trim();
                     if (content.isNotEmpty) {
                       await PostService.commentPost(
                         post.id,
                         currentUser.id,
                         content,
                       );
-                      _commentController.clear();
+                      commentController.clear();
 
                       final comments = await PostService.getCommentsByPostId(
                         post.id,
@@ -211,7 +211,7 @@ Future<void> CommentPost(
                         post,
                         currentUser,
                         setState,
-                        _commentController,
+                        commentController,
                         totalComment,
                       );
                     }

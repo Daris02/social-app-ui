@@ -7,7 +7,7 @@ import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/routes/app_router.dart';
 
 class MainDrawer extends ConsumerStatefulWidget {
-  MainDrawer({super.key});
+  const MainDrawer({super.key});
 
   @override
   ConsumerState<MainDrawer> createState() => _MainDrawerState();
