@@ -77,11 +77,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # - name: Install C++ Desktop Build Tools & SDK (incl. ATL/MFC)
-      #   run: |
-      #     choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.ATLMFC --includeRecommended --quiet --norestart" -y
-      #     choco install windows-sdk-10-version-2104-all -y
-
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -98,6 +93,15 @@ jobs:
 
       - name: Build Windows
         run: flutter build windows -v
+
+
+      - name: Copy Visual C++ Runtime DLLs
+        shell: pwsh
+        run: |
+          $dlls = @("msvcp140.dll", "vcruntime140.dll", "vcruntime140_1.dll")
+          foreach ($dll in $dlls) {
+            Copy-Item "C:\Windows\System32\$dll" "build/windows/x64/runner/Release/" -Force
+          }
 
       - name: Zip .exe
         run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath windows-build.zip
