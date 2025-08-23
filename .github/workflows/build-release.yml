@@ -107,9 +107,11 @@ jobs:
           echo "Compression=lzma" >> installer.iss
           echo "SolidCompression=yes" >> installer.iss
           echo "[Files]" >> installer.iss
-          echo "Source: \"build\windows\x64\runner\Release\*\"; DestDir: \"{app}\"; Flags: recursesubdirs" >> installer.iss
+          echo "Source: \"build\\windows\\x64\\runner\\Release\\*\"; DestDir: \"{app}\"; Flags: recursesubdirs" >> installer.iss
           echo "[Icons]" >> installer.iss
-          echo "Name: \"{autoprograms}\Social App\"; Filename: \"{app}\social_app.exe\"" >> installer.iss
+          echo "Name: \"{autoprograms}\\Social App\"; Filename: \"{app}\\social_app.exe\"" >> installer.iss
+          echo "Name: \"{autodesktop}\\Social App\"; Filename: \"{app}\\social_app.exe\"" >> installer.iss
+
 
       - name: Build Installer
         run: iscc installer.iss
