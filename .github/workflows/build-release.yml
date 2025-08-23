@@ -94,36 +94,6 @@ jobs:
       - name: Build Windows
         run: flutter build windows -v
 
-      - name: Install Inno Setup
-        run: choco install innosetup --yes
-
-      - name: Create Inno Setup Script
-        run: |
-          echo [Setup] > installer.iss
-          echo AppName=Social App >> installer.iss
-          echo AppVersion=1.0.105 >> installer.iss
-          echo DefaultDirName={pf}\Social App >> installer.iss
-          echo OutputDir=Output >> installer.iss
-          echo OutputBaseFilename=social_app_installer >> installer.iss
-          echo Compression=lzma >> installer.iss
-          echo SolidCompression=yes >> installer.iss
-          echo [Files] >> installer.iss
-          echo Source: "build\\windows\\x64\\runner\\Release\\*"; DestDir: "{app}"; Flags: recursesubdirs >> installer.iss
-          echo [Icons] >> installer.iss
-          echo Name: "{autoprograms}\\Social App"; Filename: "{app}\\social_app.exe" >> installer.iss
-          echo Name: "{autodesktop}\\Social App"; Filename: "{app}\\social_app.exe" >> installer.iss
-
-
-
-      - name: Build Installer
-        run: iscc installer.iss
-
-      - name: Upload EXE Installer
-        uses: actions/upload-artifact@v4
-        with:
-          name: social_app_installer
-          path: Output/social_app_installer.exe
-
       - name: Copy Visual C++ Runtime DLLs
         shell: pwsh
         run: |
