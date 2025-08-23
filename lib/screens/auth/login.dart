@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -60,6 +62,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  void forgotPassword() {}
+
   void _handleKeyEvent(KeyEvent event) {
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.enter) {
@@ -77,92 +81,113 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 400),
-            padding: const EdgeInsets.all(8.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // logo
-                  Icon(
-                    Icons.person,
-                    size: 80,
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // app name
-                  Text("S O C I A L", style: TextStyle(fontSize: 20)),
-
-                  const SizedBox(height: 50),
-
-                  // email
-                  MyTextField(
-                    labelText: 'Email',
-                    obscureText: false,
-                    controller: _email,
-                    validator: (v) =>
-                        v!.contains('@') ? null : "Email invalide",
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // password
-                  MyTextField(
-                    labelText: 'Password',
-                    obscureText: true,
-                    controller: _password,
-                    validator: (v) =>
-                        v!.length < 3 ? "3 caractères min." : null,
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // // forgot
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.end,
-                  //   children: [
-                  //     Text(
-                  //       'Forgot password ?',
-                  //       style: TextStyle(
-                  //         color: Theme.of(context).colorScheme.inversePrimary,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  const SizedBox(height: 10),
-
-                  // sign in
-                  MyButton(
-                    text: "Se connecter",
-                    loading: _loading,
-                    onTap: _loading ? null : login,
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // register link
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Don't have an account ? ",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.inversePrimary,
+            constraints: const BoxConstraints(maxWidth: double.infinity),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/bg-senat.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // logo
+                        CircleAvatar(
+                          radius: 30,
+                          foregroundImage: AssetImage(
+                            'assets/logos/logo-senat.png',
+                          ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap: () => router.push('/register'),
-                        child: Text(
-                          "Register Here",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        const SizedBox(height: 25),
+                
+                        // app name
+                        Text("S O C I A L", style: TextStyle(fontSize: 20)),
+                
+                        const SizedBox(height: 50),
+                
+                        // email
+                        MyTextField(
+                          labelText: 'Email',
+                          obscureText: false,
+                          controller: _email,
+                          validator: (v) =>
+                              v!.contains('@') ? null : "Email invalide",
                         ),
-                      ),
-                    ],
+                
+                        const SizedBox(height: 10),
+                
+                        // password
+                        MyTextField(
+                          labelText: 'Password',
+                          obscureText: true,
+                          controller: _password,
+                          validator: (v) =>
+                              v!.length < 3 ? "3 caractères min." : null,
+                        ),
+                
+                        const SizedBox(height: 10),
+                
+                        // forgot
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              onTap: () => router.push('/forgot-password'),
+                              child: Text(
+                                'Forgot password ?',
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.inversePrimary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                
+                        // sign in
+                        MyButton(
+                          text: "Se connecter",
+                          loading: _loading,
+                          onTap: _loading ? null : login,
+                        ),
+                
+                        const SizedBox(height: 20),
+                
+                        // register link
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Don't have an account ? ",
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.inversePrimary,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => router.push('/register'),
+                              child: Text(
+                                "Register Here",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ],
+                ),
               ),
             ),
           ),

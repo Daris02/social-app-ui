@@ -35,7 +35,7 @@ class _MyTextFieldState extends State<MyTextField> {
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         labelText: widget.labelText,
-        labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
+        labelStyle: TextStyle(color: Theme.of(context).colorScheme.inversePrimary),
         suffixIcon: widget.labelText.toLowerCase() == 'password'
             ? IconButton(
                 icon: Icon(obscure ? Icons.visibility : Icons.visibility_off),

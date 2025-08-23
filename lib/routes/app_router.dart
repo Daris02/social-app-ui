@@ -6,6 +6,7 @@ import 'package:social_app/main.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/responsive/desktop_scaffold.dart';
 import 'package:social_app/responsive/mobile_scaffold.dart';
+import 'package:social_app/screens/auth/forgot_password.dart';
 import 'package:social_app/screens/auth/login.dart';
 import 'package:social_app/screens/auth/register.dart';
 import 'package:social_app/providers/user_provider.dart';
@@ -51,6 +52,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPassword(),
       ),
 
       ShellRoute(

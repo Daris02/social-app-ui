@@ -111,10 +111,10 @@ class AuthService {
   static dynamic forgotPassword(String email) async {
     try {
       final res = await dio.post(
-        '/auth/password-forgot',
+        '/auth/forgot-password',
         data: {'email': email},
       );
-      return res.statusCode;
+      return res.statusCode == 201;
     } catch (e) {
       if (kDebugMode) {
         print('Error during forgot password: $e');
@@ -130,10 +130,10 @@ class AuthService {
   ) async {
     try {
       final res = await dio.post(
-        '/auth/verify-email',
+        '/auth/reset-password',
         data: {'email': email, 'code': code, 'newPassword': newPassword},
       );
-      return res.statusCode;
+      return res.statusCode == 201;
     } catch (e) {
       if (kDebugMode) {
         print('Error during reset password: $e');
