@@ -36,12 +36,8 @@ class _SettingState extends ConsumerState<SettingScreen> {
       isDarkMode = false;
     }
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Paramètres'),
-      ),
-      drawer: isDesktop(context)
-          ? null
-          : MainDrawer(),
+      appBar: AppBar(title: Text('Paramètres')),
+      drawer: isDesktop(context) ? null : MainDrawer(),
       body: Container(
         constraints: BoxConstraints(maxWidth: 700),
         alignment: Alignment.topCenter,
@@ -61,10 +57,11 @@ class _SettingState extends ConsumerState<SettingScreen> {
                   child: Row(
                     children: [
                       HugeIcon(
-                        icon: HugeIcons.strokeRoundedUser,
+                        icon: HugeIcons.strokeRoundedUserCircle,
                         color: const Color.fromARGB(255, 145, 145, 145),
-                        size: 70,
+                        size: 50,
                       ),
+                      const SizedBox(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -75,7 +72,6 @@ class _SettingState extends ConsumerState<SettingScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          const SizedBox(height: 10),
                           Text(
                             '${user.direction?.name} - ${user.attribution}',
                             style: TextStyle(

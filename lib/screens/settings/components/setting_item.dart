@@ -34,11 +34,11 @@ class SettingItem extends StatelessWidget {
             width: 50,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.red.shade100,
+              color: iconColor.withAlpha(100),
             ),
             child: HugeIcon(icon: icon, color: iconColor),
           ),
-          const SizedBox(width: 40),
+          const SizedBox(width: 20),
           Text(
             title,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),

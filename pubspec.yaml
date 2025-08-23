@@ -60,6 +60,7 @@ flutter:
     - .env
     - assets/images/groot_1.jpg
     - assets/logos/logo-senat.png
+    - assets/images/bg-senat.jpg
 
   # fonts:
   #   - family: Schyler
