@@ -89,7 +89,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Center(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 400),
@@ -107,12 +107,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 25),
-                
+
                         // app name
                         Text("S O C I A L", style: TextStyle(fontSize: 20)),
-                
+
                         const SizedBox(height: 50),
-                
+
                         // email
                         MyTextField(
                           labelText: 'Email',
@@ -121,9 +121,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           validator: (v) =>
                               v!.contains('@') ? null : "Email invalide",
                         ),
-                
+
                         const SizedBox(height: 10),
-                
+
                         // password
                         MyTextField(
                           labelText: 'Password',
@@ -132,9 +132,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           validator: (v) =>
                               v!.length < 3 ? "3 caractères min." : null,
                         ),
-                
+
                         const SizedBox(height: 10),
-                
+
                         // forgot
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -142,33 +142,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             GestureDetector(
                               onTap: () => router.push('/forgot-password'),
                               child: Text(
-                                'Forgot password ?',
+                                'Mot de passe oublier?',
                                 style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.inversePrimary,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  decorationStyle: TextDecorationStyle.dashed,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
-                
+                        const SizedBox(height: 20),
+
                         // sign in
                         MyButton(
                           text: "Se connecter",
                           loading: _loading,
                           onTap: _loading ? null : login,
                         ),
-                
+
                         const SizedBox(height: 20),
-                
+
                         // register link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "Don't have an account ? ",
+                              "Vous n'avez pas encore de compte? ",
                               style: TextStyle(
                                 color: Theme.of(
                                   context,
@@ -178,8 +178,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             GestureDetector(
                               onTap: () => router.push('/register'),
                               child: Text(
-                                "Register Here",
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                "S'inscrire ici",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  decorationStyle: TextDecorationStyle.dashed,
+                                ),
                               ),
                             ),
                           ],

@@ -35,14 +35,14 @@ class _MyTextFieldState extends State<MyTextField> {
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         labelText: widget.labelText,
-        labelStyle: TextStyle(color: Theme.of(context).colorScheme.inversePrimary),
+        labelStyle: TextStyle(color: Colors.white),
         suffixIcon: widget.labelText.toLowerCase() == 'password'
             ? IconButton(
                 icon: Icon(obscure ? Icons.visibility : Icons.visibility_off),
                 onPressed: () => setState(() => obscure = !obscure),
                 style: ButtonStyle(
                   iconColor: WidgetStateProperty.all(
-                    Theme.of(context).colorScheme.inversePrimary,
+                    Colors.white,
                   ),
                 ),
               )
