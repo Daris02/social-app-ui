@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/ws_provider.dart';
 
 class GroupCallRoomService {
@@ -107,8 +108,20 @@ class GroupCallRoomService {
   Future<RTCPeerConnection> _ensurePeer(int otherUserId) async {
     if (_pc.containsKey(otherUserId)) return _pc[otherUserId]!;
     final pc = await createPeerConnection({
-      // En LAN tu peux laisser vide; hors LAN ajoute STUN/TURN ici
-      'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}],
+      'iceServers': [{
+        'urls': [ "stun:jb-turn1.xirsys.com" ]
+      }, {
+          'username': iceUserName,
+          'credential': iceCredential,
+          'urls': [
+            "turn:jb-turn1.xirsys.com:80?transport=udp",
+            "turn:jb-turn1.xirsys.com:3478?transport=udp",
+            "turn:jb-turn1.xirsys.com:80?transport=tcp",
+            "turn:jb-turn1.xirsys.com:3478?transport=tcp",
+            "turns:jb-turn1.xirsys.com:443?transport=tcp",
+            "turns:jb-turn1.xirsys.com:5349?transport=tcp"
+          ]
+      }]
     });
 
     if (_local != null) {

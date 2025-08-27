@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/ws_provider.dart';
 
 final videoCallServiceProvider =
@@ -123,9 +124,20 @@ class VideoCallService {
       _onLocalStream?.call(localStream!);
 
       _peerConnection = await createPeerConnection({
-        'iceServers': [
-          {'urls': 'stun:stun.l.google.com:19302'},
-        ]
+        'iceServers': [{
+          'urls': [ "stun:jb-turn1.xirsys.com" ]
+        }, {
+          'username': iceUserName,
+          'credential': iceCredential,
+          'urls': [
+            "turn:jb-turn1.xirsys.com:80?transport=udp",
+            "turn:jb-turn1.xirsys.com:3478?transport=udp",
+            "turn:jb-turn1.xirsys.com:80?transport=tcp",
+            "turn:jb-turn1.xirsys.com:3478?transport=tcp",
+            "turns:jb-turn1.xirsys.com:443?transport=tcp",
+            "turns:jb-turn1.xirsys.com:5349?transport=tcp"
+          ]
+        }]
       });
       for (final track in localStream!.getTracks()) {
         _peerConnection!.addTrack(track, localStream!);
