@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
-import 'package:social_app/screens/settings/components/setting_switch.dart';
 import 'package:social_app/screens/settings/edit_account.dart';
 import 'package:social_app/theme/dark_mode.dart';
 import 'package:social_app/theme/theme_provider.dart';
 import 'package:social_app/utils/main_drawer.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../routes/app_router.dart';
 import 'components/forward_button.dart';
 import 'components/setting_item.dart';
@@ -21,6 +21,45 @@ class SettingScreen extends ConsumerStatefulWidget {
 
 class _SettingState extends ConsumerState<SettingScreen> {
   bool isDarkMode = false;
+  String _getThemeLabel(WidgetRef ref) {
+    final notifier = ref.read(themeProvider.notifier);
+    switch (notifier.currentMode) {
+      case AppThemeMode.light:
+        return "Clair";
+      case AppThemeMode.dark:
+        return "Sombre";
+      case AppThemeMode.system:
+        return "Système";
+    }
+  }
+
+  void _showThemeDialog(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(themeProvider.notifier);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Choisir un thème"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: AppThemeMode.values.map((mode) {
+            return RadioListTile<AppThemeMode>(
+              title: Text(mode.name),
+              value: mode,
+              groupValue: notifier.currentMode,
+              onChanged: (val) {
+                if (val != null) {
+                  notifier.setThemeMode(val);
+                  Navigator.pop(ctx);
+                  setState(() {}); // Pour rafraîchir l'affichage
+                }
+              },
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = ref.read(userProvider);
@@ -114,27 +153,28 @@ class _SettingState extends ConsumerState<SettingScreen> {
                 const SizedBox(height: 20),
                 SettingItem(
                   colorSchema: colorSchema,
-                  title: 'Notifications',
-                  bgColor: Colors.blue.shade100,
-                  iconColor: Colors.blue,
-                  icon: HugeIcons.strokeRoundedNotification01,
-                  onTap: () {},
-                ),
-                const SizedBox(height: 20),
-                SettingSwitch(
-                  colorSchema: colorSchema,
-                  title: 'Dark Mode',
-                  value: isDarkMode,
+                  title: 'Thème',
+                  value: _getThemeLabel(ref),
                   bgColor: Colors.purple.shade100,
                   iconColor: Colors.purple,
-                  icon: isDarkMode
-                      ? HugeIcons.strokeRoundedMoonEclipse
-                      : HugeIcons.strokeRoundedMoon,
-                  onTap: (value) {
-                    setState(() {
-                      ref.read(themeProvider.notifier).toggleTheme();
-                      isDarkMode = value;
-                    });
+                  icon: Icons.color_lens,
+                  onTap: () => _showThemeDialog(context, ref),
+                ),
+                const SizedBox(height: 20),
+                SettingItem(
+                  colorSchema: colorSchema,
+                  title: 'À propos du sénat',
+                  bgColor: Colors.blue.shade100,
+                  iconColor: Colors.blue,
+                  icon: HugeIcons.strokeRoundedInformationCircle,
+                  onTap: () async {
+                    final Uri url = Uri.parse('https://senat.mg');
+                    if (!await launchUrl(
+                      url,
+                      mode: LaunchMode.externalApplication,
+                    )) {
+                      throw Exception('Could not launch $url');
+                    }
                   },
                 ),
                 const SizedBox(height: 20),

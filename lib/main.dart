@@ -24,7 +24,7 @@ void main() async {
       shortcutPolicy: ShortcutPolicy.requireCreate,
     );
   }
-  
+
   await dotenv.load(fileName: ".env");
   DioClient.init();
 
