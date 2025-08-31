@@ -118,6 +118,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorSchema = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -184,9 +185,11 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
               },
               child: _buildListView(),
             ),
-      floatingActionButton: _isInCall || _isPreparingCall ? null : FloatingActionButton(
+      floatingActionButton: _isInCall || _isPreparingCall
+          ? null
+          : FloatingActionButton(
               onPressed: startGroupCall,
-              child: Icon(Icons.group),
+              child: Icon(Icons.group, color: colorSchema.inversePrimary),
             ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
     );

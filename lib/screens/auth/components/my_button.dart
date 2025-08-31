@@ -4,16 +4,12 @@ class MyButton extends StatelessWidget {
   final String text;
   final void Function()? onTap;
   final bool loading;
-  final Color? color;
-  final Color? textColor;
 
   const MyButton({
     super.key,
     required this.text,
     this.onTap,
     this.loading = false,
-    this.color,
-    this.textColor,
   });
 
   @override
@@ -24,7 +20,7 @@ class MyButton extends StatelessWidget {
         onTap: loading ? null : onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: color ?? Theme.of(context).colorScheme.inversePrimary,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.all(20),
@@ -35,7 +31,7 @@ class MyButton extends StatelessWidget {
                     height: 24,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Colors.black,
                     ),
                   )
                 : Text(
@@ -43,7 +39,7 @@ class MyButton extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: textColor ?? Theme.of(context).colorScheme.primary,
+                      color: Colors.black,
                     ),
                   ),
           ),

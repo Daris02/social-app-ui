@@ -12,9 +12,10 @@ class ImageViewerScreen extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.download_rounded),
+            icon: Icon(Icons.download_rounded),
             onPressed: () => PostService.downloadMedia(url),
           ),
         ],

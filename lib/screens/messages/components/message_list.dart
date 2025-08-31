@@ -5,37 +5,39 @@ import 'package:social_app/utils/video_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'dart:io';
+import '../../../services/message_service.dart';
 import './full_screen_gallery.dart';
 
-class MessageList extends StatelessWidget {
+class MessageList extends StatefulWidget {
   final List<Message> messages;
   final int currentUserId;
-  final Function(Message)? onDelete;
-  final Function(Message)? onUpdate;
 
   const MessageList({
     super.key,
     required this.messages,
     required this.currentUserId,
-    this.onDelete,
-    this.onUpdate,
   });
 
+  @override
+  State<MessageList> createState() => _MessageListState();
+}
+
+class _MessageListState extends State<MessageList> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       reverse: true,
       padding: const EdgeInsets.all(8),
-      itemCount: messages.length,
+      itemCount: widget.messages.length,
       itemBuilder: (context, index) {
-        final message = messages[messages.length - 1 - index];
+        final message = widget.messages[widget.messages.length - 1 - index];
         return buildMessageItem(context, message);
       },
     );
   }
 
   Widget buildMessageItem(BuildContext context, Message message) {
-    final isMe = message.from == currentUserId;
+    final isMe = message.from == widget.currentUserId;
     final String baseUrl = DioClient.baseApiUrl.contains('http://')
         ? DioClient.baseApiUrl
         : '';
@@ -198,11 +200,19 @@ class MessageList extends StatelessWidget {
                 Offset.zero & MediaQuery.of(context).size,
               ),
               items: [
-                const PopupMenuItem(value: 'update', child: Text('Edité')),
+                const PopupMenuItem(value: 'update', child: Text('Editer')),
                 const PopupMenuItem(value: 'delete', child: Text('Supprimer')),
               ],
             );
-            if (selected != null) _handleMenuAction(context, selected, message);
+
+            if (selected == 'delete') {
+              await MessageService.removeMessage(message.id!);
+              setState(
+                () => widget.messages.removeWhere((m) => m.id == message.id),
+              );
+            } else if (selected == 'update') {
+              // TODO: Update message
+            }
           },
           child: wrappedCard,
         );
@@ -239,9 +249,9 @@ class MessageList extends StatelessWidget {
     String value,
     Message message,
   ) async {
-    if (value == 'update' && onUpdate != null) {
-      onUpdate!(message);
-    } else if (value == 'delete' && onDelete != null) {
+    if (value == 'update') {
+      // onUpdate!(message);
+    } else if (value == 'delete') {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -269,7 +279,10 @@ class MessageList extends StatelessWidget {
           ],
         ),
       );
-      if (confirm == true) onDelete!(message);
+      if (confirm == true) {
+        await MessageService.removeMessage(message.id!);
+        setState(() => widget.messages.removeWhere((m) => m.id == message.id));
+      }
     }
   }
 }

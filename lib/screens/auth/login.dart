@@ -78,7 +78,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       focusNode: _keyboardFocus..requestFocus(),
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: Colors.white,
         body: Center(
           child: Container(
             constraints: const BoxConstraints(maxWidth: double.infinity),
@@ -101,7 +101,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         // logo
                         CircleAvatar(
-                          radius: 30,
+                          radius: 75,
+                          backgroundColor: Colors.transparent,
                           foregroundImage: AssetImage(
                             'assets/logos/logo-senat.png',
                           ),
@@ -109,7 +110,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 25),
 
                         // app name
-                        Text("S O C I A L", style: TextStyle(fontSize: 20)),
+                        Text(
+                          "S O C I A L   A P P",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
+                        ),
 
                         const SizedBox(height: 50),
 
@@ -145,7 +153,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 'Mot de passe oublier?',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w900,
+                                  fontWeight: FontWeight.w700,
                                   decorationStyle: TextDecorationStyle.dashed,
                                 ),
                               ),
@@ -168,11 +176,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "Vous n'avez pas encore de compte? ",
+                              "Vous n'avez pas encore de compte?  ",
                               style: TextStyle(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.inversePrimary,
+                                color: Colors.white,
+                                  fontWeight: FontWeight.w200,
                               ),
                             ),
                             GestureDetector(
@@ -181,7 +188,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 "S'inscrire ici",
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w900,
+                                  fontWeight: FontWeight.w700,
                                   decorationStyle: TextDecorationStyle.dashed,
                                 ),
                               ),

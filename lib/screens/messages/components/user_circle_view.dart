@@ -18,7 +18,9 @@ class UserCircleView extends ConsumerWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => ChatScreen(partner: user)),
+          MaterialPageRoute(
+            builder: (_) => ChatScreen(partner: user),
+          ),
         );
       },
       child: Padding(

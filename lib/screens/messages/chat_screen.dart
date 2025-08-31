@@ -17,7 +17,10 @@ import 'package:social_app/screens/messages/components/message_input.dart';
 class ChatScreen extends ConsumerStatefulWidget {
   final User partner;
 
-  const ChatScreen({super.key, required this.partner});
+  const ChatScreen({
+    super.key,
+    required this.partner,
+  });
 
   @override
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
@@ -108,21 +111,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     }
   }
 
-  deleteMessage(int id) {
-    MessageService.removeMessage(id);
-    setState(() {
-      messages.removeWhere((m) => m.id == id);
-    });
-  }
-
-  updateMessage(msg) {
-    // final updatedMsg = await MessageService.updateMessage(msg);
-    setState(() {
-      final idx = messages.indexWhere((m) => m.id == msg.id);
-      // if (idx != -1) messages[idx] = updatedMsg;
-    });
-  }
-
   @override
   void dispose() {
     _messageSub?.cancel();
@@ -139,7 +127,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ? Column(
             children: [
               Expanded(
-                child: MessageList(messages: messages, currentUserId: user.id),
+                child: MessageList(
+                  messages: messages,
+                  currentUserId: user.id,
+                ),
               ),
               MessageInput(onSend: sendMessage),
             ],
@@ -216,8 +207,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         child: MessageList(
                           messages: messages,
                           currentUserId: user.id,
-                          onDelete: (msg) => deleteMessage(msg.id!),
-                          onUpdate: (msg) => updateMessage(msg),
                         ),
                       ),
                       MessageInput(onSend: sendMessage),

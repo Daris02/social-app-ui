@@ -24,9 +24,9 @@ class _SettingState extends ConsumerState<SettingScreen> {
   String _getThemeLabel(WidgetRef ref) {
     final notifier = ref.read(themeProvider.notifier);
     switch (notifier.currentMode) {
-      case AppThemeMode.light:
+      case AppThemeMode.claire:
         return "Clair";
-      case AppThemeMode.dark:
+      case AppThemeMode.sombre:
         return "Sombre";
       case AppThemeMode.system:
         return "Système";
@@ -50,7 +50,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
                 if (val != null) {
                   notifier.setThemeMode(val);
                   Navigator.pop(ctx);
-                  setState(() {}); // Pour rafraîchir l'affichage
+                  setState(() {});
                 }
               },
             );

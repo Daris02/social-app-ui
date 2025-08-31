@@ -30,12 +30,14 @@ class _MyTextFieldState extends State<MyTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final colorSchema = Theme.of(context).colorScheme;
     return TextFormField(
       controller: widget.controller,
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        focusColor: Colors.white,
         labelText: widget.labelText,
-        labelStyle: TextStyle(color: Colors.white),
+        labelStyle: TextStyle(color: colorSchema.inversePrimary),
         suffixIcon: widget.labelText.toLowerCase() == 'password'
             ? IconButton(
                 icon: Icon(obscure ? Icons.visibility : Icons.visibility_off),

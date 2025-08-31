@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/post.dart';
 import 'package:social_app/models/user.dart';
+import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/messages/chat_screen.dart';
 import 'package:social_app/screens/posts/post_item/components/image_view.dart';
 import 'package:social_app/screens/posts/post_item/post_item.dart';
@@ -23,11 +25,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     with SingleTickerProviderStateMixin {
   late User user;
   late TabController _tabController;
+  var currentUser;
 
   @override
   void initState() {
     super.initState();
     user = widget.user;
+    currentUser = ref.read(userProvider)!;
     _tabController = TabController(length: 2, vsync: this);
   }
 
@@ -52,96 +56,107 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorSchema.primaryContainer,
+        image: DecorationImage(
+          image: AssetImage('assets/images/bg-senat.jpg'),
+          fit: BoxFit.cover,
+        ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(30),
           bottomRight: Radius.circular(30),
         ),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10),
-        ],
       ),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (user.photo != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ImageViewerScreen(url: user.photo!),
-                  ),
-                );
-              }
-            },
-            child: CircleAvatar(
-              radius: 50,
-              backgroundColor: colorSchema.inversePrimary.withOpacity(0.3),
-              backgroundImage: user.photo != null
-                  ? NetworkImage(user.photo!)
-                  : null,
-              onBackgroundImageError: (error, stackTrace) {
-                if (kDebugMode) {
-                  debugPrint('Error loading user photo: $error');
-                }
-              },
-              child: user.photo == null
-                  ? Icon(
-                      Icons.person,
-                      size: 50,
-                      color: colorSchema.onPrimaryContainer,
-                    )
-                  : null,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            "${user.firstName} ${user.lastName}",
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            user.attribution,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorSchema.primary,
-                  foregroundColor: colorSchema.onPrimary,
-                ),
-                onPressed: () {
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: () {
+                if (user.photo != null) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ChatScreen(partner: user),
+                      builder: (_) => ImageViewerScreen(url: user.photo!),
                     ),
                   );
+                }
+              },
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: colorSchema.inversePrimary.withOpacity(0.3),
+                backgroundImage: user.photo != null
+                    ? NetworkImage(user.photo!)
+                    : null,
+                onBackgroundImageError: (error, stackTrace) {
+                  if (kDebugMode) {
+                    debugPrint('Error loading user photo: $error');
+                  }
                 },
-                icon: const Icon(Icons.message_rounded),
-                label: const Text('Message'),
+                child: user.photo == null
+                    ? Icon(
+                        Icons.person,
+                        size: 50,
+                        color: colorSchema.onPrimaryContainer,
+                      )
+                    : null,
               ),
-              const SizedBox(width: 12),
-              Platform.isAndroid || Platform.isIOS ? ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "${user.firstName} ${user.lastName}",
+              style: TextStyle(
+                color: colorSchema.inversePrimary,
+                fontWeight: FontWeight.bold,
+                fontSize: 25,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              user.attribution,
+              style: TextStyle(color: colorSchema.inversePrimary, fontSize: 15),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorSchema.primary,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatScreen(partner: user),
+                      ),
+                    );
+                  },
+                  icon: Icon(
+                    Icons.message_rounded,
+                    color: colorSchema.inversePrimary,
+                  ),
+                  label: Text(
+                    'Message',
+                    style: TextStyle(color: colorSchema.inversePrimary),
+                  ),
                 ),
-                onPressed: () async {
-                  await makePhoneCall(user.phone);
-                },
-                icon: const Icon(Icons.call),
-                label: const Text('Téléphoner'),
-              ) : const SizedBox(),
-            ],
-          ),
-        ],
+                const SizedBox(width: 12),
+                Platform.isAndroid || Platform.isIOS
+                    ? ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () async {
+                          await makePhoneCall(user.phone);
+                        },
+                        icon: const Icon(Icons.call),
+                        label: const Text('Téléphoner'),
+                      )
+                    : const SizedBox(),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -167,7 +182,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
           padding: const EdgeInsets.all(16),
           itemCount: posts.length,
           itemBuilder: (context, index) =>
-              PostItem(post: posts[index], user: user, onDelete: (_) {}),
+              PostItem(post: posts[index], user: currentUser, onDelete: (_) {}),
         );
       },
     );
@@ -224,19 +239,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             color: Theme.of(context).colorScheme.surface,
             child: TabBar(
               controller: _tabController,
-              labelColor: Theme.of(context).colorScheme.primary,
+              labelColor: Theme.of(context).colorScheme.inversePrimary,
               unselectedLabelColor: Colors.grey,
-              indicatorColor: Theme.of(context).colorScheme.primary,
+              indicatorColor: Theme.of(context).colorScheme.inverseSurface,
               tabs: const [
-                Tab(icon: Icon(Icons.article_outlined), text: "Publications"),
-                Tab(icon: Icon(Icons.info_outline), text: "Informations"),
+                Tab(icon: null, text: "Informations"),
+                Tab(icon: null, text: "Publications"),
               ],
             ),
           ),
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [_buildPostsTab(), _buildInfoTab()],
+              children: [_buildInfoTab(), _buildPostsTab()],
             ),
           ),
         ],

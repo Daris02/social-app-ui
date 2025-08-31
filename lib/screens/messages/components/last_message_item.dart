@@ -26,6 +26,7 @@ class LastMessageView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorSchema = Theme.of(context).colorScheme;
     return FutureBuilder<String>(
       future: _getLastMessage(),
       builder: (context, snapshot) {
@@ -39,11 +40,15 @@ class LastMessageView extends ConsumerWidget {
             width: 100,
             child: UserCircleView(user: user),
           ),
-          title: Text('${user.firstName} ${user.lastName}'),
+          title: Text(
+            '${user.firstName} ${user.lastName}',
+            style: TextStyle(color: isSelected ? Colors.grey : colorSchema.inversePrimary),
+          ),
           subtitle: Text(
             lastMessage,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: isSelected ? Colors.grey : colorSchema.inversePrimary),
           ),
         );
       },

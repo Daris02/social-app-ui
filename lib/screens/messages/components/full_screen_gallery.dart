@@ -20,6 +20,7 @@ class FullScreenGallery extends StatelessWidget {
       body: GestureDetector(
         onTap: () => Navigator.pop(context),
         child: PhotoViewGallery.builder(
+          backgroundDecoration: const BoxDecoration(color: Colors.black),
           itemCount: mediaUrls.length,
           pageController: PageController(initialPage: initialIndex),
           builder: (context, index) {
@@ -29,7 +30,6 @@ class FullScreenGallery extends StatelessWidget {
               maxScale: PhotoViewComputedScale.covered * 2,
             );
           },
-          backgroundDecoration: const BoxDecoration(color: Colors.black),
         ),
       ),
     );
