@@ -47,7 +47,8 @@ class MessageList extends StatelessWidget {
 
     // --- Widgets médias ---
     Widget mediaWidgets() {
-      if (message.mediaUrls == null || message.mediaUrls!.isEmpty) return const SizedBox();
+      if (message.mediaUrls == null || message.mediaUrls!.isEmpty)
+        return const SizedBox();
       return Wrap(
         spacing: 6,
         runSpacing: 6,
@@ -59,7 +60,9 @@ class MessageList extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (_) => FullScreenGallery(
-                      mediaUrls: message.mediaUrls!.map((u) => '$baseUrl$url').toList(),
+                      mediaUrls: message.mediaUrls!
+                          .map((u) => '$baseUrl$url')
+                          .toList(),
                       initialIndex: message.mediaUrls!.indexOf(url),
                     ),
                   ),
@@ -150,9 +153,10 @@ class MessageList extends StatelessWidget {
       );
     }
 
-    // --- Widget texte (card blanc) ---
+    // --- Widget texte ---
     Widget textWidget() {
-      if (message.content == null || message.content!.isEmpty) return const SizedBox();
+      if (message.content == null || message.content!.isEmpty)
+        return const SizedBox();
       return Card(
         color: isMe ? Colors.blue[50] : Colors.white,
         elevation: 2,
@@ -170,17 +174,19 @@ class MessageList extends StatelessWidget {
       );
     }
 
-    // --- Combinaison ---
     List<Widget> messageContent = [];
-    if (message.content != null && message.content!.isNotEmpty) messageContent.add(textWidget());
-    if (message.mediaUrls != null && message.mediaUrls!.isNotEmpty) messageContent.add(mediaWidgets());
+    if (message.content != null && message.content!.isNotEmpty)
+      messageContent.add(textWidget());
+    if (message.mediaUrls != null && message.mediaUrls!.isNotEmpty)
+      messageContent.add(mediaWidgets());
 
     Widget wrappedCard = Column(
-      crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment: isMe
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
       children: messageContent,
     );
 
-    // Menu contextuel pour messages envoyés
     if (isMe && message.status == MessageStatus.sent && message.id != null) {
       if (isDesktop) {
         wrappedCard = GestureDetector(
@@ -244,11 +250,21 @@ class MessageList extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Annuler'),
+              child: Text(
+                'Annuler',
+                style: TextStyle(
+                  color: Theme.of(ctx).colorScheme.inversePrimary,
+                ),
+              ),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Supprimer'),
+              child: Text(
+                'Supprimer',
+                style: TextStyle(
+                  color: Theme.of(ctx).colorScheme.inversePrimary,
+                ),
+              ),
             ),
           ],
         ),

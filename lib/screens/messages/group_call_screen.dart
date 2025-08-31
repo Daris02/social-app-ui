@@ -51,8 +51,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        leading: const Text('Group Call'),
-        title: Text(widget.service.roomId),
+        title: Text('Group Call - ${widget.service.roomId.split('-')[1]}'),
         centerTitle: true,
       ),
       body: Stack(
@@ -77,40 +76,51 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
                 ),
-                itemCount: entries.length,
+                itemCount: entries.length + 1,
                 itemBuilder: (_, i) {
                   final stream = entries[i].value;
+                  if (i == 0) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: RTCVideoView(
+                        _localRenderer,
+                        objectFit:
+                            RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                      ),
+                    );
+                  }
                   return _RemoteTile(stream: stream);
                 },
               );
             },
           ),
 
-          if (_localRenderer.srcObject != null)
-            Positioned(
-              top: 16,
-              right: 16,
-              child: Container(
-                width: 120,
-                height: 160,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  border: Border.all(color: Colors.white24),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: RTCVideoView(_localRenderer, mirror: true),
-                ),
-              ),
-            ),
+          // if (_localRenderer.srcObject != null)
+          //   Positioned(
+          //     top: 16,
+          //     right: 16,
+          //     child: Container(
+          //       width: 120,
+          //       height: 160,
+          //       decoration: BoxDecoration(
+          //         color: Colors.black,
+          //         border: Border.all(color: Colors.white24),
+          //         borderRadius: BorderRadius.circular(12),
+          //       ),
+          //       child: ClipRRect(
+          //         borderRadius: BorderRadius.circular(12),
+          //         child: RTCVideoView(_localRenderer, mirror: true),
+          //       ),
+          //     ),
+          //   ),
 
           Positioned(
             bottom: 24,
             left: 0,
             right: 0,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 40,
               children: [
                 _buildControlButton(
                   icon: _micMuted ? Icons.mic_off : Icons.mic,
@@ -120,7 +130,6 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     widget.service.toggleMic(_micMuted);
                   },
                 ),
-                const SizedBox(width: 16),
                 _buildControlButton(
                   icon: _camOff ? Icons.videocam_off : Icons.videocam,
                   color: _camOff ? Colors.red : Colors.white,
@@ -130,14 +139,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   },
                 ),
                 if (Platform.isAndroid || Platform.isIOS) ...[
-                  const SizedBox(width: 16),
                   _buildControlButton(
                     icon: Icons.flip_camera_ios,
                     color: Colors.white,
                     onTap: () {}, //_switchCamera,
                   ),
                 ],
-                const SizedBox(width: 16),
                 _buildControlButton(
                   icon: Icons.call_end,
                   color: Colors.red,

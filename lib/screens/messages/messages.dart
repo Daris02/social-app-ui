@@ -184,7 +184,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
               },
               child: _buildListView(),
             ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: _isInCall || _isPreparingCall ? null : FloatingActionButton(
               onPressed: startGroupCall,
               child: Icon(Icons.group),
             ),
