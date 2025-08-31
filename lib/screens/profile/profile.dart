@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +9,7 @@ import 'package:social_app/screens/messages/chat_screen.dart';
 import 'package:social_app/screens/posts/post_item/components/image_view.dart';
 import 'package:social_app/screens/posts/post_item/post_item.dart';
 import 'package:social_app/services/post_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   final User user;
@@ -26,6 +29,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     super.initState();
     user = widget.user;
     _tabController = TabController(length: 2, vsync: this);
+  }
+
+  Future<void> makePhoneCall(String phoneNumber) async {
+    final Uri url = Uri(scheme: 'tel', path: phoneNumber);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception(
+        'Impossible d\'ouvrir le composeur téléphonique pour $phoneNumber',
+      );
+    }
   }
 
   @override
@@ -116,17 +128,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 label: const Text('Message'),
               ),
               const SizedBox(width: 12),
-              ElevatedButton.icon(
+              Platform.isAndroid || Platform.isIOS ? ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
                 ),
-                onPressed: () {
-                  // TODO: Call logic
+                onPressed: () async {
+                  await makePhoneCall(user.phone);
                 },
                 icon: const Icon(Icons.call),
-                label: const Text('Call'),
-              ),
+                label: const Text('Téléphoner'),
+              ) : const SizedBox(),
             ],
           ),
         ],
