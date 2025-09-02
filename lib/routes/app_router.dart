@@ -10,9 +10,11 @@ import 'package:social_app/screens/auth/forgot_password.dart';
 import 'package:social_app/screens/auth/login.dart';
 import 'package:social_app/screens/auth/register.dart';
 import 'package:social_app/providers/user_provider.dart';
+import 'package:social_app/screens/tv/live.dart';
 import 'package:social_app/screens/messages/messages.dart';
 import 'package:social_app/screens/posts/post.dart';
 import 'package:social_app/screens/profile/profile.dart';
+import 'package:social_app/screens/reunion/reunion.dart';
 import 'package:social_app/screens/search/search_screen.dart';
 import 'package:social_app/screens/settings/setting.dart';
 
@@ -83,6 +85,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             },
           ),
           GoRoute(path: '/settings', builder: (_, __) => const SettingScreen()),
+          GoRoute(path: '/reunion', builder: (_, __) => const Reunion()),
+          GoRoute(path: '/tv', builder: (_, __) => const Live()),
         ],
       ),
     ],

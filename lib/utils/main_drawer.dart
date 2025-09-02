@@ -108,6 +108,28 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   ),
                   const SizedBox(height: 5),
                   buildMenuItem(
+                    text: 'Reunion',
+                    icon: HugeIcons.strokeRoundedUserGroup,
+                    colorScheme: colorScheme,
+                    router: router,
+                    onTap: () {
+                      closeDrawerIfNeeded();
+                      router.go('/reunion');
+                    },
+                  ),
+                  const SizedBox(height: 5),
+                  buildMenuItem(
+                    text: 'TV & Radio',
+                    icon: HugeIcons.strokeRoundedTv01,
+                    colorScheme: colorScheme,
+                    router: router,
+                    onTap: () {
+                      closeDrawerIfNeeded();
+                      router.go('/tv');
+                    },
+                  ),
+                  const SizedBox(height: 5),
+                  buildMenuItem(
                     text: 'Parametres',
                     icon: HugeIcons.strokeRoundedSetting06,
                     colorScheme: colorScheme,

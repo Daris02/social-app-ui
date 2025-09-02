@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/settings/edit_account.dart';
+import 'package:social_app/screens/settings/update_screen.dart';
 import 'package:social_app/theme/dark_mode.dart';
 import 'package:social_app/theme/theme_provider.dart';
 import 'package:social_app/utils/main_drawer.dart';
@@ -77,121 +78,130 @@ class _SettingState extends ConsumerState<SettingScreen> {
     return Scaffold(
       appBar: AppBar(title: Text('Paramètres')),
       drawer: isDesktop(context) ? null : MainDrawer(),
-      body: Container(
-        constraints: BoxConstraints(maxWidth: 700),
-        alignment: Alignment.topCenter,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Compte',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      HugeIcon(
-                        icon: HugeIcons.strokeRoundedUserCircle,
-                        color: const Color.fromARGB(255, 145, 145, 145),
-                        size: 50,
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${user.firstName} ${user.lastName}',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Text(
-                            '${user.direction?.name} - ${user.attribution}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: colorSchema.secondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      ForwardButton(
-                        colorSchema: colorSchema,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditAccountScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+      body: Center(
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 600),
+          alignment: Alignment.topCenter,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Compte',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                ),
-                const SizedBox(height: 40),
-                Text(
-                  'Parametres',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                SettingItem(
-                  colorSchema: colorSchema,
-                  title: 'Language',
-                  value: 'Francais',
-                  bgColor: Colors.orange.shade100,
-                  iconColor: Colors.orange,
-                  icon: HugeIcons.strokeRoundedEarth,
-                  onTap: () {},
-                ),
-                const SizedBox(height: 20),
-                SettingItem(
-                  colorSchema: colorSchema,
-                  title: 'Thème',
-                  value: _getThemeLabel(ref),
-                  bgColor: Colors.purple.shade100,
-                  iconColor: Colors.purple,
-                  icon: Icons.color_lens,
-                  onTap: () => _showThemeDialog(context, ref),
-                ),
-                const SizedBox(height: 20),
-                SettingItem(
-                  colorSchema: colorSchema,
-                  title: 'À propos du sénat',
-                  bgColor: Colors.blue.shade100,
-                  iconColor: Colors.blue,
-                  icon: HugeIcons.strokeRoundedInformationCircle,
-                  onTap: () async {
-                    final Uri url = Uri.parse('https://senat.mg');
-                    if (!await launchUrl(
-                      url,
-                      mode: LaunchMode.externalApplication,
-                    )) {
-                      throw Exception('Could not launch $url');
-                    }
-                  },
-                ),
-                const SizedBox(height: 20),
-                SettingItem(
-                  colorSchema: colorSchema,
-                  title: 'Se déconnecter',
-                  bgColor: Colors.red.shade100,
-                  iconColor: Colors.red,
-                  icon: HugeIcons.strokeRoundedLogout01,
-                  onTap: () async {
-                    final success = await ref
-                        .read(userProvider.notifier)
-                        .logout();
-                    if (success) router.go('/login');
-                  },
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        HugeIcon(
+                          icon: HugeIcons.strokeRoundedUserCircle,
+                          color: const Color.fromARGB(255, 145, 145, 145),
+                          size: 50,
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${user.firstName} ${user.lastName}',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              '${user.direction?.name} - ${user.attribution}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: colorSchema.secondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        ForwardButton(
+                          colorSchema: colorSchema,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditAccountScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  Text(
+                    'Parametres',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
+                  SettingItem(
+                    colorSchema: colorSchema,
+                    title: 'Mise à jours',
+                    value: 'Derniere version',
+                    bgColor: Colors.orange.shade100,
+                    iconColor: Colors.orange,
+                    icon: HugeIcons.strokeRoundedSystemUpdate01,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UpdateScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  SettingItem(
+                    colorSchema: colorSchema,
+                    title: 'Thème',
+                    value: _getThemeLabel(ref),
+                    bgColor: Colors.purple.shade100,
+                    iconColor: Colors.purple,
+                    icon: Icons.color_lens,
+                    onTap: () => _showThemeDialog(context, ref),
+                  ),
+                  const SizedBox(height: 20),
+                  SettingItem(
+                    colorSchema: colorSchema,
+                    title: 'À propos du sénat',
+                    bgColor: Colors.blue.shade100,
+                    iconColor: Colors.blue,
+                    icon: HugeIcons.strokeRoundedInformationCircle,
+                    onTap: () async {
+                      final Uri url = Uri.parse('https://senat.mg');
+                      if (!await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      )) {
+                        throw Exception('Could not launch $url');
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  SettingItem(
+                    colorSchema: colorSchema,
+                    title: 'Se déconnecter',
+                    bgColor: Colors.red.shade100,
+                    iconColor: Colors.red,
+                    icon: HugeIcons.strokeRoundedLogout01,
+                    onTap: () async {
+                      final success = await ref
+                          .read(userProvider.notifier)
+                          .logout();
+                      if (success) router.go('/login');
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

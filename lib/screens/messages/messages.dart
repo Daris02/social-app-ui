@@ -1,19 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/models/user.dart';
-import 'package:social_app/providers/user_provider.dart';
+import 'package:social_app/constant/helpers.dart';
+import 'package:social_app/utils/main_drawer.dart';
 import 'package:social_app/providers/ws_provider.dart';
+import 'package:social_app/services/call_service.dart';
+import 'package:social_app/services/user_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/messages/call_screen.dart';
 import 'package:social_app/screens/messages/chat_screen.dart';
-import 'package:social_app/screens/messages/group_call_screen.dart';
-import 'package:social_app/services/call_service.dart';
-import 'package:social_app/services/group_call_service.dart';
-import 'package:social_app/services/user_service.dart';
 import 'package:social_app/screens/messages/components/last_message_item.dart';
-import 'package:social_app/utils/main_drawer.dart';
 
 class MessageScreen extends ConsumerStatefulWidget {
   const MessageScreen({super.key});
@@ -91,24 +89,6 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
     });
   }
 
-  void startGroupCall() {
-    final socket = ref.read(webSocketServiceProvider);
-    final user = ref.read(userProvider)!;
-    final selfUserId = user.id;
-    final roomId = 'group-${user.direction?.name}';
-
-    final roomService = GroupCallRoomService(
-      socket: socket,
-      roomId: roomId,
-      selfUserId: selfUserId,
-    );
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => GroupCallScreen(service: roomService)),
-    );
-  }
-
   @override
   void dispose() {
     _userStatusSub.cancel();
@@ -118,7 +98,6 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorSchema = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -185,13 +164,6 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
               },
               child: _buildListView(),
             ),
-      floatingActionButton: _isInCall || _isPreparingCall
-          ? null
-          : FloatingActionButton(
-              onPressed: startGroupCall,
-              child: Icon(Icons.group, color: colorSchema.inversePrimary),
-            ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
     );
   }
 
