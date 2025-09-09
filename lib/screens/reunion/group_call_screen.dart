@@ -60,60 +60,34 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             valueListenable: widget.service.remoteStreams,
             builder: (_, remote, __) {
               final entries = remote.entries.toList();
-              if (entries.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'En attente de participants…',
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                );
-              }
               return GridView.builder(
                 padding: const EdgeInsets.all(8),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // simple
+                  crossAxisCount: 2,
                   childAspectRatio: 9 / 16,
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
                 ),
                 itemCount: entries.length + 1,
                 itemBuilder: (_, i) {
-                  final stream = entries[i].value;
                   if (i == 0) {
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: RTCVideoView(
                         _localRenderer,
+                        mirror: true,
                         objectFit:
                             RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
                       ),
                     );
+                  } else {
+                    final stream = entries[i - 1].value;
+                    return _RemoteTile(stream: stream);
                   }
-                  return _RemoteTile(stream: stream);
                 },
               );
             },
           ),
-
-          // if (_localRenderer.srcObject != null)
-          //   Positioned(
-          //     top: 16,
-          //     right: 16,
-          //     child: Container(
-          //       width: 120,
-          //       height: 160,
-          //       decoration: BoxDecoration(
-          //         color: Colors.black,
-          //         border: Border.all(color: Colors.white24),
-          //         borderRadius: BorderRadius.circular(12),
-          //       ),
-          //       child: ClipRRect(
-          //         borderRadius: BorderRadius.circular(12),
-          //         child: RTCVideoView(_localRenderer, mirror: true),
-          //       ),
-          //     ),
-          //   ),
-
           Positioned(
             bottom: 24,
             left: 0,

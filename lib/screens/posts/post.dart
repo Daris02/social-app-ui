@@ -41,7 +41,6 @@ class _PostScreenState extends ConsumerState<PostScreen> {
 
     socket = ref.read(webSocketServiceProvider);
     socket.onPostUpdated((postId) async {
-      debugPrint('Post $postId Update');
       setState(() {});
     });
   }

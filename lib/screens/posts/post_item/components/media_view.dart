@@ -31,8 +31,6 @@ class _MediaViewState extends State<MediaView> {
       final isVideo =
           url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov');
 
-      debugPrint('URL POST: $url');
-
       if (isImage) {
         return GestureDetector(
           onTap: () {

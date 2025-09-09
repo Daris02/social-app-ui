@@ -49,7 +49,7 @@ class _ReunionState extends ConsumerState<Reunion> {
               onPressed: startGroupCall,
               child: Icon(Icons.group, color: colorScheme.inversePrimary),
             ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterFloat,
     );
   }
 }

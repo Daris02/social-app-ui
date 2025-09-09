@@ -146,10 +146,10 @@ class _SettingState extends ConsumerState<SettingScreen> {
                   SettingItem(
                     colorSchema: colorSchema,
                     title: 'Mise à jours',
-                    value: 'Derniere version',
+                    value: 'v1.0.111',
                     bgColor: Colors.orange.shade100,
                     iconColor: Colors.orange,
-                    icon: HugeIcons.strokeRoundedSystemUpdate01,
+                    icon: HugeIcons.strokeRoundedInboxDownload,
                     onTap: () {
                       Navigator.push(
                         context,
