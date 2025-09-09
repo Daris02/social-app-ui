@@ -111,7 +111,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                         // app name
                         Text(
-                          "S O C I A L   A P P",
+                          "",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,

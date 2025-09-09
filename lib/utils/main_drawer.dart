@@ -52,7 +52,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   ),
                   child: buildHeader(
                     urlImage: urlImage,
-                    text: 'Social App',
+                    text: 'Sénat Com',
                     colorScheme: colorScheme,
                     router: router,
                   ),
@@ -130,7 +130,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   ),
                   const SizedBox(height: 5),
                   buildMenuItem(
-                    text: 'Parametres',
+                    text: 'Paramètres',
                     icon: HugeIcons.strokeRoundedSetting06,
                     colorScheme: colorScheme,
                     router: router,
@@ -161,6 +161,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
           CircleAvatar(
             radius: 30,
             backgroundImage: Image.asset(urlImage).image,
+            backgroundColor: Colors.transparent,
           ),
           SizedBox(width: 20),
           Text(
