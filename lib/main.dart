@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:social_app/constant/api.dart';
 import 'package:social_app/providers/user_provider.dart';
+import 'package:social_app/theme/dark_mode.dart';
 import 'package:social_app/theme/theme_provider.dart';
 import 'package:social_app/utils/app_startup_observer.dart';
 import 'package:social_app/utils/notification_call.dart';
@@ -27,6 +28,7 @@ void main() async {
 
   await dotenv.load(fileName: ".env");
   DioClient.init();
+  DioClient.ping();
 
   // Initialize Awesome Notifications
   await AwesomeNotifications().initialize(null, [
@@ -70,6 +72,7 @@ class MyApp extends ConsumerWidget {
     return init.when(
       loading: () => MaterialApp(
         debugShowCheckedModeBanner: false,
+        theme: darkMode,
         home: const Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
       error: (err, data) {
