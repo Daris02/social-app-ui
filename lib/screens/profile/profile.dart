@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/models/post.dart';
 import 'package:social_app/models/user.dart';
 import 'package:social_app/providers/user_provider.dart';
-import 'package:social_app/screens/messages/chat_screen.dart';
+import 'package:social_app/screens/messages/messages.dart';
 import 'package:social_app/screens/posts/post_item/components/image_view.dart';
 import 'package:social_app/screens/posts/post_item/post_item.dart';
 import 'package:social_app/services/post_service.dart';
@@ -126,7 +126,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ChatScreen(partner: user),
+                        builder: (_) => MessageScreen(userToTalk: user),
                       ),
                     );
                   },

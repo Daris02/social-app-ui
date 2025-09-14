@@ -14,7 +14,8 @@ import 'package:social_app/screens/messages/chat_screen.dart';
 import 'package:social_app/screens/messages/components/last_message_item.dart';
 
 class MessageScreen extends ConsumerStatefulWidget {
-  const MessageScreen({super.key});
+  final User? userToTalk;
+  const MessageScreen({super.key, this.userToTalk});
   @override
   ConsumerState<MessageScreen> createState() => _MessageScreenState();
 }
@@ -41,6 +42,9 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
             setState(() {});
           }
         });
+    if (widget.userToTalk != null) {
+      _selectedContact = widget.userToTalk;
+    }
   }
 
   void fetchContacts() async {
