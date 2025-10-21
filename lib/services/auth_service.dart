@@ -33,7 +33,7 @@ class AuthService {
 
   static Future<String> register(CreateUser newUser) async {
     try {
-      final res = await dio.post(
+      await dio.post(
         '/auth/register',
         data: {
           'firstName': newUser.firstName,
@@ -51,7 +51,6 @@ class AuthService {
           'entryDate': newUser.entryDate.toString(),
         },
       );
-      debugPrint('Response: ${res.data}');
       return 'user_created';
     } on DioException catch (e) {
       if (e.response?.statusCode == 201) {
