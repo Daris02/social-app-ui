@@ -50,8 +50,9 @@ class _MessageListState extends State<MessageList> {
 
     // --- Widgets médias ---
     Widget mediaWidgets() {
-      if (message.mediaUrls == null || message.mediaUrls!.isEmpty)
+      if (message.mediaUrls == null || message.mediaUrls!.isEmpty) {
         return const SizedBox();
+      }
       return Wrap(
         spacing: 6,
         runSpacing: 6,
@@ -158,8 +159,9 @@ class _MessageListState extends State<MessageList> {
 
     // --- Widget texte ---
     Widget textWidget() {
-      if (message.content == null || message.content!.isEmpty)
+      if (message.content == null || message.content!.isEmpty) {
         return const SizedBox();
+      }
       return Card(
         color: isMe ? Colors.blue[50] : Colors.white,
         elevation: 2,
@@ -178,10 +180,12 @@ class _MessageListState extends State<MessageList> {
     }
 
     List<Widget> messageContent = [];
-    if (message.content != null && message.content!.isNotEmpty)
+    if (message.content != null && message.content!.isNotEmpty) {
       messageContent.add(textWidget());
-    if (message.mediaUrls != null && message.mediaUrls!.isNotEmpty)
+    }
+    if (message.mediaUrls != null && message.mediaUrls!.isNotEmpty) {
       messageContent.add(mediaWidgets());
+    }
 
     Widget wrappedCard = Column(
       crossAxisAlignment: isMe

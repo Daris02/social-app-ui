@@ -20,7 +20,7 @@ class StreamSource {
 }
 
 class LiverView extends ConsumerStatefulWidget {
-  const LiverView({Key? key}) : super(key: key);
+  const LiverView({super.key});
 
   @override
   ConsumerState createState() => _LiverViewState();
@@ -63,7 +63,7 @@ class _LiverViewState extends ConsumerState<LiverView> {
     await _videoController!.play();
 
      // ⚡️ Capture le flux de la vidéo et le push au service
-    final stream = await _videoController!.videoPlayerOptions?.mixWithOthers;
+    final stream = _videoController!.videoPlayerOptions?.mixWithOthers;
     // TODO: ici, tu devrais encoder la vidéo dans un `MediaStream`
     // Pour l’instant on reste en mock avec la caméra (car flutter_webrtc ne capture pas VideoPlayer directement)
     // --> tu pourrais encoder via `canvas`/`ffmpeg` pour le vrai flux.

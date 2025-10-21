@@ -8,7 +8,7 @@ import 'package:social_app/screens/tv/liver_view.dart';
 import 'package:social_app/utils/main_drawer.dart';
 
 class Live extends ConsumerStatefulWidget {
-  const Live({Key? key}) : super(key: key);
+  const Live({super.key});
 
   @override
   ConsumerState createState() => _LiveState();
