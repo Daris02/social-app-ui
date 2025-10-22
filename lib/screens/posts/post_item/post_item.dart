@@ -36,6 +36,7 @@ class _PostItemState extends ConsumerState<PostItem>
   late final User currentUser;
   int totalReaction = 0;
   int totalComment = 0;
+  ReactionType? selectedReaction;
   late final WebSocketService socket;
   final TextEditingController _commentController = TextEditingController();
 
@@ -82,17 +83,22 @@ class _PostItemState extends ConsumerState<PostItem>
     isLiked = post.reactions.any(
       (reaction) => reaction.user.id == currentUser.id,
     );
+    selectedReaction = isLiked
+        ? post.reactions
+            .firstWhere((reaction) => reaction.user.id == currentUser.id).reactionType
+        : null;
     if (!mounted) return;
     setState(() {});
   }
 
-  Future<void> toggleLike() async {
+  Future<void> toggleLike(ReactionType reaction) async {
     if (!isLiked) {
-      await PostService.likePost(post.id, currentUser.id, ReactionType.LIKE);
+      await PostService.likePost(post.id, currentUser.id, reaction);
       socket.sendPostUpdate(currentUser.id.toString(), post.id);
       setState(() {
         totalReaction++;
         isLiked = true;
+        selectedReaction = reaction;
       });
     } else {
       await PostService.unlikePost(post.id, currentUser.id);
@@ -100,6 +106,7 @@ class _PostItemState extends ConsumerState<PostItem>
       setState(() {
         totalReaction--;
         isLiked = false;
+        selectedReaction = null;
       });
     }
   }
@@ -181,15 +188,27 @@ class _PostItemState extends ConsumerState<PostItem>
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Row(
                       children: [
-                        IconButton(
-                          icon: Icon(
-                            isLiked
-                                ? Icons.thumb_up
-                                : Icons.thumb_up_alt_outlined,
-                            color: isLiked ? Colors.blue : null,
-                          ),
-                          onPressed: toggleLike,
-                        ),
+                        for (var type in ReactionType.values)
+                            if (isLiked && selectedReaction != null && type == selectedReaction)
+                              IconButton(
+                                icon: Icon(
+                                  _iconForReaction(type),
+                                  color: switch (type) {
+                                    ReactionType.LIKE => Colors.blue,
+                                    ReactionType.LOVE => Colors.pink,
+                                    ReactionType.ANGRY => Colors.orange,
+                                    ReactionType.SAD => Colors.grey,
+                                  },
+                                ),
+                                onPressed: () => toggleLike(type),
+                                tooltip: type.toString().split('.').last,
+                              )
+                            else if (!isLiked)
+                              IconButton(
+                                icon: Icon(_iconForReaction(type)),
+                                onPressed: () => toggleLike(type),
+                                tooltip: type.toString().split('.').last,
+                              ),
                         const Spacer(),
                         IconButton(
                           icon: const Icon(Icons.comment_outlined),
@@ -215,4 +234,17 @@ class _PostItemState extends ConsumerState<PostItem>
     _commentController,
     totalComment,
   );
+
+  IconData _iconForReaction(ReactionType type) {
+    switch (type) {
+      case ReactionType.LIKE:
+        return Icons.thumb_up;
+      case ReactionType.LOVE:
+        return Icons.favorite;
+      case ReactionType.ANGRY:
+        return Icons.sentiment_very_dissatisfied;
+      case ReactionType.SAD:
+        return Icons.sentiment_dissatisfied;
+      }
+  }
 }
