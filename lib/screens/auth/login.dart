@@ -179,7 +179,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               "Vous n'avez pas encore de compte?  ",
                               style: TextStyle(
                                 color: Colors.white,
-                                  fontWeight: FontWeight.w200,
+                                fontWeight: FontWeight.w200,
                               ),
                             ),
                             GestureDetector(

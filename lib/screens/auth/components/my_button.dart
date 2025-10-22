@@ -14,13 +14,14 @@ class MyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorSchema = Theme.of(context).colorScheme;
     return SizedBox(
       width: double.infinity,
       child: GestureDetector(
         onTap: loading ? null : onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorSchema.inversePrimary,
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.all(20),
@@ -31,7 +32,7 @@ class MyButton extends StatelessWidget {
                     height: 24,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.black,
+                      color: colorSchema.primary,
                     ),
                   )
                 : Text(
@@ -39,7 +40,7 @@ class MyButton extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: Colors.black,
+                      color: colorSchema.primary,
                     ),
                   ),
           ),

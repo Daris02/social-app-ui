@@ -6,6 +6,7 @@ class MyTextField extends StatefulWidget {
   final TextEditingController controller;
   final FormFieldValidator<String>? validator;
   final TextInputType? type;
+
   const MyTextField({
     super.key,
     required this.labelText,
@@ -35,16 +36,16 @@ class _MyTextFieldState extends State<MyTextField> {
       controller: widget.controller,
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        focusColor: Colors.white,
         labelText: widget.labelText,
         labelStyle: TextStyle(color: colorSchema.inversePrimary),
+        fillColor: colorSchema.inversePrimary,
         suffixIcon: widget.labelText.toLowerCase() == 'password'
             ? IconButton(
                 icon: Icon(obscure ? Icons.visibility : Icons.visibility_off),
                 onPressed: () => setState(() => obscure = !obscure),
                 style: ButtonStyle(
                   iconColor: WidgetStateProperty.all(
-                    Colors.white,
+                    colorSchema.inversePrimary,
                   ),
                 ),
               )

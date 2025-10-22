@@ -131,7 +131,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   const SizedBox(height: 5),
                   buildMenuItem(
                     text: 'Paramètres',
-                    icon: HugeIcons.strokeRoundedSetting06,
+                    icon: Icons.settings,
                     colorScheme: colorScheme,
                     router: router,
                     onTap: () {

@@ -4,14 +4,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/theme/dark_mode.dart';
 import 'package:social_app/theme/light_mode.dart';
 
-enum AppThemeMode { claire, sombre, system }
+enum AppThemeMode { claire, sombre, systeme}
 
 class ThemeNotifier extends StateNotifier<ThemeData> {
   ThemeNotifier() : super(lightMode) {
     _loadTheme();
   }
 
-  AppThemeMode _currentMode = AppThemeMode.system;
+  AppThemeMode _currentMode = AppThemeMode.systeme;
 
   AppThemeMode get currentMode => _currentMode;
 
@@ -37,7 +37,7 @@ class ThemeNotifier extends StateNotifier<ThemeData> {
       case AppThemeMode.sombre:
         state = darkMode;
         break;
-      case AppThemeMode.system:
+      case AppThemeMode.systeme:
         state = WidgetsBinding.instance.platformDispatcher.platformBrightness ==
                 Brightness.dark
             ? darkMode

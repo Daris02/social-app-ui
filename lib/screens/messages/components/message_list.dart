@@ -163,7 +163,7 @@ class _MessageListState extends State<MessageList> {
         return const SizedBox();
       }
       return Card(
-        color: isMe ? Colors.blue[50] : Colors.white,
+        color: isMe ? Colors.blue : const Color.fromARGB(255, 238, 238, 238),
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
@@ -171,7 +171,7 @@ class _MessageListState extends State<MessageList> {
           child: Text(
             message.content!,
             style: TextStyle(
-              color: isMe ? Colors.blue[900] : Colors.black87,
+              color: isMe ? Colors.white : const Color.fromARGB(255, 0, 96, 175),
               fontSize: 15,
             ),
           ),
@@ -223,10 +223,13 @@ class _MessageListState extends State<MessageList> {
         );
       } else {
         wrappedCard = GestureDetector(
-          onLongPress: () async {
+          onLongPressEnd: (details) async {
             final selected = await showMenu<String>(
               context: context,
-              position: RelativeRect.fromLTRB(100, 100, 100, 100),
+              position: RelativeRect.fromRect(
+                details.globalPosition & const Size(40, 40),
+                Offset.zero & MediaQuery.of(context).size,
+              ),
               items: [
                 const PopupMenuItem(value: 'update', child: Text('Edité')),
                 const PopupMenuItem(value: 'delete', child: Text('Supprimer')),

@@ -14,14 +14,11 @@ class ForwardButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: colorSchema.secondary,
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Icon(Icons.chevron_right_rounded),
+      child: Icon(
+        Icons.chevron_right_rounded,
+        color: colorSchema.inversePrimary,
+        applyTextScaling: true,
+        size: 40,
       ),
     );
   }

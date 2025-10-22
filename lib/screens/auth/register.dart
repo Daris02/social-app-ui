@@ -248,7 +248,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                           const SizedBox(height: 16),
                           DropdownButtonFormField<Position>(
-                            value: _position,
+                            initialValue: _position,
                             items: Position.values
                                 .map(
                                   (position) => DropdownMenuItem(
@@ -276,7 +276,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                           const SizedBox(height: 12),
                           DropdownButtonFormField<Direction>(
-                            value: _direction,
+                            initialValue: _direction,
                             items: Direction.values
                                 .map(
                                   (direction) => DropdownMenuItem(
@@ -294,6 +294,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                           const SizedBox(height: 12),
                           ListTile(
+                            contentPadding: EdgeInsets.all(20),
                             title: Text(
                               _entryDate == null
                                   ? "Date d'entrée au Sénat"
@@ -315,6 +316,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             },
                           ),
                           CheckboxListTile(
+                            contentPadding: EdgeInsets.all(10),
                             value: _senator,
                             onChanged: (v) => setState(() => _senator = v!),
                             title: const Text("secretaire particullier"),

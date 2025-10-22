@@ -22,49 +22,12 @@ class SettingScreen extends ConsumerStatefulWidget {
 
 class _SettingState extends ConsumerState<SettingScreen> {
   bool isDarkMode = false;
-  String _getThemeLabel(WidgetRef ref) {
-    final notifier = ref.read(themeProvider.notifier);
-    switch (notifier.currentMode) {
-      case AppThemeMode.claire:
-        return "Clair";
-      case AppThemeMode.sombre:
-        return "Sombre";
-      case AppThemeMode.system:
-        return "Système";
-    }
-  }
-
-  void _showThemeDialog(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(themeProvider.notifier);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Choisir un thème"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: AppThemeMode.values.map((mode) {
-            return RadioListTile<AppThemeMode>(
-              title: Text(mode.name),
-              value: mode,
-              groupValue: notifier.currentMode,
-              onChanged: (val) {
-                if (val != null) {
-                  notifier.setThemeMode(val);
-                  Navigator.pop(ctx);
-                  setState(() {});
-                }
-              },
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.read(userProvider);
     final router = ref.read(appRouterProvider);
+    final notifier = ref.read(themeProvider.notifier);
     final colorSchema = Theme.of(context).colorScheme;
     final theme = ref.watch(themeProvider);
     if (user == null) {
@@ -153,9 +116,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => UpdateScreen(),
-                        ),
+                        MaterialPageRoute(builder: (context) => UpdateScreen()),
                       );
                     },
                   ),
@@ -163,11 +124,10 @@ class _SettingState extends ConsumerState<SettingScreen> {
                   SettingItem(
                     colorSchema: colorSchema,
                     title: 'Thème',
-                    value: _getThemeLabel(ref),
                     bgColor: Colors.purple.shade100,
                     iconColor: Colors.purple,
                     icon: Icons.color_lens,
-                    onTap: () => _showThemeDialog(context, ref),
+                    notifier: notifier,
                   ),
                   const SizedBox(height: 20),
                   SettingItem(
