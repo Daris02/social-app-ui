@@ -92,7 +92,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => EditAccountScreen(),
+                                builder: (context) => EditAccountScreen(user: user),
                               ),
                             );
                           },
