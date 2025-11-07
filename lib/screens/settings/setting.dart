@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -60,10 +61,25 @@ class _SettingState extends ConsumerState<SettingScreen> {
                     width: double.infinity,
                     child: Row(
                       children: [
-                        HugeIcon(
-                          icon: HugeIcons.strokeRoundedUserCircle,
-                          color: const Color.fromARGB(255, 145, 145, 145),
-                          size: 50,
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: colorSchema.inversePrimary
+                              .withOpacity(0.3),
+                          backgroundImage: user.photo != null
+                              ? NetworkImage(user.photo!)
+                              : null,
+                          onBackgroundImageError: (error, stackTrace) {
+                            if (kDebugMode) {
+                              debugPrint('Error loading user photo: $error');
+                            }
+                          },
+                          child: user.photo == null
+                              ? Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: colorSchema.onPrimaryContainer,
+                                )
+                              : null,
                         ),
                         const SizedBox(width: 10),
                         Column(
@@ -92,7 +108,8 @@ class _SettingState extends ConsumerState<SettingScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => EditAccountScreen(user: user),
+                                builder: (context) =>
+                                    EditAccountScreen(user: user),
                               ),
                             );
                           },

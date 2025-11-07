@@ -22,7 +22,7 @@ class _EditAccountScreenState extends ConsumerState<EditAccountScreen> {
     colorScheme = ref.read(themeProvider).colorScheme;
   }
 
-  bool _showPassword = false;
+  final bool _showPassword = false;
 
   Future<void> _showEditDialog(
     String title,
@@ -179,12 +179,7 @@ class _EditAccountScreenState extends ConsumerState<EditAccountScreen> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: user.photo != null
-                            ? NetworkImage(user.photo!)
-                            : const AssetImage(
-                                    'assets/images/default_avatar.png',
-                                  )
-                                  as ImageProvider,
+                        backgroundImage: NetworkImage(user.photo!)
                       ),
                       Positioned(
                         bottom: 0,

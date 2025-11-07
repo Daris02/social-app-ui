@@ -69,7 +69,7 @@ class _ReunionState extends ConsumerState<Reunion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Reunion')),
+      appBar: AppBar(title: Text('Réunion')),
       drawer: isDesktop(context) ? null : MainDrawer(),
       body: Center(
         child: Container(
