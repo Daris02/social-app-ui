@@ -64,9 +64,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 padding: const EdgeInsets.all(8),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 9 / 16,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
+                  childAspectRatio: 16 / 16,
+                  crossAxisSpacing: 2,
+                  mainAxisSpacing: 2,
                 ),
                 itemCount: entries.length + 1,
                 itemBuilder: (_, i) {
@@ -77,7 +77,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         _localRenderer,
                         mirror: true,
                         objectFit:
-                            RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                            RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                       ),
                     );
                   } else {
