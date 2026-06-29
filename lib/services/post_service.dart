@@ -80,7 +80,7 @@ class PostService {
             ).toList(),
     });
 
-    var result = await dio.post(
+    await dio.post(
       '/posts/upload',
       data: formData,
       options: Options(
