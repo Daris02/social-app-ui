@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:social_app/theme/theme_provider.dart';
 
 import 'forward_button.dart';
@@ -41,7 +40,7 @@ class SettingItem extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: iconColor.withAlpha(100),
               ),
-              child: HugeIcon(icon: icon, color: iconColor),
+              child: Icon(icon, color: iconColor),
             ),
             const SizedBox(width: 20),
             Text(

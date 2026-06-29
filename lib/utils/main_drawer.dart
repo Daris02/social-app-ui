@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/src/router.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/routes/app_router.dart';
 
@@ -98,7 +97,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   const SizedBox(height: 20),
                   buildMenuItem(
                     text: 'Message',
-                    icon: HugeIcons.strokeRoundedMessage02,
+                    icon: Icons.message,
                     colorScheme: colorScheme,
                     router: router,
                     onTap: () {
@@ -109,7 +108,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   const SizedBox(height: 5),
                   buildMenuItem(
                     text: 'Reunion',
-                    icon: HugeIcons.strokeRoundedUserGroup,
+                    icon: Icons.group,
                     colorScheme: colorScheme,
                     router: router,
                     onTap: () {
@@ -120,7 +119,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   const SizedBox(height: 5),
                   buildMenuItem(
                     text: 'TV & Radio',
-                    icon: HugeIcons.strokeRoundedTv01,
+                    icon: Icons.tv,
                     colorScheme: colorScheme,
                     router: router,
                     onTap: () {
@@ -173,7 +172,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
     );
   }
 
-  buildSearchField(ColorScheme colorScheme) {
+  TextField buildSearchField(ColorScheme colorScheme) {
     final color = colorScheme.inversePrimary;
     return TextField(
       style: TextStyle(color: color),

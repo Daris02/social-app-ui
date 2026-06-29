@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 
 class SettingSwitch extends StatelessWidget {
   final String title;
@@ -35,7 +34,7 @@ class SettingSwitch extends StatelessWidget {
               shape: BoxShape.circle,
               color: iconColor.withAlpha(100),
             ),
-            child: HugeIcon(icon: icon, color: iconColor),
+            child: Icon(icon, color: iconColor),
           ),
           const SizedBox(width: 20),
           Text(

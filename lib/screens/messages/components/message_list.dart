@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:social_app/constant/api.dart';
 import 'package:social_app/models/message.dart';
 import 'package:social_app/utils/video_player.dart';
@@ -147,8 +146,7 @@ class _MessageListState extends State<MessageList> {
               ),
             );
           } else {
-            return Icon(
-              HugeIcons.strokeRoundedFileAttachment,
+            return Icon(Icons.file_present_rounded,
               size: 50,
               color: Theme.of(context).colorScheme.inverseSurface,
             );

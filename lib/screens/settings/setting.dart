@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:social_app/constant/helpers.dart';
 import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/screens/settings/edit_account.dart';
@@ -129,7 +128,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
                     value: 'v1.0.111',
                     bgColor: Colors.orange.shade100,
                     iconColor: Colors.orange,
-                    icon: HugeIcons.strokeRoundedInboxDownload,
+                    icon: Icons.download,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -152,7 +151,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
                     title: 'À propos du sénat',
                     bgColor: Colors.blue.shade100,
                     iconColor: Colors.blue,
-                    icon: HugeIcons.strokeRoundedInformationCircle,
+                    icon: Icons.info_outline,
                     onTap: () async {
                       final Uri url = Uri.parse('https://senat.mg');
                       if (!await launchUrl(
@@ -169,7 +168,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
                     title: 'Se déconnecter',
                     bgColor: Colors.red.shade100,
                     iconColor: Colors.red,
-                    icon: HugeIcons.strokeRoundedLogout01,
+                    icon: Icons.logout_rounded,
                     onTap: () async {
                       final success = await ref
                           .read(userProvider.notifier)
