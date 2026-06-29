@@ -32,7 +32,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     initSearch();
   }
 
-  initSearch() {
+  void initSearch() {
     _postsFuture = PostService.searchPosts(
       widget.valueSearch,
     ).then((value) => value ?? []);

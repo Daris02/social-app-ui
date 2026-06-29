@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/services/live_service.dart';
@@ -93,7 +94,7 @@ class _LiverViewState extends ConsumerState<LiverView> {
   }
 
   Future<void> _addToPlaylist() async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.video);
+    final result = await FilePickerPlatform.instance.pickFiles(type: FileType.video);
     if (result == null) return;
 
     final picked = File(result.files.single.path!);

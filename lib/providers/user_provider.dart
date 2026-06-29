@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/models/create_user.dart';
 import 'package:social_app/providers/ws_provider.dart';
@@ -40,7 +41,7 @@ final userInitProvider = FutureProvider<void>((ref) async {
   }
 });
 
-tokenIsValid(String token) async {
+Future<bool> tokenIsValid(String token) async {
   final statusCode = await AuthService.whoami(token);
   if (statusCode == 200) {
     return true;

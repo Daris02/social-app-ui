@@ -21,7 +21,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   bool isSuccess = false;
 
   Future<void> pickMedia() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePickerPlatform.instance.pickFiles(
       allowMultiple: true,
       type: FileType.any,
     );

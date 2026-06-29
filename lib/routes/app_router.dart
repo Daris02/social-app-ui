@@ -68,8 +68,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               : MobileScaffold(child: child);
         },
         routes: [
-          GoRoute(path: '/', builder: (_, __) => const PostScreen()),
-          GoRoute(path: '/messages', builder: (_, __) => const MessageScreen()),
+          GoRoute(path: '/', builder: (_, _) => const PostScreen()),
+          GoRoute(path: '/messages', builder: (_, _) => const MessageScreen()),
           GoRoute(
             path: '/profile',
             builder: (context, state) {
@@ -84,9 +84,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               return SearchScreen(valueSearch: valueSearch);
             },
           ),
-          GoRoute(path: '/settings', builder: (_, __) => const SettingScreen()),
-          GoRoute(path: '/reunion', builder: (_, __) => const Reunion()),
-          GoRoute(path: '/tv', builder: (_, __) => const Live()),
+          GoRoute(path: '/settings', builder: (_, _) => const SettingScreen()),
+          GoRoute(path: '/reunion', builder: (_, _) => const Reunion()),
+          GoRoute(path: '/tv', builder: (_, _) => const Live()),
         ],
       ),
     ],

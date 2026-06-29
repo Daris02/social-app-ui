@@ -7,23 +7,22 @@ import 'package:social_app/providers/user_provider.dart';
 import 'package:social_app/providers/ws_provider.dart';
 import 'package:social_app/utils/notification_call.dart';
 
-class AppStartupObserver extends ProviderObserver {
+final class AppStartupObserver extends ProviderObserver {
   bool _isListeningToCalls = false;
   StreamSubscription<bool>? _connectionSub;
 
   @override
   void didUpdateProvider(
-    ProviderBase provider,
+    ProviderObserverContext context,
     Object? previousValue,
     Object? newValue,
-    ProviderContainer container,
   ) {
-    if (provider == userProvider && newValue != null && !_isListeningToCalls) {
+    if (context.provider == userProvider && newValue != null && !_isListeningToCalls) {
       _isListeningToCalls = true;
       final user = newValue as User;
-      final socket = container.read(webSocketServiceProvider);
+      final socket = context.container.read(webSocketServiceProvider);
 
-      _listenToIncomingCalls(container, socket, user);
+      _listenToIncomingCalls(context.container, socket, user);
     }
   }
 

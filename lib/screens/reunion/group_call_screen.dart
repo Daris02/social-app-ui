@@ -58,7 +58,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         children: [
           ValueListenableBuilder<Map<int, MediaStream>>(
             valueListenable: widget.service.remoteStreams,
-            builder: (_, remote, __) {
+            builder: (_, remote, _) {
               final entries = remote.entries.toList();
               return GridView.builder(
                 padding: const EdgeInsets.all(8),

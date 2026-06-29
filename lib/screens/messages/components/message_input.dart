@@ -38,7 +38,7 @@ class _MessageInputState extends State<MessageInput> {
   }
 
   Future<void> pickFiles(String mediaType) async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePickerPlatform.instance.pickFiles(
       allowMultiple: true,
       type: mediaType == 'image'
           ? FileType.image
