@@ -63,7 +63,7 @@ class _SettingState extends ConsumerState<SettingScreen> {
                         CircleAvatar(
                           radius: 50,
                           backgroundColor: colorSchema.inversePrimary
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                           backgroundImage: user.photo != null
                               ? NetworkImage(user.photo!)
                               : null,

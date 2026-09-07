@@ -82,7 +82,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               },
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: colorSchema.inversePrimary.withOpacity(0.3),
+                backgroundColor: colorSchema.inversePrimary.withValues(alpha: 0.3),
                 backgroundImage: user.photo != null
                     ? NetworkImage(user.photo!)
                     : null,
