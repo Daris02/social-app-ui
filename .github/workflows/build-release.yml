@@ -176,8 +176,7 @@ jobs:
         with:
           tag_name: v${{ needs.build-apk.outputs.version }}
           name: Release v${{ needs.build-apk.outputs.version }}
+          token: ${{ secrets.PAT }}
           files: |
             dist/app-release.apk
             dist/windows-build.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
